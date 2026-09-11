@@ -8,18 +8,60 @@
   </head>
   <body>
 
-    <h1>Crossy Road</h1>
+    <!-- ══════════════════════════════════════════
+         START SCREEN  — shown before game begins
+    ══════════════════════════════════════════ -->
+    <div id="startScreen" class="overlay">
+      <div class="overlay-box">
+        <div class="chicken-logo">🐔</div>
+        <h1>Crossy Road</h1>
+        <p class="tagline">How far can you go?</p>
 
-    <!-- The game is drawn onto this canvas element -->
-    <canvas id="gameCanvas" width="600" height="600"></canvas>
+        <div class="instructions">
+          <p><strong>Move:</strong> Arrow Keys or WASD</p>
+          <p><strong>Avoid:</strong> Cars &amp; trucks</p>
+          <p><strong>Cross</strong> roads to score points</p>
+          <p><strong>Logs</strong> keep you above water</p>
+        </div>
 
-    <!-- Score display shown during gameplay -->
-    <p id="score">Score: 0</p>
+        <button id="startBtn" class="big-btn">▶ Start Game</button>
 
-    <!-- Start button — clicking this will kick off the game -->
-    <button id="startBtn">Start Game</button>
+        <p class="hint">Press <kbd>Space</kbd> or <kbd>Enter</kbd> to start</p>
+      </div>
+    </div>
 
-    <!-- game.js is loaded last so the HTML above is ready when the script runs -->
+    <!-- ══════════════════════════════════════════
+         GAME OVER OVERLAY  — shown when you die
+    ══════════════════════════════════════════ -->
+    <div id="gameOverScreen" class="overlay hidden">
+      <div class="overlay-box">
+        <div class="dead-chicken">💀</div>
+        <h2>Game Over</h2>
+        <p class="go-score">Score: <span id="finalScore">0</span></p>
+        <p class="go-best">Best:&nbsp;&nbsp;<span id="finalBest">0</span></p>
+        <button id="restartBtn" class="big-btn">↩ Play Again</button>
+        <p class="hint">Press <kbd>R</kbd>, <kbd>Space</kbd>, or <kbd>Enter</kbd></p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         GAME WRAPPER  — HUD + canvas
+    ══════════════════════════════════════════ -->
+    <div id="gameWrapper" class="hidden">
+
+      <!-- top HUD bar -->
+      <div id="hud">
+        <span id="hudScore">Score: 0</span>
+        <span id="hudTitle">🐔 Crossy Road</span>
+        <span id="hudBest">Best: 0</span>
+      </div>
+
+      <!-- the canvas — all game graphics are drawn here -->
+      <canvas id="gameCanvas" width="600" height="600"></canvas>
+
+    </div>
+
+    <!-- game.js is loaded last so every HTML element above already exists -->
     <script src="game.js"></script>
 
   </body>
