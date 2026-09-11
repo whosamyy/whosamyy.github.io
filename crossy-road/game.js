@@ -236,15 +236,8 @@ function startHop(newCol, newRow) {
   if (newCol < 0 || newCol >= COLS) return;
   if (newRow < 0) return;
 
+  // Record the start screen position BEFORE changing anything
   const start = tileToScreen(player.col, player.row);
-  const end   = tileToScreen(newCol, newRow);
-
-  player.hopping   = true;
-  player.hopStartX = start.x;
-  player.hopStartY = start.y;
-  player.hopEndX   = end.x;
-  player.hopEndY   = end.y;
-  player.hopT      = 0;
 
   // Commit the grid position immediately
   player.col = newCol;
@@ -257,12 +250,30 @@ function startHop(newCol, newRow) {
     updateScore(player.maxRow - START_LANE);
   }
 
-  // Scroll the camera to keep the player in the lower third
+  // Scroll the camera BEFORE calculating the end screen position.
+  // This matters: if the camera shifts during this hop, tileToScreen
+  // will return a different y value. We need hopEndY to reflect the
+  // post-scroll position so the animation lands in exactly the right spot.
   const idealCamera = player.row - Math.floor(VISIBLE * 0.65);
   if (idealCamera > world.cameraRow) {
+    // The camera is about to jump — adjust the start position to account
+    // for the scroll offset so the animation origin stays visually correct.
+    const cameraDelta = idealCamera - world.cameraRow;
     world.cameraRow = idealCamera;
     ensureLanes();
+    // Shift the start Y up by however many tiles the camera moved
+    start.y -= cameraDelta * TILE;
   }
+
+  // Now calculate the end position using the (potentially updated) camera
+  const end = tileToScreen(newCol, newRow);
+
+  player.hopping   = true;
+  player.hopStartX = start.x;
+  player.hopStartY = start.y;
+  player.hopEndX   = end.x;
+  player.hopEndY   = end.y;
+  player.hopT      = 0;
 }
 
 // Advance the hop animation by dt milliseconds

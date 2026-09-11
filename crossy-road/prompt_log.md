@@ -60,15 +60,18 @@ Also add this current prompt itself as the first at-home prompt.
 ---
 
 **Prompt 3:**
-add the following new things to my game:
-Weather: rain, snow, or fog that slightly changes how the game looks or plays.
-Train/subway event: every so often, warning lights flash and a fast train crosses several tiles.
+include my very first prompt as well
+
+---
+
+**Prompt 3:**
+it still has the bug where if i get to the top and the screen moves up a bit it glitches and i end up in the middle of the road and die
 
 ---
 
 **Prompt 3:**
 add the following new things to my game:
-
 Weather: rain, snow, or fog that slightly changes how the game looks or plays.
-
 Train/subway event: every so often, warning lights flash and a fast train crosses several tiles.
+
+---
