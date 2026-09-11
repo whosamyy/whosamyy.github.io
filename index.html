@@ -1,10 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Amy Hu</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amy Hu's personal portfolio: about me, projects, and contact information.">
+    <title>Amy Hu | Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Hi, I'm Amy</h1>
-    <p>My portfolio is coming soon.</p>
+    <!-- AI assistance: Codex helped create the HTML structure, CSS layout, and
+         theme button, and adapted the content from Amy's résumé and messages.
+         See PROMPT_LOG.md for the conversation record. -->
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+        <div class="container header-content">
+            <a class="name" href="#home">Amy Hu<span>.</span></a>
+            <nav aria-label="Main navigation">
+                <a href="#home">Home</a>
+                <a href="#about">About Me</a>
+                <a href="#projects">Projects</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <button id="theme-toggle" type="button" aria-pressed="false" hidden>Dark mode</button>
+        </div>
+    </header>
+
+    <main id="main" class="container">
+        <section id="home" class="hero" aria-labelledby="home-title">
+            <div>
+                <p class="eyebrow">WELCOME TO MY PORTFOLIO</p>
+                <h1 id="home-title">Hi, I'm Amy<span>.</span></h1>
+                <p class="intro">Math, computer science, and a little matcha.</p>
+                <p>I'm a Carnegie Mellon student studying Mathematical Sciences and Computer Science. This is where I share what I'm learning and building.</p>
+                <div class="actions">
+                    <a class="button" href="#projects">Explore my projects &rarr;</a>
+                    <a class="text-link" href="#contact">Get in touch</a>
+                </div>
+            </div>
+            <!-- Personal photo provided by Amy. CSS fits it into the portrait area. -->
+            <img class="profile-photo" src="assets/amy-hu.jpg"
+                 alt="Amy holding a matcha drink at a café" width="4800" height="3600">
+        </section>
+
+        <section id="about" aria-labelledby="about-title">
+            <p class="eyebrow">A LITTLE BACKGROUND</p>
+            <h2 id="about-title">About Me</h2>
+            <div class="about-grid">
+                <div>
+                    <p>I'm pursuing a B.S. in Mathematical Sciences with a focus on Discrete Mathematics &amp; Logic, along with an additional major in Computer Science at Carnegie Mellon University. I expect to graduate in May 2029.</p>
+                    <p>My experience includes building C++ graph-analysis tools as a software engineering intern at Semisight and helping students as a teaching assistant for CMU's Principles of Computing course. I'm also involved in ScottyLabs and Badminton Club.</p>
+                    <p>I'm building this portfolio for CMU 15-113: Effective Coding with AI, where I'm practicing how to create and explain a website.</p>
+                </div>
+                <div class="about-details">
+                    <h3>Interests</h3>
+                    <p>Outside of class, I enjoy playing badminton, trying matcha, exploring cafés, and shopping.</p>
+                    <h3>Programming &amp; tools</h3>
+                    <ul class="tags" aria-label="Programming languages and tools">
+                        <li>C++</li><li>C</li><li>Java</li><li>Python</li><li>JavaScript</li><li>React</li><li>Git/GitHub</li><li>Linux</li><li>LaTeX</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" aria-labelledby="projects-title">
+            <p class="eyebrow">LEARNING BY BUILDING</p>
+            <h2 id="projects-title">Projects</h2>
+            <p>This portfolio is my first project. I'll share more here as I learn and build throughout the semester.</p>
+            <div class="project-grid">
+                <article class="project-card">
+                    <div class="project-preview"><p>Portfolio screenshot to add</p></div>
+                    <div class="project-content">
+                        <p class="eyebrow">CMU 15-113 · PROJECT 1</p>
+                        <h3>Personal Portfolio</h3>
+                        <p>A responsive website to introduce myself, share my work, and practice the basics of web development.</p>
+                        <ul class="tags" aria-label="Project technologies"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>
+                        <a class="text-link" href="https://github.com/whosamyy/whosamyy.github.io">View source code &rarr;</a>
+                    </div>
+                </article>
+                <article class="project-card upcoming">
+                    <p class="eyebrow">UP NEXT</p>
+                    <h3>More to come</h3>
+                    <p>I'll add future projects here as the semester progresses, with descriptions, screenshots, and links to the code.</p>
+                    <span class="status">Coming soon</span>
+                </article>
+            </div>
+        </section>
+
+        <section id="contact" aria-labelledby="contact-title">
+            <p class="eyebrow">SAY HELLO</p>
+            <h2 id="contact-title">Let's connect.</h2>
+            <p>I'd love to connect! Find me on LinkedIn or explore what I'm learning on GitHub.</p>
+            <div class="actions">
+                <a class="button" href="https://www.linkedin.com/in/amy-hu-a94375286">Connect on LinkedIn &rarr;</a>
+                <a class="text-link" href="https://github.com/whosamyy">GitHub &rarr;</a>
+                <a class="text-link" href="mailto:amyh2@andrew.cmu.edu">amyh2@andrew.cmu.edu</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="container">
+        <p>&copy; 2026 Amy Hu</p>
+        <p>Built with HTML, CSS, and a little JavaScript.</p>
+    </footer>
 </body>
 </html>

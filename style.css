@@ -1,0 +1,86 @@
+/* AI assistance: Codex drafted these styles. Variables hold shared colors;
+   flex/grid arrange content, and the media query adapts it to small screens. */
+:root {
+    --background: #faf9f6;
+    --surface: #ffffff;
+    --text: #222d28;
+    --muted: #58665e;
+    --accent: #285b43;
+    --soft: #e8eee7;
+    --border: #d8dfd7;
+}
+
+body.dark-mode {
+    --background: #18201c;
+    --surface: #222d26;
+    --text: #f0f2eb;
+    --muted: #bcc9bf;
+    --accent: #add5b6;
+    --soft: #2d3e32;
+    --border: #44554a;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.7;
+}
+a { color: var(--accent); text-underline-offset: 4px; }
+a:hover { text-decoration: underline; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+.container { width: 88%; max-width: 1040px; margin: 0 auto; }
+.site-header { border-bottom: 1px solid var(--border); }
+.header-content { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 0; }
+.name { font-size: 24px; font-weight: bold; text-decoration: none; color: var(--text); }
+.name span, h1 span { color: var(--accent); }
+nav { display: flex; flex-wrap: wrap; gap: 24px; }
+nav a { color: var(--text); text-decoration: none; font-size: 14px; }
+button { border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); padding: 9px 13px; font: inherit; font-size: 13px; cursor: pointer; }
+section { padding: 68px 0; scroll-margin-top: 24px; border-bottom: 1px solid var(--border); }
+.hero { display: grid; grid-template-columns: 1.6fr 1fr; align-items: center; gap: 64px; padding: 90px 0; }
+.eyebrow { color: var(--accent); font-size: 11px; letter-spacing: 2px; font-weight: bold; }
+h1, h2, h3 { line-height: 1.15; }
+h1 { font-size: clamp(42px, 6vw, 68px); letter-spacing: -2px; margin: 18px 0; }
+h2 { font-size: 34px; letter-spacing: -1px; margin: 12px 0 24px; }
+h3 { font-size: 21px; margin: 12px 0; }
+p { color: var(--muted); }
+.intro { font-size: 22px; color: var(--text); }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 28px; }
+.button { display: inline-block; background: var(--accent); color: var(--background); padding: 12px 20px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; }
+.text-link { font-size: 14px; font-weight: bold; }
+.profile-photo { display: block; width: 100%; height: 380px; object-fit: cover; object-position: 44% center; border-radius: 12px; }
+.about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; }
+.about-grid p:first-child { margin-top: 0; }
+.about-details h3:first-child { margin-top: 0; }
+.placeholder { font-size: 14px; }
+.tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 18px 0; }
+.tags li, .status { font-size: 12px; background: var(--soft); color: var(--accent); padding: 4px 10px; border-radius: 4px; }
+.project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 30px; }
+.project-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.project-preview { min-height: 160px; display: flex; align-items: center; justify-content: center; background: var(--soft); font-size: 13px; }
+.project-content, .upcoming { padding: 28px; }
+.upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.contact-note { margin-top: 20px; }
+footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px 0; font-size: 12px; }
+.skip-link { position: absolute; top: -100px; left: 16px; padding: 12px; background: var(--surface); }
+.skip-link:focus { top: 8px; }
+
+/* Stack columns and wrap navigation so narrow screens do not overflow. */
+@media (max-width: 700px) {
+    .header-content { flex-wrap: wrap; gap: 16px; }
+    nav { order: 3; width: 100%; justify-content: space-between; gap: 12px; }
+    .hero, .about-grid, .project-grid { grid-template-columns: 1fr; gap: 28px; }
+    .hero { padding: 52px 0; }
+    .profile-photo { height: 340px; }
+    section { padding: 48px 0; }
+    footer { flex-direction: column; gap: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
