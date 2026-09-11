@@ -21,7 +21,7 @@
   --shadow:    rgba(0, 0, 0, 0.55);
 }
 
-html, body {
+html {
   height: 100%;
 }
 
@@ -37,6 +37,9 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+
+  /* Allow scrolling when the viewport is shorter than the content */
+  overflow-y: auto;
 }
 
 
@@ -235,6 +238,15 @@ kbd {
 #hudTitle {
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+/* Weather indicator in the HUD */
+#hudWeather {
+  color: #a8d8ea;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+  text-align: center;
 }
 
 /* ── Canvas ── */

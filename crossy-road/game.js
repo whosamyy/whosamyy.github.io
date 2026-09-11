@@ -16,6 +16,8 @@
 //  § 10 Input handling
 //  § 11 Game loop
 //  § 12 Start / Game-over / Restart
+//  § 13 Weather system  (rain, snow, fog)
+//  § 14 Train / subway event
 //
 // ═══════════════════════════════════════════════════════════════
 
@@ -54,6 +56,7 @@ const LANE_GRASS  = "grass";
 const LANE_ROAD   = "road";
 const LANE_WATER  = "water";
 const LANE_SAFE   = "safe";   // wide safe grass strip (start / checkpoints)
+const LANE_TRAIN  = "train";  // train / subway track — fast hazard with warning phase
 
 // world.lanes is an array of lane objects; index 0 is the very first (bottom) lane.
 // As the player moves up, we generate more lanes on top.
@@ -88,6 +91,7 @@ function makeLane(index) {
     const roll = rand();
     if (roll < 0.38)      type = LANE_ROAD;
     else if (roll < 0.55) type = LANE_WATER;
+    else if (roll < 0.60) type = LANE_TRAIN;  // ~5 % chance of a train lane
     else                  type = LANE_GRASS;
   }
 
@@ -103,6 +107,15 @@ function makeLane(index) {
     lane.dir    = randChoice([-1, 1]);
     lane.speed  = 0.7 + rand() * 1.0;
     lane.logs   = makeLogs(lane);
+  }
+
+  if (type === LANE_TRAIN) {
+    lane.dir          = randChoice([-1, 1]);
+    lane.trainState   = "warning";   // "warning" → "active" → "clear"
+    lane.warningTimer = 0;           // counts up in ms during warning phase
+    lane.warningFlash = false;       // toggled for blinking lights
+    lane.trains       = [];          // train car objects (spawned when active)
+    lane.cleared      = false;       // true once the train has fully passed
   }
 
   return lane;
@@ -276,14 +289,14 @@ function tickHop(dt) {
 //  § 4  Cars & logs update
 // ─────────────────────────────────────────────────────────────
 
-// Move all vehicles and logs; called once per frame
+// Move all vehicles, logs, and trains; called once per frame
 function updateObstacles(dt) {
   const speedMult = 1 + (score * 0.015);  // gradually speed up with score
 
   for (const lane of world.lanes) {
     if (lane.type === LANE_ROAD) {
       for (const v of lane.vehicles) {
-        v.x += lane.dir * lane.speed * speedMult * (dt / 16);
+        v.x += lane.dir * lane.speed * speedMult * weatherSpeedMult() * (dt / 16);
         // Wrap around when they leave the screen
         if (lane.dir === 1  && v.x >  CANVAS_W + v.w)  v.x = -v.w;
         if (lane.dir === -1 && v.x < -v.w)              v.x =  CANVAS_W + v.w;
@@ -296,6 +309,10 @@ function updateObstacles(dt) {
         if (lane.dir === 1  && log.x >  CANVAS_W + log.w) log.x = -log.w;
         if (lane.dir === -1 && log.x < -log.w)            log.x =  CANVAS_W + log.w;
       }
+    }
+
+    if (lane.type === LANE_TRAIN) {
+      updateTrainLane(lane, dt);
     }
   }
 }
@@ -350,6 +367,7 @@ const LANE_COLORS = {
   [LANE_GRASS]: ["#52b788", "#40916c"],
   [LANE_ROAD]:  ["#495057", "#343a40"],
   [LANE_WATER]: ["#1971c2", "#1864ab"],
+  [LANE_TRAIN]: ["#2b2d42", "#1a1b2e"],   // dark charcoal for subway tracks
 };
 
 // Rounded-rectangle helper
@@ -570,6 +588,10 @@ function drawLane(lane, screenY) {
       drawDecor(item, sx, screenY);
     }
   }
+
+  if (lane.type === LANE_TRAIN) {
+    drawTrainLane(lane, screenY);
+  }
 }
 
 function drawAllLanes() {
@@ -723,13 +745,20 @@ function updateAll(timestamp) {
 
   tickHop(dt);
   updateObstacles(dt);
+  updateWeather(dt);   // move rain/snow particles
 
   if (!player.dead) {
-    const lane = world.lanes[player.row];
-    if (lane && lane.type === LANE_WATER) {
-      carryPlayerOnLog();
+    // Only run water/collision logic once the hop has fully landed.
+    // During a hop the drawX is mid-animation, so log detection and
+    // collision checks would fire at the wrong position and cause
+    // false deaths (the "slight glitch → hit by car" bug).
+    if (!player.hopping) {
+      const lane = world.lanes[player.row];
+      if (lane && lane.type === LANE_WATER) {
+        carryPlayerOnLog();
+      }
+      checkCollisions();
     }
-    checkCollisions();
   }
 }
 
@@ -752,6 +781,16 @@ function checkCollisions() {
   if (lane.type === LANE_ROAD) {
     for (const v of lane.vehicles) {
       if (px2 > v.x + margin && px1 < v.x + v.w - margin) {
+        triggerDeath();
+        return;
+      }
+    }
+  }
+
+  // Train lane — hit by any active train car
+  if (lane.type === LANE_TRAIN && lane.trainState === "active") {
+    for (const t of lane.trains) {
+      if (px2 > t.x + margin && px1 < t.x + t.w - margin) {
         triggerDeath();
         return;
       }
@@ -855,6 +894,9 @@ function gameLoop(timestamp) {
   // Player (drawn on top of lanes, below UI)
   drawPlayer();
 
+  // Weather particles / fog drawn on top of everything
+  drawWeather();
+
   // Request next frame
   loopId = requestAnimationFrame(gameLoop);
 }
@@ -897,6 +939,11 @@ function startGame() {
   running  = true;
   lastTimestamp = 0;
 
+  // Pick a weather condition for this run and spawn its particles
+  pickWeather();
+  initWeatherParticles();
+  updateWeatherHUD();
+
   refreshHUD();
 
   // Show game wrapper, hide overlays
@@ -917,6 +964,7 @@ function showGameOver() {
   ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
   drawAllLanes();
   drawPlayer();
+  drawWeather();
 
   document.getElementById("finalScore").textContent = score;
   document.getElementById("finalBest").textContent  = highScore;
@@ -931,3 +979,330 @@ function restartGame() {
 // Wire up buttons
 document.getElementById("startBtn").addEventListener("click",   startGame);
 document.getElementById("restartBtn").addEventListener("click", restartGame);
+
+
+// ─────────────────────────────────────────────────────────────
+//  § 13  Weather system  (rain, snow, fog)
+// ─────────────────────────────────────────────────────────────
+//
+//  How it works:
+//  - At the start of each run, `currentWeather` is randomly set to
+//    "none", "rain", "snow", or "fog".
+//  - `weatherParticles` is an array of small dots/flakes that move
+//    down the screen each frame.
+//  - `drawWeather()` is called at the end of every game-loop frame,
+//    so the particles appear on top of the lanes and player.
+//  - Fog is drawn as a translucent grey rectangle over the whole canvas.
+//  - Rain slightly increases car speed (wet roads = faster traffic).
+
+const WEATHER_TYPES = ["none", "rain", "snow", "fog"];
+
+let currentWeather   = "none";
+let weatherParticles = [];       // array of { x, y, speed, size, opacity }
+
+// Pick a random weather condition for this run
+function pickWeather() {
+  // Weights: 40 % none, 25 % rain, 20 % snow, 15 % fog
+  const roll = rand();
+  if      (roll < 0.40) currentWeather = "none";
+  else if (roll < 0.65) currentWeather = "rain";
+  else if (roll < 0.85) currentWeather = "snow";
+  else                  currentWeather = "fog";
+}
+
+// Create the initial batch of particles (called when the game starts)
+function initWeatherParticles() {
+  weatherParticles = [];
+  if (currentWeather === "none" || currentWeather === "fog") return;
+
+  const count = currentWeather === "rain" ? 120 : 70; // rain is denser
+  for (let i = 0; i < count; i++) {
+    weatherParticles.push(makeParticle(true));
+  }
+}
+
+// Build one particle; `scattered` = true means it can start anywhere on screen
+function makeParticle(scattered) {
+  return {
+    x:       rand() * CANVAS_W,
+    y:       scattered ? rand() * CANVAS_H : -5,   // start off-screen top when not scattered
+    speed:   currentWeather === "rain"
+               ? 6 + rand() * 5        // rain falls fast
+               : 1.2 + rand() * 2,     // snow drifts slowly
+    drift:   currentWeather === "snow"
+               ? (rand() - 0.5) * 0.6  // snow drifts left/right slightly
+               : 0.8 + rand() * 0.4,   // rain slants a tiny bit
+    size:    currentWeather === "rain"
+               ? 1 + rand()            // rain = thin lines
+               : 2 + rand() * 2,       // snow = small circles
+    opacity: 0.55 + rand() * 0.45
+  };
+}
+
+// Move all particles down by dt; recycle any that leave the screen
+function updateWeather(dt) {
+  if (currentWeather === "none" || currentWeather === "fog") return;
+
+  for (const p of weatherParticles) {
+    p.y += p.speed * (dt / 16);
+    p.x += p.drift;
+
+    // Recycle — send back to the top with a fresh random x
+    if (p.y > CANVAS_H + 5 || p.x < -10 || p.x > CANVAS_W + 10) {
+      Object.assign(p, makeParticle(false));
+    }
+  }
+}
+
+// Draw weather on top of everything else
+function drawWeather() {
+  if (currentWeather === "none") return;
+
+  if (currentWeather === "fog") {
+    // Layered fog: two semi-transparent passes for a smoky look
+    ctx.fillStyle = "rgba(200, 210, 215, 0.28)";
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    ctx.fillStyle = "rgba(210, 220, 225, 0.15)";
+    ctx.fillRect(0, CANVAS_H * 0.4, CANVAS_W, CANVAS_H * 0.6);
+    return;
+  }
+
+  ctx.save();
+  for (const p of weatherParticles) {
+    ctx.globalAlpha = p.opacity;
+
+    if (currentWeather === "rain") {
+      // Rain = short diagonal lines
+      ctx.strokeStyle = "#a8d8ea";
+      ctx.lineWidth   = p.size;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + p.drift * 3, p.y + p.speed * 1.5);
+      ctx.stroke();
+
+    } else if (currentWeather === "snow") {
+      // Snow = soft white circles
+      ctx.fillStyle = "#e8f4f8";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+// Show the current weather in the HUD
+function updateWeatherHUD() {
+  const labels = { none: "", rain: "🌧 Rain", snow: "❄️ Snow", fog: "🌫 Fog" };
+  const el = document.getElementById("hudWeather");
+  if (el) el.textContent = labels[currentWeather] || "";
+}
+
+// Rain modifier: cars go a bit faster in wet weather
+function weatherSpeedMult() {
+  return currentWeather === "rain" ? 1.18 : 1.0;
+}
+
+
+// ─────────────────────────────────────────────────────────────
+//  § 14  Train / subway event
+// ─────────────────────────────────────────────────────────────
+//
+//  How it works:
+//  - A LANE_TRAIN lane goes through three phases automatically:
+//      "warning"  → red lights flash for ~2.2 seconds (safe to cross)
+//      "active"   → a fast multi-car train blasts across (instant death)
+//      "clear"    → train has passed; lane is safe again until next cycle
+//  - After the clear phase, the lane resets back to "warning" after a
+//    random pause, so the hazard repeats on a loop.
+//  - `drawTrainLane()` handles all the visuals for all three phases.
+//  - `updateTrainLane()` advances the phase timers each frame.
+
+const TRAIN_WARNING_MS  = 2200;  // how long the warning lights flash
+const TRAIN_CLEAR_MS    = 3500;  // how long the lane stays clear before repeating
+const TRAIN_SPEED       = 18;    // px per frame — very fast
+const TRAIN_CAR_W       = TILE * 3.5;  // each car is 3.5 tiles wide
+const TRAIN_CAR_GAP     = 6;     // gap between cars
+const TRAIN_CAR_COUNT   = 5;     // number of cars in one train
+
+let trainFlashTimer = 0;         // shared blink timer for warning lights
+
+// Advance the train lane state machine
+function updateTrainLane(lane, dt) {
+  trainFlashTimer += dt;
+
+  if (lane.trainState === "warning") {
+    lane.warningTimer += dt;
+
+    // Flash the warning lights (toggle every 250 ms)
+    lane.warningFlash = Math.floor(trainFlashTimer / 250) % 2 === 0;
+
+    // After the warning period, spawn the train and switch to active
+    if (lane.warningTimer >= TRAIN_WARNING_MS) {
+      lane.trainState   = "active";
+      lane.warningTimer = 0;
+      lane.trains       = spawnTrain(lane);
+    }
+
+  } else if (lane.trainState === "active") {
+    // Move every car in the train
+    const moved = lane.dir * TRAIN_SPEED * (dt / 16);
+    for (const t of lane.trains) {
+      t.x += moved;
+    }
+
+    // Check if the whole train has cleared the screen
+    const allGone = lane.trains.every(t =>
+      lane.dir === 1  ? t.x > CANVAS_W + t.w + 10
+                      : t.x < -t.w - 10
+    );
+
+    if (allGone) {
+      lane.trainState   = "clear";
+      lane.warningTimer = 0;
+      lane.trains       = [];
+    }
+
+  } else if (lane.trainState === "clear") {
+    lane.warningTimer += dt;
+
+    // After the clear pause, start a fresh warning cycle
+    if (lane.warningTimer >= TRAIN_CLEAR_MS) {
+      lane.trainState   = "warning";
+      lane.warningTimer = 0;
+      lane.warningFlash = false;
+    }
+  }
+}
+
+// Spawn all the train cars lined up off-screen, ready to enter
+function spawnTrain(lane) {
+  const cars = [];
+  const totalW = TRAIN_CAR_W + TRAIN_CAR_GAP;
+
+  for (let i = 0; i < TRAIN_CAR_COUNT; i++) {
+    // dir = 1 means the train enters from the left edge
+    const startX = lane.dir === 1
+      ? -totalW * (TRAIN_CAR_COUNT - i)        // enter from the left
+      :  CANVAS_W + totalW * i;                // enter from the right
+
+    cars.push({
+      x: startX,
+      w: TRAIN_CAR_W,
+      h: TILE * 0.82,
+      // Alternate car colours for a subway look
+      color: i % 2 === 0 ? "#c0392b" : "#922b21"
+    });
+  }
+  return cars;
+}
+
+// Draw the train lane in any of its three phases
+function drawTrainLane(lane, screenY) {
+  // ── Rail tracks (always visible) ──
+  const railY1 = screenY + TILE * 0.28;
+  const railY2 = screenY + TILE * 0.68;
+
+  ctx.strokeStyle = "#7f8c8d";
+  ctx.lineWidth = 4;
+  for (const railY of [railY1, railY2]) {
+    ctx.beginPath();
+    ctx.moveTo(0, railY);
+    ctx.lineTo(CANVAS_W, railY);
+    ctx.stroke();
+  }
+
+  // Sleepers (cross-ties)
+  ctx.fillStyle = "#5d4037";
+  for (let sx = 0; sx < CANVAS_W; sx += 28) {
+    ctx.fillRect(sx, railY1 - 4, 16, (railY2 - railY1) + 8);
+  }
+
+  // ── Warning phase: flashing red lights on each side ──
+  if (lane.trainState === "warning" && lane.warningFlash) {
+    // Left light
+    ctx.fillStyle = "#e74c3c";
+    ctx.beginPath();
+    ctx.arc(18, screenY + TILE / 2, 9, 0, Math.PI * 2);
+    ctx.fill();
+    // Glow
+    ctx.fillStyle = "rgba(231, 76, 60, 0.35)";
+    ctx.beginPath();
+    ctx.arc(18, screenY + TILE / 2, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right light
+    ctx.fillStyle = "#e74c3c";
+    ctx.beginPath();
+    ctx.arc(CANVAS_W - 18, screenY + TILE / 2, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(231, 76, 60, 0.35)";
+    ctx.beginPath();
+    ctx.arc(CANVAS_W - 18, screenY + TILE / 2, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // "⚠ TRAIN" text centred on the lane
+    ctx.fillStyle = "#f1c40f";
+    ctx.font      = "bold 13px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("⚠ TRAIN", CANVAS_W / 2, screenY + TILE / 2 + 5);
+    ctx.textAlign = "left";   // reset
+  }
+
+  // ── Active phase: draw the train cars ──
+  if (lane.trainState === "active") {
+    for (const t of lane.trains) {
+      drawTrainCar(t, screenY);
+    }
+  }
+}
+
+// Draw one subway/train car
+function drawTrainCar(t, screenY) {
+  const carY = screenY + (TILE - t.h) / 2;
+
+  // Shadow
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  roundRect(t.x + 5, carY + 8, t.w, t.h, 5);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = t.color;
+  roundRect(t.x, carY, t.w, t.h, 5);
+  ctx.fill();
+
+  // Side stripe
+  ctx.fillStyle = "rgba(255,255,255,0.18)";
+  ctx.fillRect(t.x + 6, carY + t.h * 0.3, t.w - 12, t.h * 0.2);
+
+  // Windows (evenly spaced along the car)
+  const winCount  = 4;
+  const winW      = 18;
+  const winH      = t.h * 0.38;
+  const winY      = carY + t.h * 0.18;
+  const winSpacing = (t.w - 20) / winCount;
+  ctx.fillStyle   = "#d4efff";
+  for (let i = 0; i < winCount; i++) {
+    const wx = t.x + 10 + i * winSpacing;
+    roundRect(wx, winY, winW, winH, 3);
+    ctx.fill();
+    // Window reflection
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.fillRect(wx + 2, winY + 2, 5, winH * 0.5);
+    ctx.fillStyle = "#d4efff";
+  }
+
+  // Front headlight (bright yellow on the leading end)
+  const lightSide = t.x + (t.w - 10);  // right end of car
+  ctx.fillStyle   = "#f9e94e";
+  ctx.fillRect(lightSide, carY + t.h * 0.25, 10, t.h * 0.25);
+
+  // Wheels
+  ctx.fillStyle = "#2c3e50";
+  for (const wx of [t.x + 15, t.x + t.w - 18]) {
+    ctx.beginPath();
+    ctx.arc(wx, carY + t.h + 2, 6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
