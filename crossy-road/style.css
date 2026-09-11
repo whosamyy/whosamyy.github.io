@@ -1,0 +1,55 @@
+/* ── Reset & base ── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #1a1a2e;
+  color: #eaeaea;
+  font-family: Arial, sans-serif;
+
+  /* Center everything vertically and horizontally */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 12px;
+}
+
+/* ── Title ── */
+h1 {
+  font-size: 2rem;
+  letter-spacing: 2px;
+}
+
+/* ── Canvas ── */
+#gameCanvas {
+  background-color: #16213e;
+  border: 3px solid #0f3460;
+  display: block;
+}
+
+/* ── Score ── */
+#score {
+  font-size: 1.2rem;
+}
+
+/* ── Start button ── */
+#startBtn {
+  padding: 10px 28px;
+  font-size: 1rem;
+  background-color: #0f3460;
+  color: #eaeaea;
+  border: 2px solid #e94560;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#startBtn:hover {
+  background-color: #e94560;
+  color: #fff;
+}

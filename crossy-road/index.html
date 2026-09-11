@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crossy Road</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <h1>Crossy Road</h1>
+
+    <!-- The game is drawn onto this canvas element -->
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+
+    <!-- Score display shown during gameplay -->
+    <p id="score">Score: 0</p>
+
+    <!-- Start button — clicking this will kick off the game -->
+    <button id="startBtn">Start Game</button>
+
+    <!-- game.js is loaded last so the HTML above is ready when the script runs -->
+    <script src="game.js"></script>
+
+  </body>
+</html>
