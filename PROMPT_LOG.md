@@ -65,3 +65,35 @@ Updated your portfolio with your photo, résumé-based bio and skills, hobbies, 
 No more personal information is needed right now. Review the wording in index.html and let me know if you'd prefer a different contact email. The project screenshot, browser testing, and deployment still remain.
 
 Local image paths and photo alt text checks passed.
+
+## User — pink theme
+
+some changes: dont have Amy Hu and then the period after my name. also i want my theme to be pink
+
+## Assistant — plan
+
+I’ll remove the period after your name and change the green accents to pink, with a soft blush background and matching dark-mode colors.
+
+## Assistant — closing reply
+
+Done—removed the periods after your name in the header and introduction, and changed both light and dark modes to a pink palette. Refresh your local preview to see the changes. Commit and push when you’re ready to update the live site.
+
+## User — résumé availability
+
+is my resume there
+
+## Assistant
+
+Your résumé’s information is included in your bio and skills, but the PDF itself isn’t on the website—there’s no résumé download link yet.
+
+## User — résumé attachment
+
+Provided Hu_Amy_Resume.pdf with no additional text, following the résumé-link discussion.
+
+## Assistant — plan
+
+I’ll add the résumé PDF to your existing repository and put a “View résumé” link beside your introduction.
+
+## Assistant — closing reply
+
+Added your PDF and a “View résumé (PDF)” link beside your introduction. Refresh your preview to see it. Commit and push the changes to make it available on your live website.

@@ -1,23 +1,23 @@
 /* AI assistance: Codex drafted these styles. Variables hold shared colors;
    flex/grid arrange content, and the media query adapts it to small screens. */
 :root {
-    --background: #faf9f6;
+    --background: #fff7fa;
     --surface: #ffffff;
-    --text: #222d28;
-    --muted: #58665e;
-    --accent: #285b43;
-    --soft: #e8eee7;
-    --border: #d8dfd7;
+    --text: #38232d;
+    --muted: #735562;
+    --accent: #a52c61;
+    --soft: #fce3ee;
+    --border: #ebcad9;
 }
 
 body.dark-mode {
-    --background: #18201c;
-    --surface: #222d26;
-    --text: #f0f2eb;
-    --muted: #bcc9bf;
-    --accent: #add5b6;
-    --soft: #2d3e32;
-    --border: #44554a;
+    --background: #251820;
+    --surface: #33232d;
+    --text: #fff0f6;
+    --muted: #d9b9c9;
+    --accent: #f4a7c8;
+    --soft: #492c3b;
+    --border: #664355;
 }
 
 * { box-sizing: border-box; }
@@ -37,7 +37,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outlin
 .site-header { border-bottom: 1px solid var(--border); }
 .header-content { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 0; }
 .name { font-size: 24px; font-weight: bold; text-decoration: none; color: var(--text); }
-.name span, h1 span { color: var(--accent); }
 nav { display: flex; flex-wrap: wrap; gap: 24px; }
 nav a { color: var(--text); text-decoration: none; font-size: 14px; }
 button { border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); padding: 9px 13px; font: inherit; font-size: 13px; cursor: pointer; }
