@@ -6,7 +6,7 @@ A beginner-friendly, one-page portfolio for CMU 15-113 Project 1.
 
 - `index.html`: page content. Navigation links match the sections' IDs.
 - `style.css`: colors, spacing, and layout. The media query stacks columns on small screens.
-- `script.js`: a button toggles the `dark-mode` class to change the colors.
+- `script.js`: a button toggles the `dark-mode` class to change the colors. An `IntersectionObserver` reveals each section once as it enters view by removing `reveal-pending`; CSS handles the fade and 24px slide over 600ms. Reduced-motion settings disable the animation, and keyboard focus reveals a section immediately.
 
 Open `index.html` in a browser to preview. No installation or build step is needed.
 
@@ -23,8 +23,5 @@ Open `index.html` in a browser to preview. No installation or build step is need
 ## References and assistance
 
 Assignment: https://www.cs.cmu.edu/~113/project1.html
-
-User-provided navigation reference: https://tshakeel05.github.io/
-No code, images, or text were copied from that portfolio. This draft uses no external assets or templates.
 
 Codex generated the initial HTML, CSS, and JavaScript with the user's requested scope, then personalized the content using Amy's résumé and messages. AI assistance is also documented in code comments. Amy supplied the personal photo in `assets/amy-hu.jpg`. The portfolio screenshot remains to be added.
