@@ -19,11 +19,41 @@ main {
 
 #game-container {
     width: 100%;
-    min-height: 360px;
+    aspect-ratio: 9 / 11;
+    position: relative;
+    overflow: hidden;
     margin: 20px 0;
     border: 1px solid #aaa;
-    background: #fff;
+    background: #d8ebcb;
 }
+
+.road, .car, .player {
+    position: absolute;
+}
+
+.road {
+    background: #53565c;
+    border-bottom: 2px dashed #ddd;
+}
+
+.car {
+    background: #ffce63;
+    border: 2px solid #6b4816;
+    border-radius: 5px;
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4a7c8;
+    color: #38232d;
+    border: 2px solid #782449;
+    border-radius: 4px;
+    z-index: 1;
+}
+
+#game-status { min-height: 1.5em; font-weight: bold; }
 
 button {
     padding: 10px 20px;

@@ -10,8 +10,10 @@
 <body>
     <main>
         <h1>Crossy Road</h1>
+        <p id="controls">Move one space with the arrow keys or W, A, S, D. Avoid the cars!</p>
         <p>Score: <span id="score">0</span></p>
-        <div id="game-container" aria-label="Game area"></div>
+        <div id="game-container" role="img" aria-label="Crossy Road board with a pink player and moving cars" aria-describedby="controls"></div>
+        <p id="game-status" role="status"></p>
         <button id="restart-button" type="button">Restart</button>
     </main>
 </body>
