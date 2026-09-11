@@ -254,14 +254,17 @@ function startHop(newCol, newRow) {
   // This matters: if the camera shifts during this hop, tileToScreen
   // will return a different y value. We need hopEndY to reflect the
   // post-scroll position so the animation lands in exactly the right spot.
-  const idealCamera = player.row - Math.floor(VISIBLE * 0.65);
-  if (idealCamera > world.cameraRow) {
-    // The camera is about to jump — adjust the start position to account
-    // for the scroll offset so the animation origin stays visually correct.
-    const cameraDelta = idealCamera - world.cameraRow;
-    world.cameraRow = idealCamera;
+  //
+  // We keep the player in the lower 55% of the screen (threshold row = VISIBLE * 0.45
+  // from the top, i.e. row index = cameraRow + VISIBLE - floor(VISIBLE*0.45)).
+  // The camera only ever moves ONE row per hop so there is no sudden large jump.
+  const scrollThreshold = world.cameraRow + Math.ceil(VISIBLE * 0.55);
+  if (player.row >= scrollThreshold) {
+    // Advance the camera by exactly one row
+    const cameraDelta = 1;
+    world.cameraRow += cameraDelta;
     ensureLanes();
-    // Shift the start Y up by however many tiles the camera moved
+    // Shift the start Y up to compensate for the scroll
     start.y -= cameraDelta * TILE;
   }
 
