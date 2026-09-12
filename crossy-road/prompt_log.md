@@ -35,6 +35,11 @@ Keep the code beginner-readable because I need to understand and explain it.
 ---
 
 **Prompt 2:**
+i feel like when the chicken gets to the top, every jump's movement is too big (the screen moves too much) so it seems kind of glitchy
+
+---
+
+**Prompt 3:**
 I already have a file called prompt_log.md in my crossy-road folder, but it is currently empty.
 
 Please update that file with this structure:
@@ -59,19 +64,18 @@ Also add this current prompt itself as the first at-home prompt.
 
 ---
 
-**Prompt 3:**
-include my very first prompt as well
-
----
-
-**Prompt 3:**
+**Prompt 4:**
 it still has the bug where if i get to the top and the screen moves up a bit it glitches and i end up in the middle of the road and die
 
 ---
 
-**Prompt 3:**
+**Prompt 5:**
 add the following new things to my game:
 Weather: rain, snow, or fog that slightly changes how the game looks or plays.
 Train/subway event: every so often, warning lights flash and a fast train crosses several tiles.
 
 ---
+
+**Prompt 6:**
+
+i feel like when the chicken gets to the top, every jump's movement is too big (the screen moves too much) so it seems kind of glitchy
