@@ -87,3 +87,8 @@ i feel like when the chicken gets to the top, every jump's movement is too big (
 
 **Prompt 7:**
 Add some additional features to my crossy road: Different background everytime and different animal every time so that's it's not just that chicken. Make it look good. Also, add cute music to my game where you can turn on and off the music
+
+---
+
+**Prompt 8:**
+In addition to those 5 animals, add more: pig, dog, bear, monkey, penguin

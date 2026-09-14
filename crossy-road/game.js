@@ -1339,7 +1339,12 @@ const ANIMALS = [
   { name: "Bunny", icon: "🐰", color: "#fff0e8" },
   { name: "Fox", icon: "🦊", color: "#ed9a55" },
   { name: "Panda", icon: "🐼", color: "#f2f4f1" },
-  { name: "Frog", icon: "🐸", color: "#9cd878" }
+  { name: "Frog", icon: "🐸", color: "#9cd878" },
+  { name: "Pig", icon: "🐷", color: "#f5a9bb" },
+  { name: "Dog", icon: "🐶", color: "#dca76b" },
+  { name: "Bear", icon: "🐻", color: "#a87550" },
+  { name: "Monkey", icon: "🐵", color: "#b9845b" },
+  { name: "Penguin", icon: "🐧", color: "#384252" }
 ];
 let currentTheme = THEMES[0];
 let currentAnimal = ANIMALS[0];
@@ -1373,11 +1378,19 @@ function drawAnimalBody(x, y, w, h, dead) {
   function block(bx, by, bw, bh, fill, radius = 5) {
     ctx.fillStyle = fill; roundRect(bx, by, bw, bh, radius); ctx.fill();
   }
-  block(x + 3, y + h - 5, 13, 9, shadeColor(color, -30));
-  block(x + w - 16, y + h - 5, 13, 9, shadeColor(color, -30));
+  const feetColor = name === "Penguin" && !dead ? "#f3b34c" : shadeColor(color, -30);
+  // A curled tail and wide ears give the monkey its own silhouette.
+  if (name === "Monkey") {
+    ctx.strokeStyle = color; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(x + w + 1, y + h - 12, 8, -Math.PI / 2, Math.PI); ctx.stroke();
+    block(x - 6, y + 3, 14, 16, color, 7);
+    block(x + w - 8, y + 3, 14, 16, color, 7);
+  }
+  block(x + 3, y + h - 5, 13, 9, feetColor);
+  block(x + w - 16, y + h - 5, 13, 9, feetColor);
   block(x, y + 5, w, h - 7, shadeColor(color, -18), 10);
   block(x + 9, y + 21, w - 18, 18, "#fff1da", 8);
-  if (name !== "Frog") {
+  if (name !== "Frog" && name !== "Penguin" && name !== "Monkey") {
     const earH = name === "Bunny" ? 23 : 13;
     const earColor = name === "Panda" ? "#384252" : color;
     block(x + 3, y - earH + 6, 12, earH, earColor);
@@ -1388,6 +1401,20 @@ function drawAnimalBody(x, y, w, h, dead) {
     }
   }
   block(x, y, w, 29, color, 10);
+  if (name === "Dog") {
+    block(x - 4, y + 2, 11, 24, shadeColor(color, -45), 5);
+    block(x + w - 7, y + 2, 11, 24, shadeColor(color, -45), 5);
+  }
+  if (name === "Monkey" || name === "Penguin") {
+    block(x + 5, y + 4, w - 10, 23, name === "Monkey" ? "#f3d1a6" : "#fff8e8", 9);
+  }
+  if (name === "Penguin") {
+    block(x - 5, y + 20, 9, 19, color, 4);
+    block(x + w - 4, y + 20, 9, 19, color, 4);
+  }
+  if (name === "Bear" || name === "Dog") {
+    block(x + w / 2 - 10, y + 16, 20, 12, "#f3d1a6", 6);
+  }
   for (const ex of [x + 12, x + w - 12]) {
     if (name === "Panda") block(ex - 7, y + 5, 14, 15, "#384252", 6);
     if (name === "Frog") block(ex - 8, y - 8, 16, 18, color, 7);
@@ -1403,7 +1430,15 @@ function drawAnimalBody(x, y, w, h, dead) {
   }
   block(x + 4, y + 20, 7, 3, "#eea5ad", 1);
   block(x + w - 11, y + 20, 7, 3, "#eea5ad", 1);
-  block(x + w / 2 - 3, y + 18, 6, 4, name === "Frog" ? "#46744c" : "#72545c", 2);
+  if (name === "Pig") {
+    block(x + w / 2 - 10, y + 16, 20, 12, dead ? "#aaa" : "#e786a0", 5);
+    block(x + w / 2 - 5, y + 20, 3, 4, "#925365", 1);
+    block(x + w / 2 + 2, y + 20, 3, 4, "#925365", 1);
+  } else if (name === "Penguin") {
+    block(x + w / 2 - 5, y + 18, 10, 7, dead ? "#aaa" : "#f3b34c", 2);
+  } else {
+    block(x + w / 2 - 3, y + 18, 6, 4, name === "Frog" ? "#46744c" : "#72545c", 2);
+  }
 }
 
 // § 16 Music — original, softly plucked pentatonic melody, no audio downloads.
