@@ -64,3 +64,16 @@ window.addEventListener("pageshow", function (event) {
     if (event.persisted) startAnimations();
 });
 reducedMotion.addEventListener("change", startAnimations);
+
+// A small, fixed set of petals; CSS handles the motion and reduced-motion setting.
+const sakuraBackground = document.querySelector(".sakura-background");
+for (let i = 0; i < 18; i += 1) {
+    const petal = document.createElement("span");
+    petal.className = "sakura-petal";
+    petal.style.setProperty("--left", `${Math.random() * 100}%`);
+    petal.style.setProperty("--size", `${8 + Math.random() * 7}px`);
+    petal.style.setProperty("--duration", `${14 + Math.random() * 12}s`);
+    // Negative delays fill the screen gently as soon as the page loads.
+    petal.style.setProperty("--delay", `${-Math.random() * 26}s`);
+    sakuraBackground.appendChild(petal);
+}

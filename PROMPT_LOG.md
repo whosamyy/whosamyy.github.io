@@ -147,3 +147,15 @@ I’ll give the typewriter line a cuter, handwritten font while keeping its anim
 ## Assistant — closing reply
 
 Changed the typewriter line to a playful handwritten font in pink, with slightly larger lettering. The typing animation stays intact. The font is included locally with its license.
+
+## User — falling cherry blossoms
+
+add sakura/cherry blossoms that float down the screen to the background of my website
+
+## Assistant — plan
+
+I’ll add soft pink cherry blossom petals drifting down the background, with reduced-motion support and no interference with clicks or reading.
+
+## Assistant — closing reply
+
+Added soft pink sakura petals that gently fall, sway, and rotate behind your content. Fewer petals appear on mobile, and the effect respects reduced-motion settings.
