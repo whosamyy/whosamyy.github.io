@@ -49,6 +49,20 @@ h2 { font-size: 34px; letter-spacing: -1px; margin: 12px 0 24px; }
 h3 { font-size: 21px; margin: 12px 0; }
 p { color: var(--muted); }
 .intro { font-size: 22px; color: var(--text); }
+.intro { display: grid; }
+.intro-full, .intro-typed { grid-area: 1 / 1; }
+.intro-typed { display: none; }
+.intro.is-typing .intro-full { opacity: 0; }
+.intro.is-typing .intro-typed { display: block; }
+.intro.is-typing .intro-typed::after {
+    content: "";
+    display: inline-block;
+    height: 1em;
+    border-right: 2px solid var(--accent);
+    vertical-align: -0.1em;
+    animation: typing-cursor 700ms step-end infinite;
+}
+@keyframes typing-cursor { 50% { opacity: 0; } }
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 28px; }
 .button { display: inline-block; background: var(--accent); color: var(--background); padding: 12px 20px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; }
 .text-link { font-size: 14px; font-weight: bold; }
@@ -69,12 +83,20 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px
 .skip-link { position: absolute; top: -100px; left: 16px; padding: 12px; background: var(--surface); }
 .skip-link:focus { top: 8px; }
 
-/* JavaScript adds this class until a section enters view.
-   Keep these effects inside the motion preference so content is visible otherwise. */
+/* Animate children so their movement cannot change the observed section's bounds.
+   Sections replay whenever they re-enter the viewport. */
 @media (prefers-reduced-motion: no-preference) {
-    main section { transition: opacity 600ms ease, transform 600ms ease; }
-    main section.reveal-pending { opacity: 0; transform: translateY(24px); }
-    main section:focus-within { opacity: 1; transform: translateY(0); }
+    main section.reveal-active > * {
+        animation: scroll-reveal 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    main section.reveal-active > :nth-child(2) { animation-delay: 100ms; }
+    main section.reveal-active > :nth-child(3) { animation-delay: 180ms; }
+    main section.reveal-active > :nth-child(n+4) { animation-delay: 260ms; }
+    main section:focus-within > * { animation: none; }
+    @keyframes scroll-reveal {
+        from { opacity: 0; transform: translateY(56px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
 }
 
 /* Stack columns and wrap navigation so narrow screens do not overflow. */
