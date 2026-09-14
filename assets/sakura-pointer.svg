@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <g fill="#e98ab5" stroke="#78264e" stroke-width="1.2" stroke-linejoin="round">
+    <path id="petal" d="M16 17C10 13 9 5 13 3L16 5L19 3C23 5 22 13 16 17Z"/>
+    <use href="#petal" transform="rotate(72 16 16)"/>
+    <use href="#petal" transform="rotate(144 16 16)"/>
+    <use href="#petal" transform="rotate(216 16 16)"/>
+    <use href="#petal" transform="rotate(288 16 16)"/>
+  </g>
+  <path d="M16 11L17.5 14.5L21 16L17.5 17.5L16 21L14.5 17.5L11 16L14.5 14.5Z" fill="#fff6cf" stroke="#78264e" stroke-width="0.8"/>
+</svg>

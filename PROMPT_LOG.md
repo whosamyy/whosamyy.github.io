@@ -159,3 +159,15 @@ I’ll add soft pink cherry blossom petals drifting down the background, with re
 ## Assistant — closing reply
 
 Added soft pink sakura petals that gently fall, sway, and rotate behind your content. Fewer petals appear on mobile, and the effect respects reduced-motion settings.
+
+## User — cute cursor
+
+when the user is on my website, turn the user's cursor into something cuter than a normal cursor
+
+## Assistant — plan
+
+I’ll make the cursor a small pink cherry blossom, with a matching pointer for links and buttons.
+
+## Assistant — closing reply
+
+Added a pink cherry blossom cursor that turns a deeper pink with a sparkle center over links and buttons. It applies to mouse users and matches the falling sakura background.

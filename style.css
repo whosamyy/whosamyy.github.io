@@ -83,6 +83,12 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outlin
 nav { display: flex; flex-wrap: wrap; gap: 24px; }
 nav a { color: var(--text); text-decoration: none; font-size: 14px; }
 button { border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); padding: 9px 13px; font: inherit; font-size: 13px; cursor: pointer; }
+/* The flower's center is the click point. Native cursors remain as fallbacks. */
+@media (hover: hover) and (pointer: fine) {
+    html { cursor: url("assets/sakura-cursor.svg") 16 16, auto; }
+    a, button { cursor: url("assets/sakura-pointer.svg") 16 16, pointer; }
+    input, textarea, [contenteditable="true"] { cursor: text; }
+}
 section { padding: 68px 0; scroll-margin-top: 24px; border-bottom: 1px solid var(--border); }
 .hero { display: grid; grid-template-columns: 1.6fr 1fr; align-items: center; gap: 64px; padding: 90px 0; }
 .eyebrow { color: var(--accent); font-size: 11px; letter-spacing: 2px; font-weight: bold; }
