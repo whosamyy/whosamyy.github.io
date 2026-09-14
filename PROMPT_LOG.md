@@ -171,3 +171,27 @@ I’ll make the cursor a small pink cherry blossom, with a matching pointer for 
 ## Assistant — closing reply
 
 Added a pink cherry blossom cursor that turns a deeper pink with a sparkle center over links and buttons. It applies to mouse users and matches the falling sakura background.
+
+## User — bubbly greeting
+
+Make the "Hi, I'm Amy" cute bubbly text
+
+## Assistant — plan
+
+I’ll give “Hi, I’m Amy” a rounded, bubbly font with a soft pink shadow to match your theme.
+
+## Assistant — closing reply
+
+Changed “Hi, I'm Amy” to a rounded, bubbly pink font with a soft shadow. It adapts to light and dark mode. Refresh your preview to see it.
+
+## User — cute photo frame
+
+add a cute frame around the picture of me
+
+## Assistant — plan
+
+I’ll add a rounded pink frame with a soft shadow and small decorative accents around your photo.
+
+## Assistant — closing reply
+
+Added a rounded pink frame with a layered border, shadow, cherry blossom, and little heart. Your local photo file, assets/amy-hu.jpg, is currently missing, so the picture needs to be restored for the local preview to show it.

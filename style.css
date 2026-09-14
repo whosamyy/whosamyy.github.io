@@ -8,6 +8,14 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: "Baloo 2";
+    src: url("assets/baloo-2-bold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+}
+
 :root {
     --background: #fff7fa;
     --surface: #ffffff;
@@ -94,6 +102,14 @@ section { padding: 68px 0; scroll-margin-top: 24px; border-bottom: 1px solid var
 .eyebrow { color: var(--accent); font-size: 11px; letter-spacing: 2px; font-weight: bold; }
 h1, h2, h3 { line-height: 1.15; }
 h1 { font-size: clamp(42px, 6vw, 68px); letter-spacing: -2px; margin: 18px 0; }
+/* Rounded lettering and a soft shadow give the greeting a bubbly look. */
+#home-title {
+    font-family: "Baloo 2", "Arial Rounded MT Bold", sans-serif;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--accent);
+    text-shadow: 2px 3px 0 var(--soft);
+}
 h2 { font-size: 34px; letter-spacing: -1px; margin: 12px 0 24px; }
 h3 { font-size: 21px; margin: 12px 0; }
 p { color: var(--muted); }
@@ -120,7 +136,38 @@ p { color: var(--muted); }
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 28px; }
 .button { display: inline-block; background: var(--accent); color: var(--background); padding: 12px 20px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; }
 .text-link { font-size: 14px; font-weight: bold; }
-.profile-photo { display: block; width: 100%; height: 380px; object-fit: cover; object-position: 44% center; border-radius: 12px; }
+/* A layered pink frame with small sakura and heart decorations. */
+.photo-frame {
+    position: relative;
+    min-width: 0;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 28px;
+    background: var(--soft);
+    box-shadow: inset 0 0 0 5px var(--surface), 6px 8px 0 var(--border);
+}
+.profile-photo { display: block; width: 100%; height: 380px; object-fit: cover; object-position: 44% center; border-radius: 16px; }
+.photo-frame-flower, .photo-frame-heart {
+    position: absolute;
+    pointer-events: none;
+}
+.photo-frame-flower {
+    top: -14px;
+    left: -12px;
+    width: 46px;
+    height: 46px;
+    background: url("assets/sakura-cursor.svg") center / contain no-repeat;
+    transform: rotate(-18deg);
+}
+.photo-frame-heart {
+    right: -9px;
+    bottom: -14px;
+    color: var(--accent);
+    font-size: 40px;
+    line-height: 1;
+    text-shadow: 2px 2px 0 var(--surface);
+    transform: rotate(15deg);
+}
 .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; }
 .about-grid p:first-child { margin-top: 0; }
 .about-details h3:first-child { margin-top: 0; }
