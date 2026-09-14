@@ -173,7 +173,7 @@ function makeDecor(type, index) {
     do { col = randInt(0, COLS - 1); } while (used.has(col));
     used.add(col);
     const kind = randChoice(["tree","bush","flower","rock"]);
-    items.push({ col, kind });
+    items.push({ col, kind, color: randChoice(["#ff91b8", "#ffe99a", "#d1b3ff", "#ffffff"]) });
   }
   return items;
 }
@@ -491,21 +491,21 @@ function drawDecor(item, screenX, screenY) {
     ctx.fillStyle = "#795548";
     ctx.fillRect(cx - 4, cy - 10, 8, 16);
     // Canopy layers
-    ctx.fillStyle = "#2e7d32";
+    ctx.fillStyle = currentTheme.leaf;
     ctx.beginPath(); ctx.arc(cx, cy - 18, 14, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#388e3c";
+    ctx.fillStyle = currentTheme.leaf;
     ctx.beginPath(); ctx.arc(cx - 5, cy - 12, 10, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx + 5, cy - 12, 10, 0, Math.PI * 2); ctx.fill();
     // Highlight
-    ctx.fillStyle = "#43a047";
+    ctx.fillStyle = shadeColor(currentTheme.leaf, 24);
     ctx.beginPath(); ctx.arc(cx - 3, cy - 22, 6, 0, Math.PI * 2); ctx.fill();
 
   } else if (item.kind === "bush") {
-    ctx.fillStyle = "#388e3c";
+    ctx.fillStyle = currentTheme.leaf;
     ctx.beginPath(); ctx.arc(cx,     cy - 6, 10, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx - 8, cy - 2, 8,  0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx + 8, cy - 2, 8,  0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#43a047";
+    ctx.fillStyle = shadeColor(currentTheme.leaf, 24);
     ctx.beginPath(); ctx.arc(cx - 2, cy - 9, 5,  0, Math.PI * 2); ctx.fill();
 
   } else if (item.kind === "flower") {
@@ -515,7 +515,7 @@ function drawDecor(item, screenX, screenY) {
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 12); ctx.stroke();
     // Petals
     const petalColors = ["#e91e63","#ff9800","#ffeb3b","#9c27b0","#03a9f4"];
-    ctx.fillStyle = randChoice(petalColors);
+    ctx.fillStyle = item.color;
     for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
       ctx.beginPath();
       ctx.arc(cx + Math.cos(a) * 5, cy - 12 + Math.sin(a) * 5, 4, 0, Math.PI * 2);
@@ -577,7 +577,7 @@ function shadeColor(hex, amount) {
 let rippleOffset = 0;
 
 function drawLane(lane, screenY) {
-  const colors = LANE_COLORS[lane.type];
+  const colors = currentTheme.lanes[lane.type] || LANE_COLORS[lane.type];
   // Alternating stripe colour based on lane index
   ctx.fillStyle = colors[lane.index % 2];
   ctx.fillRect(0, screenY, CANVAS_W, TILE);
@@ -634,7 +634,7 @@ function drawPlayer() {
   const bh = TILE - 14;
 
   // Drop shadow (ellipse on the ground)
-  const shadowY = x !== player.hopEndX || y !== player.hopEndY
+  const shadowY = player.hopping
     ? player.hopEndY + TILE - 10    // shadow stays at destination during hop
     : y + TILE - 10;
   ctx.fillStyle = "rgba(0,0,0,0.22)";
@@ -647,12 +647,12 @@ function drawPlayer() {
     ctx.save();
     ctx.translate(x + TILE / 2, y + TILE / 2);
     ctx.rotate(0.5);
-    drawChickenBody(0 - TILE / 2 + 8, 0 - TILE / 2 + 6, bw, bh, true);
+    drawAnimalBody(0 - TILE / 2 + 8, 0 - TILE / 2 + 6, bw, bh, true);
     ctx.restore();
     return;
   }
 
-  drawChickenBody(bx, by, bw, bh, false);
+  drawAnimalBody(bx, by, bw, bh, false);
 }
 
 function drawChickenBody(bx, by, bw, bh, dead) {
@@ -828,9 +828,11 @@ function triggerDeath() {
 // ─────────────────────────────────────────────────────────────
 
 document.addEventListener("keydown", function(e) {
+  // Let focused buttons receive their native keyboard activation.
+  if (e.target instanceof HTMLButtonElement && (e.key === "Enter" || e.key === " ")) return;
   // Start / restart shortcuts
   if (!running) {
-    if (e.key === "Enter" || e.key === " ") startGame();
+    if (["Enter", " ", "r", "R"].includes(e.key)) { e.preventDefault(); startGame(); }
     return;
   }
   if (gameOver) {
@@ -937,6 +939,9 @@ function updateScore(newScore) {
 }
 
 function startGame() {
+  chooseAdventure();
+  syncMusic();
+
   // Re-seed random for a fresh world each run
   _seed = Date.now();
 
@@ -1320,3 +1325,152 @@ function drawTrainCar(t, screenY) {
     ctx.fill();
   }
 }
+
+
+// § 15 Adventures — avoid the previous choice, including after a reload.
+const THEMES = [
+  { name: "Clover Meadow", icon: "🌿", bg: "#163f37", glow: "#477b58", panel: "#102c29", accent: "#ffe49a", leaf: "#308456", lanes: { grass: ["#8bc989", "#7cbd80"], safe: ["#8bc989", "#7cbd80"], water: ["#459cb2", "#368ca5"] } },
+  { name: "Cherry Blossom", icon: "🌸", bg: "#472c49", glow: "#946078", panel: "#302238", accent: "#ffd1dc", leaf: "#e999bc", lanes: { grass: ["#d5b8cc", "#c4a8c0"], safe: ["#d5b8cc", "#c4a8c0"], water: ["#708bb7", "#647daa"] } },
+  { name: "Autumn Orchard", icon: "🍂", bg: "#493124", glow: "#a16b3c", panel: "#32251f", accent: "#ffda94", leaf: "#d88743", lanes: { grass: ["#d5b575", "#c6a56a"], safe: ["#d5b575", "#c6a56a"], water: ["#54989c", "#46888f"] } },
+  { name: "Frosty Pines", icon: "❄️", bg: "#24394f", glow: "#567b99", panel: "#192c40", accent: "#c3edff", leaf: "#75a99f", lanes: { grass: ["#d9e9ea", "#c7dce2"], safe: ["#d9e9ea", "#c7dce2"], water: ["#669fbd", "#578faa"] } }
+];
+const ANIMALS = [
+  { name: "Chicken", icon: "🐔", color: "#fff8e1" },
+  { name: "Bunny", icon: "🐰", color: "#fff0e8" },
+  { name: "Fox", icon: "🦊", color: "#ed9a55" },
+  { name: "Panda", icon: "🐼", color: "#f2f4f1" },
+  { name: "Frog", icon: "🐸", color: "#9cd878" }
+];
+let currentTheme = THEMES[0];
+let currentAnimal = ANIMALS[0];
+function readPreference(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function savePreference(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* Private storage may be unavailable. */ }
+}
+function freshChoice(options, key) {
+  const previous = readPreference(key);
+  const choices = options.filter(item => item.name !== previous);
+  const choice = choices[Math.floor(Math.random() * choices.length)];
+  savePreference(key, choice.name);
+  return choice;
+}
+function chooseAdventure() {
+  currentTheme = freshChoice(THEMES, "crossy_theme");
+  currentAnimal = freshChoice(ANIMALS, "crossy_animal");
+  const style = document.documentElement.style;
+  for (const [key, value] of Object.entries({ bg: currentTheme.bg, glow: currentTheme.glow, "panel-bg": currentTheme.panel, accent: currentTheme.accent })) style.setProperty("--" + key, value);
+  document.getElementById("hudTitle").textContent = currentAnimal.icon + " " + currentAnimal.name;
+  document.getElementById("adventureLabel").textContent = currentTheme.icon + " " + currentTheme.name;
+}
+
+// Small hand-drawn animals share the same movement and collision size.
+function drawAnimalBody(x, y, w, h, dead) {
+  if (currentAnimal.name === "Chicken") { drawChickenBody(x, y, w, h, dead); return; }
+  const name = currentAnimal.name;
+  const color = dead ? "#c8c8c8" : currentAnimal.color;
+  function block(bx, by, bw, bh, fill, radius = 5) {
+    ctx.fillStyle = fill; roundRect(bx, by, bw, bh, radius); ctx.fill();
+  }
+  block(x + 3, y + h - 5, 13, 9, shadeColor(color, -30));
+  block(x + w - 16, y + h - 5, 13, 9, shadeColor(color, -30));
+  block(x, y + 5, w, h - 7, shadeColor(color, -18), 10);
+  block(x + 9, y + 21, w - 18, 18, "#fff1da", 8);
+  if (name !== "Frog") {
+    const earH = name === "Bunny" ? 23 : 13;
+    const earColor = name === "Panda" ? "#384252" : color;
+    block(x + 3, y - earH + 6, 12, earH, earColor);
+    block(x + w - 15, y - earH + 6, 12, earH, earColor);
+    if (name === "Bunny") {
+      block(x + 7, y - 13, 4, 15, "#efb3bc", 2);
+      block(x + w - 11, y - 13, 4, 15, "#efb3bc", 2);
+    }
+  }
+  block(x, y, w, 29, color, 10);
+  for (const ex of [x + 12, x + w - 12]) {
+    if (name === "Panda") block(ex - 7, y + 5, 14, 15, "#384252", 6);
+    if (name === "Frog") block(ex - 8, y - 8, 16, 18, color, 7);
+    const ey = name === "Frog" ? y + 1 : y + 12;
+    if (dead) {
+      ctx.strokeStyle = "#384252"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(ex - 3, ey - 3); ctx.lineTo(ex + 3, ey + 3);
+      ctx.moveTo(ex + 3, ey - 3); ctx.lineTo(ex - 3, ey + 3); ctx.stroke();
+    } else {
+      block(ex - 3, ey - 3, 6, 7, "#202936", 2);
+      block(ex - 2, ey - 2, 2, 2, "#ffffff", 1);
+    }
+  }
+  block(x + 4, y + 20, 7, 3, "#eea5ad", 1);
+  block(x + w - 11, y + 20, 7, 3, "#eea5ad", 1);
+  block(x + w / 2 - 3, y + 18, 6, 4, name === "Frog" ? "#46744c" : "#72545c", 2);
+}
+
+// § 16 Music — original, softly plucked pentatonic melody, no audio downloads.
+const musicButton = document.getElementById("musicToggle");
+let musicEnabled = readPreference("crossy_music") !== "off";
+let audioContext;
+let musicGain;
+let musicTimer;
+let nextNoteTime = 0;
+let musicStep = 0;
+const melody = [72, 76, 79, 76, 81, 79, 76, 74, 72, 76, 79, 84, 81, 79, 76, null,
+                74, 77, 81, 77, 79, 77, 74, 72, 74, 76, 79, 76, 74, 72, 72, null];
+function musicNote(midi, time, length, volume) {
+  const oscillator = audioContext.createOscillator();
+  const envelope = audioContext.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
+  envelope.gain.setValueAtTime(0, time);
+  envelope.gain.linearRampToValueAtTime(volume, time + 0.012);
+  envelope.gain.exponentialRampToValueAtTime(0.001, time + length);
+  oscillator.connect(envelope); envelope.connect(musicGain);
+  oscillator.start(time); oscillator.stop(time + length + 0.02);
+  oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
+}
+function scheduleMusic() {
+  if (!musicEnabled || document.hidden || audioContext.state !== "running") return;
+  if (nextNoteTime < audioContext.currentTime) nextNoteTime = audioContext.currentTime + 0.04;
+  while (nextNoteTime < audioContext.currentTime + 0.15) {
+    const note = melody[musicStep % melody.length];
+    if (note !== null) musicNote(note, nextNoteTime, 0.32, 0.22);
+    if (musicStep % 4 === 0) musicNote([48, 53, 55, 48][Math.floor(musicStep / 8) % 4], nextNoteTime, 0.7, 0.16);
+    musicStep++; nextNoteTime += 0.24;
+  }
+}
+async function syncMusic() {
+  musicButton.textContent = musicEnabled ? "♫ Music on" : "♫ Music off";
+  musicButton.setAttribute("aria-pressed", String(musicEnabled));
+  clearInterval(musicTimer);
+  if (!musicEnabled || document.hidden) {
+    if (audioContext) await audioContext.suspend();
+    return;
+  }
+  try {
+    if (!audioContext) {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) throw new Error("Audio unavailable");
+      audioContext = new Audio();
+      musicGain = audioContext.createGain();
+      musicGain.gain.value = 0.35;
+      musicGain.connect(audioContext.destination);
+    }
+    await audioContext.resume();
+    clearInterval(musicTimer);
+    if (!musicEnabled || document.hidden) { await audioContext.suspend(); return; }
+    nextNoteTime = audioContext.currentTime + 0.04;
+    scheduleMusic(); musicTimer = setInterval(scheduleMusic, 80);
+  } catch {
+    musicEnabled = false;
+    musicButton.textContent = "♫ Music unavailable";
+    musicButton.setAttribute("aria-pressed", "false");
+  }
+}
+musicButton.textContent = musicEnabled ? "♫ Music on" : "♫ Music off";
+musicButton.setAttribute("aria-pressed", String(musicEnabled));
+musicButton.addEventListener("click", () => {
+  musicEnabled = !musicEnabled;
+  savePreference("crossy_music", musicEnabled ? "on" : "off");
+  syncMusic();
+});
+document.addEventListener("visibilitychange", () => { if (audioContext) syncMusic(); });

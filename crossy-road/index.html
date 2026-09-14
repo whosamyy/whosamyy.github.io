@@ -7,15 +7,16 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <button id="musicToggle" type="button" aria-pressed="true">♫ Music on</button>
 
     <!-- ══════════════════════════════════════════
          START SCREEN  — shown before game begins
     ══════════════════════════════════════════ -->
     <div id="startScreen" class="overlay">
       <div class="overlay-box">
-        <div class="chicken-logo">🐔</div>
+        <div class="chicken-logo">🐰 🦊 🐸</div>
         <h1>Crossy Road</h1>
-        <p class="tagline">How far can you go?</p>
+        <p class="tagline">Little paws. Big adventures.</p>
 
         <div class="instructions">
           <p><strong>Move:</strong> Arrow Keys or WASD</p>
@@ -25,6 +26,7 @@
           <p><strong>⚠ Train:</strong> Wait for lights to stop flashing!</p>
         </div>
 
+        <p class="adventure-hint">A new animal &amp; a new world every run.</p>
         <button id="startBtn" class="big-btn">▶ Start Game</button>
 
         <p class="hint">Press <kbd>Space</kbd> or <kbd>Enter</kbd> to start</p>
@@ -50,6 +52,7 @@
     ══════════════════════════════════════════ -->
     <div id="gameWrapper" class="hidden">
 
+      <div id="adventureLabel">🌿 Clover Meadow</div>
       <!-- top HUD bar -->
       <div id="hud">
         <span id="hudScore">Score: 0</span>

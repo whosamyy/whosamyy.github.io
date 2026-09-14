@@ -2,6 +2,7 @@
 
 ## Tools Used
 - Kiro
+- Codex
 
 ## In-Class Prompts
 I was not present for the in-class work session, so I do not have any in-class prompts.
@@ -48,6 +49,7 @@ Please update that file with this structure:
 
 ## Tools Used
 - Kiro
+- Codex
 
 ## In-Class Prompts
 I was not present for the in-class work session, so I do not have any in-class prompts.
@@ -79,3 +81,9 @@ Train/subway event: every so often, warning lights flash and a fast train crosse
 **Prompt 6:**
 
 i feel like when the chicken gets to the top, every jump's movement is too big (the screen moves too much) so it seems kind of glitchy
+
+
+---
+
+**Prompt 7:**
+Add some additional features to my crossy road: Different background everytime and different animal every time so that's it's not just that chicken. Make it look good. Also, add cute music to my game where you can turn on and off the music
