@@ -118,3 +118,32 @@ Implemented:
 - Stable text spacing and reduced-motion support.
 
 JavaScript syntax and animation behavior checks passed.
+
+## User — Crossy Road background
+
+for the crossy road section, add a background for it so that project section isn't just blank and "crossy road"
+
+## Assistant — plan
+
+I’ll find the Crossy Road project section and add a background that fits the site’s design.
+
+I’ll add a pixel-style scene with roads, cars, grass, and a chicken above the Crossy Road description, using soft pink accents to match your theme.
+
+## Assistant — closing reply
+
+Added a pixel-style background to the Crossy Road card with roads, pastel cars, grass, and a chicken. It scales to fit the card on mobile, too.
+
+SVG, markup, game link, and diff checks passed.
+
+## User — cuter typewriter text
+
+Math, computer science, and a little matcha.
+make the script of that typewrite text cuter
+
+## Assistant — plan
+
+I’ll give the typewriter line a cuter, handwritten font while keeping its animation.
+
+## Assistant — closing reply
+
+Changed the typewriter line to a playful handwritten font in pink, with slightly larger lettering. The typing animation stays intact. The font is included locally with its license.

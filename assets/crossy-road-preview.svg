@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <!-- Simple block shapes echo the game's roads, cars, and chicken. -->
+  <rect width="600" height="200" fill="#d9e8cd"/>
+  <path d="M0 22h600v64H0zM0 132h600v52H0z" fill="#665867"/>
+  <path d="M0 27h600M0 81h600M0 137h600M0 179h600" stroke="#8e7b8c" stroke-width="3"/>
+  <path d="M0 54h600M0 158h600" stroke="#f7e9cf" stroke-width="3" stroke-dasharray="23 20"/>
+  <!-- Grass and flowers. -->
+  <path d="M28 101h6v8h-6zM39 106h6v8h-6zM193 115h6v8h-6zM420 100h6v8h-6zM430 105h6v8h-6zM552 189h6v8h-6zM98 7h6v8h-6z" fill="#a6c28f"/>
+  <path d="M143 99h7v7h-7zM459 119h7v7h-7zM523 7h7v7h-7z" fill="#e69bb9"/>
+  <!-- Pink car. -->
+  <g transform="translate(102 34)">
+    <path d="M8-4h13v7H8zM8 33h13v7H8zM50-4h13v7H50zM50 33h13v7H50z" fill="#382d3d"/>
+    <rect width="72" height="36" fill="#d879a3"/>
+    <path d="M19 5h31v26H19z" fill="#f4b9d1"/>
+    <path d="M42 6h10v24H42zM15 6h8v24h-8z" fill="#685d79"/>
+    <path d="M67 3h5v7h-5zM67 26h5v7h-5z" fill="#fff1cd"/>
+  </g>
+  <!-- Lavender car traveling in the other lane. -->
+  <g transform="translate(398 141)">
+    <path d="M9-4h12v6H9zM9 32h12v6H9zM48-4h12v6H48zM48 32h12v6H48z" fill="#382d3d"/>
+    <rect width="68" height="33" fill="#aaa0cb"/>
+    <path d="M21 4h30v25H21z" fill="#d3cbea"/>
+    <path d="M17 5h9v23h-9zM47 5h8v23h-8z" fill="#685d79"/>
+    <path d="M0 3h5v6H0zM0 24h5v6H0z" fill="#fff1cd"/>
+  </g>
+  <!-- Blocky chicken waiting on the grass. -->
+  <g transform="translate(289 88)">
+    <rect x="-5" y="28" width="39" height="8" fill="#b3ca9f"/>
+    <path d="M6 28h6v8H6zM21 28h6v8h-6z" fill="#e4a14f"/>
+    <path d="M0 9h30v21H0zM9 0h21v15H9z" fill="#fffaf1"/>
+    <path d="M0 18h12v10H0z" fill="#e6d9d5"/>
+    <path d="M13-5h12v6H13z" fill="#cf6688"/>
+    <path d="M30 8h8v6h-8z" fill="#e4a14f"/>
+    <path d="M24 4h4v4h-4z" fill="#382d3d"/>
+  </g>
+</svg>

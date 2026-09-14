@@ -1,5 +1,13 @@
 /* AI assistance: Codex drafted these styles. Variables hold shared colors;
    flex/grid arrange content, and the media query adapts it to small screens. */
+@font-face {
+    font-family: "Coming Soon";
+    src: url("assets/coming-soon.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
 :root {
     --background: #fff7fa;
     --surface: #ffffff;
@@ -48,8 +56,13 @@ h1 { font-size: clamp(42px, 6vw, 68px); letter-spacing: -2px; margin: 18px 0; }
 h2 { font-size: 34px; letter-spacing: -1px; margin: 12px 0 24px; }
 h3 { font-size: 21px; margin: 12px 0; }
 p { color: var(--muted); }
-.intro { font-size: 22px; color: var(--text); }
-.intro { display: grid; }
+.intro {
+    display: grid;
+    font-family: "Coming Soon", "Comic Sans MS", cursive;
+    font-size: clamp(23px, 2.6vw, 28px);
+    line-height: 1.6;
+    color: var(--accent);
+}
 .intro-full, .intro-typed { grid-area: 1 / 1; }
 .intro-typed { display: none; }
 .intro.is-typing .intro-full { opacity: 0; }
@@ -76,6 +89,10 @@ p { color: var(--muted); }
 .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 30px; }
 .project-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
 .project-preview { min-height: 160px; display: flex; align-items: center; justify-content: center; background: var(--soft); font-size: 13px; }
+/* A decorative game scene fills the card preview at every screen size. */
+.crossy-preview {
+    background: #d9e8cd url("assets/crossy-road-preview.svg") center / cover no-repeat;
+}
 .project-content, .upcoming { padding: 28px; }
 .upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .contact-note { margin-top: 20px; }
