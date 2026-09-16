@@ -171,6 +171,19 @@ p { color: var(--muted); }
 .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; }
 .about-grid p:first-child { margin-top: 0; }
 .about-details h3:first-child { margin-top: 0; }
+.section-intro { max-width: 670px; margin-bottom: 30px; }
+.experience-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.experience-card { padding: 30px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.featured-experience { border-top: 4px solid var(--accent); }
+.experience-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.experience-heading .eyebrow { margin: 0; }
+.experience-heading h3 { margin: 8px 0 0; }
+.experience-card > p { margin: 20px 0 14px; }
+.experience-card ul:not(.tags) { margin: 0; padding-left: 20px; color: var(--muted); }
+.experience-card li { margin-bottom: 8px; }
+.publication { font-size: 14px; line-height: 1.55; }
+.experience-summary { margin-top: 24px; padding: 18px 22px; border-left: 3px solid var(--accent); background: var(--soft); }
+.experience-summary p { margin: 0; }
 .placeholder { font-size: 14px; }
 .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 18px 0; }
 .tags li, .status { font-size: 12px; background: var(--soft); color: var(--accent); padding: 4px 10px; border-radius: 4px; }
@@ -208,7 +221,7 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px
 @media (max-width: 700px) {
     .header-content { flex-wrap: wrap; gap: 16px; }
     nav { order: 3; width: 100%; justify-content: space-between; gap: 12px; }
-    .hero, .about-grid, .project-grid { grid-template-columns: 1fr; gap: 28px; }
+    .hero, .about-grid, .experience-grid, .project-grid { grid-template-columns: 1fr; gap: 28px; }
     .hero { padding: 52px 0; }
     .profile-photo { height: 340px; }
     section { padding: 48px 0; }
