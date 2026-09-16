@@ -180,3 +180,5 @@ DESIGN / API / README / PORTFOLIO / WORKFLOW
 ==================================================
 
 Build a polished, accessible, responsive food app without large libraries. Use async/await and fetch(), inspect the real API response first, fetch only once, and comment the request for class explanation. Add the project to the main portfolio as Recipe Finder with a relative `recipe-finder/` Try It link. Create a student-friendly README covering what it does, the API, how the call works, how to run, features, AI tools, and an empty Known Issues section. Do not commit or push anything; report files changed, endpoint and JSON fields, matching, localStorage, local testing, edge cases, security findings, and what to understand before submission.
+
+Is it possible to add nutrition info for the recipe finder as well?

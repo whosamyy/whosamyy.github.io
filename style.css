@@ -194,6 +194,12 @@ p { color: var(--muted); }
 .crossy-preview {
     background: #d9e8cd url("assets/crossy-road-preview.svg") center / cover no-repeat;
 }
+.recipe-preview {
+    background: #d9e8cd url("https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80") center / cover no-repeat;
+}
+.portfolio-preview {
+    background: #fce3ee url("https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80") center / cover no-repeat;
+}
 .project-content, .upcoming { padding: 28px; }
 .upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .contact-note { margin-top: 20px; }

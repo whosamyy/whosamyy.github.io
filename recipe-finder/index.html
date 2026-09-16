@@ -12,21 +12,24 @@
     <header class="site-header"><a class="brand" href="../">Amy Hu <span>✦ Recipe Finder</span></a></header>
     <main>
         <section class="hero">
-            <p class="eyebrow">MAKE MORE WITH WHAT YOU HAVE</p>
-            <h1>What's in your kitchen?</h1>
-            <p>Enter what you have and find something to cook.</p>
-            <div class="ingredient-entry">
-                <label class="sr-only" for="ingredient-input">Add an ingredient</label>
-                <input id="ingredient-input" type="text" placeholder="Try chicken, rice, or garlic" autocomplete="off">
-                <button id="add-ingredient" class="secondary" type="button">Add ingredient</button>
+            <div class="hero-copy">
+                <p class="eyebrow">MAKE MORE WITH WHAT YOU HAVE</p>
+                <h1>What's in your kitchen?</h1>
+                <p>Enter what you have and find something to cook.</p>
+                <div class="ingredient-entry">
+                    <label class="sr-only" for="ingredient-input">Add an ingredient</label>
+                    <input id="ingredient-input" type="text" placeholder="Try chicken, rice, or garlic" autocomplete="off">
+                    <button id="add-ingredient" class="secondary" type="button">Add ingredient</button>
+                </div>
+                <div id="ingredient-chips" class="chips" aria-live="polite"></div>
+                <div class="hero-actions">
+                    <button id="find-recipes" class="primary" type="button">Find recipes</button>
+                    <button id="surprise-me" class="secondary" type="button" disabled>Surprise me ✨</button>
+                    <button id="clear-all" class="text-button" type="button">Clear all</button>
+                </div>
+                <p id="input-message" class="input-message" aria-live="polite"></p>
             </div>
-            <div id="ingredient-chips" class="chips" aria-live="polite"></div>
-            <div class="hero-actions">
-                <button id="find-recipes" class="primary" type="button">Find recipes</button>
-                <button id="surprise-me" class="secondary" type="button" disabled>Surprise me ✨</button>
-                <button id="clear-all" class="text-button" type="button">Clear all</button>
-            </div>
-            <p id="input-message" class="input-message" aria-live="polite"></p>
+            <img class="hero-image" src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Colorful fresh ingredients in bowls">
         </section>
 
         <section class="controls" aria-label="Recipe controls">

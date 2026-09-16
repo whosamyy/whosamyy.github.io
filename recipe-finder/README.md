@@ -10,7 +10,7 @@ This app uses the keyless public [DummyJSON Recipes API](https://dummyjson.com/d
 
 ## How the API Call Works
 
-`app.js` uses `fetch()` to send an HTTP GET request to the recipe endpoint. After checking that the response succeeded, `response.json()` converts the JSON response into JavaScript objects. The response contains a `recipes` array; this app uses fields such as `name`, `ingredients`, `instructions`, `image`, `cuisine`, `difficulty`, `mealType`, `prepTimeMinutes`, `cookTimeMinutes`, `servings`, and `rating`. The recipe list is fetched once and cached in memory, then filtering and matching happen locally.
+`app.js` uses `fetch()` to send an HTTP GET request to the recipe endpoint. After checking that the response succeeded, `response.json()` converts the JSON response into JavaScript objects. The response contains a `recipes` array; this app uses fields such as `name`, `ingredients`, `instructions`, `image`, `cuisine`, `difficulty`, `mealType`, `prepTimeMinutes`, `cookTimeMinutes`, `servings`, `rating`, and `caloriesPerServing`. The recipe list is fetched once and cached in memory, then filtering and matching happen locally.
 
 ## How to Run
 
@@ -21,7 +21,7 @@ Open `recipe-finder/index.html` through a local web server (for example, run `py
 - Ingredient chips, Enter-to-add, duplicate prevention, and clear all
 - Partial ingredient matching with match percentages and missing ingredients
 - Sort by match, total time, or rating; filter by cuisine, difficulty, meal type, and time
-- Recipe detail dialog, localStorage favorites, and Surprise Me
+- Recipe detail dialog with calories per serving, localStorage favorites, and Surprise Me
 - Helpful loading, empty-input, no-results, and failed-request messages
 
 ## AI Tools Used
