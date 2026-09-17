@@ -195,11 +195,24 @@ p { color: var(--muted); }
     background: #d9e8cd url("assets/crossy-road-preview.svg") center / cover no-repeat;
 }
 .recipe-preview {
-    background: #d9e8cd url("https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80") center / cover no-repeat;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 18% 23%, #fff8d8 0 7%, transparent 7.5%),
+        radial-gradient(circle at 75% 75%, #ffd2df 0 10%, transparent 10.5%),
+        linear-gradient(135deg, #ffe8bd, #ffd5d9 48%, #d9efd8);
 }
+.recipe-preview::after { content: "✦  ♡  ✦"; position: absolute; inset: 0; display: grid; place-items: center; color: #bf5a76; font-size: 32px; letter-spacing: 13px; text-shadow: 2px 2px 0 #fff9f2; transform: rotate(-8deg); }
 .portfolio-preview {
-    background: #fce3ee url("https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80") center / cover no-repeat;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 20% 20%, #fff 0 5%, transparent 5.5%),
+        radial-gradient(circle at 78% 73%, #ffd7e8 0 13%, transparent 13.5%),
+        repeating-linear-gradient(45deg, transparent 0 19px, rgba(255,255,255,.45) 20px 22px),
+        linear-gradient(135deg, #f8d6e5, #eadcff 54%, #cfebed);
 }
+.portfolio-preview::after { content: "✿  ♡  ✿"; position: absolute; inset: 0; display: grid; place-items: center; color: #a52c61; font-size: 35px; letter-spacing: 12px; text-shadow: 2px 2px 0 #fff; transform: rotate(7deg); }
 .project-content, .upcoming { padding: 28px; }
 .upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .contact-note { margin-top: 20px; }
