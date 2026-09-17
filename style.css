@@ -202,7 +202,8 @@ p { color: var(--muted); }
         radial-gradient(circle at 75% 75%, #ffd2df 0 10%, transparent 10.5%),
         linear-gradient(135deg, #ffe8bd, #ffd5d9 48%, #d9efd8);
 }
-.recipe-preview::after { content: "✦  ♡  ✦"; position: absolute; inset: 0; display: grid; place-items: center; color: #bf5a76; font-size: 32px; letter-spacing: 13px; text-shadow: 2px 2px 0 #fff9f2; transform: rotate(-8deg); }
+.recipe-preview::after { content: "🍓  🥕  🍋"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 36px; letter-spacing: 10px; text-shadow: 2px 2px 0 #fff9f2; transform: rotate(-8deg); }
+.recipe-preview::before { content: "recipe finder"; position: absolute; z-index: 1; right: 16px; bottom: 13px; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.78); color: #a84a65; font: 700 11px Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
 .portfolio-preview {
     position: relative;
     overflow: hidden;
@@ -212,7 +213,8 @@ p { color: var(--muted); }
         repeating-linear-gradient(45deg, transparent 0 19px, rgba(255,255,255,.45) 20px 22px),
         linear-gradient(135deg, #f8d6e5, #eadcff 54%, #cfebed);
 }
-.portfolio-preview::after { content: "✿  ♡  ✿"; position: absolute; inset: 0; display: grid; place-items: center; color: #a52c61; font-size: 35px; letter-spacing: 12px; text-shadow: 2px 2px 0 #fff; transform: rotate(7deg); }
+.portfolio-preview::after { content: "⌨️  { }  ✿"; position: absolute; inset: 0; display: grid; place-items: center; color: #a52c61; font: 700 34px "Courier New", monospace; letter-spacing: 8px; text-shadow: 2px 2px 0 #fff; transform: rotate(7deg); }
+.portfolio-preview::before { content: "personal portfolio"; position: absolute; z-index: 1; right: 16px; bottom: 13px; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.78); color: #8c3d76; font: 700 11px Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
 .project-content, .upcoming { padding: 28px; }
 .upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .contact-note { margin-top: 20px; }
