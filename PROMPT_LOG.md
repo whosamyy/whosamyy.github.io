@@ -1,10 +1,10 @@
-# Project 1 prompt log
+# Portfolio prompt log
 
 Keep adding your prompts and the assistant's conversational replies here as you develop the site. Generated code and tool output are omitted. This records the initial exchange; add the closing reply and any later conversations as well.
 
 ## User — initial request
 
-Create an imI am building a personal portfolio website for my CMU 15-113 Project 1. Work inside this existing repository. Do not create another repo. First create a simple responsive one-page portfolio with sections for Home, About Me, Projects, and Contact. Use HTML and CSS, with minimal JavaScript. Keep the code beginner-friendly because I need to understand and explain it. Do not overcomplicate the design. Before making major design decisions, tell me what you plan to change.
+Create an imI am building a personal portfolio website. Work inside this existing repository. Do not create another repo. First create a simple responsive one-page portfolio with sections for Home, About Me, Projects, and Contact. Use HTML and CSS, with minimal JavaScript. Keep the code beginner-friendly because I need to understand and explain it. Do not overcomplicate the design. Before making major design decisions, tell me what you plan to change.
 
 ## Assistant — initial response
 
@@ -12,7 +12,7 @@ I’ll read the assignment and example, then inspect this repository. Before edi
 
 ## Assistant — design plan
 
-The assignment asks for a bio, photo, interests, skills, projects (including this portfolio), contact details, responsive layout, and AI documentation. It also asks you to try an interactive feature and keep a prompt log. [Assignment](https://www.cs.cmu.edu/~113/project1.html)
+The portfolio will include a bio, photo, interests, skills, projects, contact details, a responsive layout, and an interactive feature.
 
 I’ll use your existing name, Amy Hu, and build a single page with a warm white background, dark text, a muted green accent, and simple project cards. Navigation will jump to each section, and a small dark-mode button will provide the JavaScript interaction. I’ll use clearly labeled placeholders for missing personal details. The example’s clear navigation is useful inspiration; your site will have an original, simpler layout. [Example](https://tshakeel05.github.io/)
 

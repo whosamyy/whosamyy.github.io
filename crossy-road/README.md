@@ -1,6 +1,6 @@
 # Crossy Road
 
-This is my version of Crossy Road for 15-113 HW2. It has the normal cars and roads, but I also added water with moving logs, train tracks, different weather conditions like rain/snow/fog, and a high score system. There are now different animals, scenery themes, and background music too.
+This is my browser-based version of Crossy Road. It includes cars and roads, plus water with moving logs, train tracks, changing weather, and a high-score system. There are also different animals, scenery themes, and background music.
 
 ## How to Play
 
@@ -28,7 +28,7 @@ I wanted each run to feel a little different instead of always having the same c
 
 ## AI Tools Used
 
-I mainly used Kiro to help me build and debug the game. I also used ChatGPT (GPT-5.6) to help me understand the assignment, plan out features, and organize parts of the project.
+I mainly used Kiro to help me build and debug the game. I also used ChatGPT (GPT-5.6) to plan features and organize parts of the project.
 
 My overall strategy was to first get the basic Crossy Road gameplay working, like movement, scoring, cars, and collisions. After that, I added extra features one at a time, like logs, trains, weather, animations, and the high score system.
 

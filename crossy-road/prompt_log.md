@@ -4,19 +4,10 @@
 - Kiro
 - Codex
 
-## In-Class Prompts
-I was not present for the in-class work session, so I do not have any in-class prompts.
-
-## At-Home Prompts
+## Development Prompts
 
 **Prompt 1:**
-https://www.cs.cmu.edu/~113/hw2.html
-
-these are my instructions for this crossy road project.
-
- 
-
-I am working on CMU 15-113 HW2. I need to build a Crossy Road-style browser game in plain HTML, CSS, and JavaScript that will run directly on GitHub Pages.  
+I am building a Crossy Road-style browser game in plain HTML, CSS, and JavaScript that will run directly on GitHub Pages.
   
 I am working inside my existing whosamyy.github.io repository.  
   
