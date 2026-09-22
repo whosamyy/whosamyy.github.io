@@ -1,9 +1,8 @@
-// Recipe Finder uses DummyJSON's public, keyless recipes endpoint.
-// fetch() sends an HTTP GET request; response.json() turns the JSON response
-// into JavaScript objects. We use recipes plus fields including ingredients,
-// image, cuisine, difficulty, mealType, prepTimeMinutes, cookTimeMinutes, and rating.
-const API_URL = "https://dummyjson.com/recipes?limit=0";
-const state = { recipes: [], ingredients: [], favorites: loadFavorites(), searched: false };
+// The separate Flask backend fetches DummyJSON and ranks ingredient matches.
+const API_URL = "https://recipe-finder-backend-o6bk.onrender.com/recommend";
+const INITIAL_MESSAGE = "Add ingredients, then choose Find recipes to see your best matches.";
+let activeRequest = null;
+const state = { recipes: [], ingredients: [], favorites: loadFavorites(), searched: false, resultIngredients: [] };
 const $ = (selector) => document.querySelector(selector);
 const el = {
   input: $("#ingredient-input"), chips: $("#ingredient-chips"), message: $("#input-message"),
@@ -11,32 +10,70 @@ const el = {
   sort: $("#sort"), cuisine: $("#cuisine"), difficulty: $("#difficulty"), mealType: $("#meal-type"), maxTime: $("#max-time"), favoritesOnly: $("#favorites-only"), surprise: $("#surprise-me")
 };
 
-function loadFavorites() { try { return JSON.parse(localStorage.getItem("recipe-finder-favorites")) || []; } catch { return []; } }
-function saveFavorites() { localStorage.setItem("recipe-finder-favorites", JSON.stringify(state.favorites)); }
+function loadFavorites() { try { const saved = JSON.parse(localStorage.getItem("recipe-finder-favorites")); return Array.isArray(saved) ? saved.filter(Number.isFinite) : []; } catch { return []; } }
+function saveFavorites() { try { localStorage.setItem("recipe-finder-favorites", JSON.stringify(state.favorites)); } catch { el.message.textContent = "Your favorite is saved for this visit, but browser storage is unavailable."; } }
 function normalized(text) { return String(text).toLowerCase().replace(/[^a-z0-9 ]/g, " ").trim(); }
-function matchesIngredient(userIngredient, recipeIngredient) {
-  const user = normalized(userIngredient), recipe = normalized(recipeIngredient);
-  if (!user || !recipe) return false;
-  const userWords = user.split(/\s+/), recipeWords = recipe.split(/\s+/);
-  return recipe.includes(user) || user.includes(recipe) || userWords.some(word => word.length > 2 && recipeWords.some(part => part === word || part.startsWith(word) || word.startsWith(part)));
-}
-function getMatch(recipe) {
-  const matched = state.ingredients.filter(ingredient => recipe.ingredients.some(item => matchesIngredient(ingredient, item)));
-  return { recipe, matched, score: state.ingredients.length ? matched.length / state.ingredients.length : 0 };
-}
-function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value; return div.innerHTML; }
+function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value; return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
 
+function validRecipe(recipe) {
+  if (!recipe || typeof recipe !== "object") return false;
+  return ["name", "image", "cuisine", "difficulty"].every(key => typeof recipe[key] === "string") &&
+    ["ingredients", "instructions", "mealType", "matchedIngredients", "missingIngredients"].every(key =>
+      Array.isArray(recipe[key]) && recipe[key].every(value => typeof value === "string")) &&
+    ["id", "prepTimeMinutes", "cookTimeMinutes", "rating", "servings", "caloriesPerServing", "reviewCount", "matchCount", "matchPercentage"].every(key =>
+      Number.isFinite(recipe[key]) && recipe[key] >= 0);
+}
+function cancelRequest() {
+  if (activeRequest) activeRequest.abort();
+  activeRequest = null;
+  el.grid.setAttribute("aria-busy", "false");
+  $("#find-recipes").disabled = false;
+}
+function invalidateResults() {
+  cancelRequest();
+  state.searched = false; state.recipes = []; state.resultIngredients = [];
+  el.grid.innerHTML = ""; el.count.textContent = ""; el.surprise.disabled = true;
+  el.status.textContent = INITIAL_MESSAGE;
+}
 async function fetchRecipes() {
+  cancelRequest();
+  const controller = new AbortController();
+  activeRequest = controller;
+  const ingredients = [...state.ingredients];
+  state.searched = false; state.recipes = [];
+  el.grid.innerHTML = ""; el.count.textContent = ""; el.surprise.disabled = true;
+  el.grid.setAttribute("aria-busy", "true");
+  $("#find-recipes").disabled = true;
+  el.status.textContent = "Finding recipes... The server may take a few seconds to wake up.";
+  // Allow a sleeping Render service up to two minutes to respond.
+  const timeout = setTimeout(() => controller.abort(), 120000);
   try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error(`The API returned ${response.status}.`);
-    const data = await response.json();
-    if (!data || !Array.isArray(data.recipes)) throw new Error("The recipe data was not in the expected format.");
-    state.recipes = data.recipes;
-    populateFilters();
-    el.status.textContent = "Add ingredients, then choose Find recipes to see your best matches.";
+    const response = await fetch(API_URL, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ingredients, limit: 100 }), signal: controller.signal
+    });
+    let data;
+    try { data = await response.json(); }
+    catch { throw new Error(response.ok ? "The server returned unreadable recipe data. Please try again." : `The recipe server is unavailable (HTTP ${response.status}). Please try again shortly.`); }
+    if (!response.ok || data?.error || data?.success === false) {
+      throw new Error(typeof data?.error === "string" ? `Couldn't find recipes: ${data.error}` : `The recipe server could not complete your request (HTTP ${response.status}). Please try again.`);
+    }
+    if (!data || data.success !== true || !Array.isArray(data.recipes) || !data.recipes.every(validRecipe) ||
+        !Array.isArray(data.ingredients) || !data.ingredients.length || !data.ingredients.every(value => typeof value === "string")) {
+      throw new Error("The server returned incomplete recipe data. Please try again shortly.");
+    }
+    if (activeRequest !== controller) return;
+    state.recipes = data.recipes; state.resultIngredients = data.ingredients; state.searched = true;
+    populateFilters(); renderResults();
   } catch (error) {
-    el.status.textContent = `Couldn't load recipes right now. Check your connection and try reloading. (${error.message})`;
+    if (activeRequest !== controller) return;
+    el.status.textContent = controller.signal.aborted
+      ? "The server is taking longer than expected to wake up. Please choose Find recipes to try again."
+      : error instanceof TypeError ? "Couldn't reach the recipe server. Check your connection and try again shortly."
+      : error.message;
+  } finally {
+    clearTimeout(timeout);
+    if (activeRequest === controller) { activeRequest = null; el.grid.setAttribute("aria-busy", "false"); $("#find-recipes").disabled = false; }
   }
 }
 function populateFilters() {
@@ -44,27 +81,31 @@ function populateFilters() {
   addOptions(el.difficulty, [...new Set(state.recipes.map(r => r.difficulty))].sort());
   addOptions(el.mealType, [...new Set(state.recipes.flatMap(r => r.mealType || []))].sort());
 }
-function addOptions(select, values) { values.forEach(value => select.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)); }
+function addOptions(select, values) { const selected = select.value; select.length = 1; if (selected && !values.includes(selected)) values.push(selected); values.forEach(value => select.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)); select.value = selected; }
 
 function addIngredient() {
-  const ingredient = el.input.value.trim().replace(/\s+/g, " ");
-  if (!ingredient) { el.message.textContent = "Type an ingredient first."; return; }
-  if (state.ingredients.some(item => normalized(item) === normalized(ingredient))) { el.message.textContent = "That ingredient is already on your list."; return; }
-  state.ingredients.push(ingredient); el.input.value = ""; el.message.textContent = ""; renderChips();
+  const ingredients = el.input.value.split(",").map(value => value.trim().replace(/\s+/g, " ")).filter(Boolean);
+  if (!ingredients.length) { el.message.textContent = "Type an ingredient first."; return false; }
+  if (ingredients.some(value => value.length > 100 || !/[\p{L}\p{N}]/u.test(value))) { el.message.textContent = "Use ingredient names of at most 100 characters, containing a letter or number."; return false; }
+  const added = ingredients.filter((value, index) => !state.ingredients.some(item => normalized(item) === normalized(value)) && ingredients.findIndex(item => normalized(item) === normalized(value)) === index);
+  if (state.ingredients.length + added.length > 50) { el.message.textContent = "Please use at most 50 ingredients."; return false; }
+  if (!added.length) { el.message.textContent = "Those ingredients are already on your list."; el.input.value = ""; return true; }
+  state.ingredients.push(...added); el.input.value = ""; el.message.textContent = ""; invalidateResults(); renderChips(); return true;
 }
+
 function renderChips() {
   el.chips.innerHTML = state.ingredients.map((ingredient, index) => `<span class="chip">${escapeHtml(ingredient)} <button type="button" data-remove="${index}" aria-label="Remove ${escapeHtml(ingredient)}">×</button></span>`).join("");
-  el.chips.querySelectorAll("[data-remove]").forEach(button => button.addEventListener("click", () => { state.ingredients.splice(Number(button.dataset.remove), 1); renderChips(); if (state.searched) renderResults(); }));
+  el.chips.querySelectorAll("[data-remove]").forEach(button => button.addEventListener("click", () => { state.ingredients.splice(Number(button.dataset.remove), 1); invalidateResults(); renderChips(); }));
 }
 function currentResults() {
-  let results = state.recipes.map(getMatch).filter(item => item.score > 0);
+  let results = state.recipes.map(recipe => ({ recipe, matched: recipe.matchedIngredients, score: recipe.matchPercentage / 100 }));
   if (el.cuisine.value) results = results.filter(item => item.recipe.cuisine === el.cuisine.value);
   if (el.difficulty.value) results = results.filter(item => item.recipe.difficulty === el.difficulty.value);
   if (el.mealType.value) results = results.filter(item => (item.recipe.mealType || []).includes(el.mealType.value));
   if (el.maxTime.value) results = results.filter(item => item.recipe.prepTimeMinutes + item.recipe.cookTimeMinutes <= Number(el.maxTime.value));
   if (el.favoritesOnly.checked) results = results.filter(item => state.favorites.includes(item.recipe.id));
   const sort = el.sort.value;
-  return results.sort((a, b) => sort === "time" ? totalTime(a.recipe) - totalTime(b.recipe) : sort === "rating" ? b.recipe.rating - a.recipe.rating : b.score - a.score || b.recipe.rating - a.recipe.rating);
+  return results.sort((a, b) => sort === "time" ? totalTime(a.recipe) - totalTime(b.recipe) : sort === "rating" ? b.recipe.rating - a.recipe.rating : 0);
 }
 function totalTime(recipe) { return recipe.prepTimeMinutes + recipe.cookTimeMinutes; }
 function renderResults() {
@@ -78,8 +119,8 @@ function renderResults() {
   el.grid.querySelectorAll("[data-details]").forEach(button => button.addEventListener("click", () => openDetails(Number(button.dataset.details))));
 }
 function card({ recipe, matched, score }) {
-  const saved = state.favorites.includes(recipe.id), needed = recipe.ingredients.filter(item => !matched.some(ingredient => matchesIngredient(ingredient, item))).slice(0, 3);
-  return `<article class="recipe-card"><img class="recipe-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}" loading="lazy"><div class="card-body"><div class="card-top"><h3>${escapeHtml(recipe.name)}</h3><button class="heart" data-favorite="${recipe.id}" aria-label="${saved ? "Remove" : "Save"} ${escapeHtml(recipe.name)}">${saved ? "♥" : "♡"}</button></div><p class="meta">${escapeHtml(recipe.cuisine)} · ${escapeHtml(recipe.difficulty)} · ★ ${recipe.rating}<br>Prep ${recipe.prepTimeMinutes} min · Cook ${recipe.cookTimeMinutes} min · Serves ${recipe.servings}</p><p class="nutrition">⚡ ${recipe.caloriesPerServing} calories per serving</p><span class="match">${matched.length} of ${state.ingredients.length} ingredients match (${Math.round(score * 100)}%)</span><p class="matched"><strong>You have:</strong> ${escapeHtml(matched.join(", "))}<br><strong>Still need:</strong> ${escapeHtml(needed.join(", ") || "nothing listed")}</p><button class="details-button" data-details="${recipe.id}" type="button">View recipe</button></div></article>`;
+  const saved = state.favorites.includes(recipe.id), needed = recipe.missingIngredients.slice(0, 3);
+  return `<article class="recipe-card"><img class="recipe-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}" loading="lazy"><div class="card-body"><div class="card-top"><h3>${escapeHtml(recipe.name)}</h3><button class="heart" data-favorite="${recipe.id}" aria-label="${saved ? "Remove" : "Save"} ${escapeHtml(recipe.name)}">${saved ? "♥" : "♡"}</button></div><p class="meta">${escapeHtml(recipe.cuisine)} · ${escapeHtml(recipe.difficulty)} · ★ ${recipe.rating}<br>Prep ${recipe.prepTimeMinutes} min · Cook ${recipe.cookTimeMinutes} min · Serves ${recipe.servings}</p><p class="nutrition">⚡ ${recipe.caloriesPerServing} calories per serving</p><span class="match">${recipe.matchCount} of ${state.resultIngredients.length} ingredients match (${Math.round(score * 100)}%)</span><p class="matched"><strong>You have:</strong> ${escapeHtml(matched.join(", "))}<br><strong>Still need:</strong> ${escapeHtml(needed.join(", ") || "nothing listed")}</p><button class="details-button" data-details="${recipe.id}" type="button">View recipe</button></div></article>`;
 }
 function toggleFavorite(id) { state.favorites = state.favorites.includes(id) ? state.favorites.filter(item => item !== id) : [...state.favorites, id]; saveFavorites(); renderResults(); }
 function openDetails(id) {
@@ -87,8 +128,8 @@ function openDetails(id) {
   el.modalContent.innerHTML = `<img class="modal-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}"><div class="modal-body"><h2 id="modal-title">${escapeHtml(recipe.name)}</h2><p class="meta">${escapeHtml(recipe.cuisine)} · ${escapeHtml(recipe.difficulty)} · ★ ${recipe.rating} (${recipe.reviewCount} reviews)</p><div class="detail-grid"><div><strong>Prep</strong>${recipe.prepTimeMinutes} min</div><div><strong>Cook</strong>${recipe.cookTimeMinutes} min</div><div><strong>Serves</strong>${recipe.servings}</div><div><strong>Meal</strong>${escapeHtml((recipe.mealType || []).join(", "))}</div></div><section class="nutrition-panel" aria-label="Nutrition information"><p class="eyebrow">NUTRITION</p><p><strong>${recipe.caloriesPerServing} calories</strong> per serving</p><small>Nutrition values are provided by DummyJSON and are shown for general information.</small></section><h3>Ingredients</h3><ul>${recipe.ingredients.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul><h3>Instructions</h3><ol>${recipe.instructions.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol></div>`;
   el.modal.showModal();
 }
-function findRecipes() { if (!state.ingredients.length) { el.message.textContent = "Add at least one ingredient so I can look for matches."; return; } state.searched = true; el.message.textContent = ""; renderResults(); }
-function clearAll() { state.ingredients = []; state.searched = false; el.input.value = ""; el.message.textContent = ""; document.querySelectorAll(".controls select").forEach(select => select.selectedIndex = 0); el.favoritesOnly.checked = false; renderChips(); el.grid.innerHTML = ""; el.count.textContent = ""; el.status.textContent = state.recipes.length ? "Add ingredients, then choose Find recipes to see your best matches." : ""; el.surprise.disabled = true; }
+function findRecipes() { if (el.input.value.trim() && !addIngredient()) return; if (!state.ingredients.length) { el.message.textContent = "Add at least one ingredient so I can look for matches."; return; } el.message.textContent = ""; return fetchRecipes(); }
+function clearAll() { invalidateResults(); state.ingredients = []; state.searched = false; el.input.value = ""; el.message.textContent = ""; document.querySelectorAll(".controls select").forEach(select => select.selectedIndex = 0); el.favoritesOnly.checked = false; renderChips(); el.grid.innerHTML = ""; el.count.textContent = ""; el.status.textContent = INITIAL_MESSAGE; el.surprise.disabled = true; }
 
 $("#add-ingredient").addEventListener("click", addIngredient); el.input.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addIngredient(); } }); $("#find-recipes").addEventListener("click", findRecipes); $("#clear-all").addEventListener("click", clearAll); el.surprise.addEventListener("click", () => { const results = currentResults(); if (results.length) openDetails(results[Math.floor(Math.random() * results.length)].recipe.id); }); $("#close-modal").addEventListener("click", () => el.modal.close()); document.querySelectorAll(".controls select, #favorites-only").forEach(control => control.addEventListener("change", renderResults));
-fetchRecipes();
+el.status.textContent = INITIAL_MESSAGE;

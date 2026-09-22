@@ -1,33 +1,33 @@
 # Recipe From Ingredients
 
-## What It Does
+Recipe Finder helps you decide what to cook from ingredients already in your kitchen. Its existing interface supports ingredient chips, recipe cards, filters, sorting, details, favorites, and Surprise Me.
 
-Recipe Finder helps you decide what to cook from ingredients already in your kitchen. Add ingredients as removable chips, then compare them with public recipe data. You can sort and filter matches, save favorites in your browser, open full recipe details, or use Surprise Me to select a random match.
+## Backend connection
 
-## API Used
+The frontend sends `POST https://recipe-finder-backend-o6bk.onrender.com/recommend` with `Content-Type: application/json` and a JSON body such as:
 
-This app uses the keyless public [DummyJSON Recipes API](https://dummyjson.com/docs/recipes), specifically `https://dummyjson.com/recipes?limit=0`. It intentionally uses an endpoint that does not require a private API key, so no secret credentials are stored in this repository.
+```json
+{"ingredients":["chicken","rice","garlic"],"limit":100}
+```
 
-## How the API Call Works
+The separate Flask backend fetches DummyJSON recipes, matches ingredients, and returns ranked recommendations. The supported `limit: 100` gives the existing local filters a broader result set. Cuisine, difficulty, meal type, maximum time, and saved-only filters operate on those returned recommendations. Sorting by best match preserves backend order; time and rating sorting operate locally. No ingredient matching runs in the frontend.
 
-`app.js` uses `fetch()` to send an HTTP GET request to the recipe endpoint. After checking that the response succeeded, `response.json()` converts the JSON response into JavaScript objects. The response contains a `recipes` array; this app uses fields such as `name`, `ingredients`, `instructions`, `image`, `cuisine`, `difficulty`, `mealType`, `prepTimeMinutes`, `cookTimeMinutes`, `servings`, `rating`, and `caloriesPerServing`. The recipe list is fetched once and cached in memory, then filtering and matching happen locally.
+The response must contain `success: true`, an `ingredients` array, and a `recipes` array. Cards use the backend's `matchedIngredients`, `missingIngredients`, `matchCount`, and `matchPercentage`. Recipe details use the full recipe fields returned by the backend. Favorites retain the existing localStorage key and numeric recipe IDs.
 
-## How to Run
+## Loading and errors
 
-Open `recipe-finder/index.html` through a local web server (for example, run `python3 -m http.server` from the repository root, then visit `http://localhost:8000/recipe-finder/`). You can also use the published GitHub Pages site. An internet connection is required to load recipes and their images from DummyJSON.
+Add ingredients individually with Enter/Add ingredient, or enter a comma-separated list and choose Find recipes. Empty input is rejected before sending a request. Searches display “Finding recipes... The server may take a few seconds to wake up.” and allow up to two minutes before showing a retry message. Editing ingredient chips or clearing the form cancels stale requests.
 
-## Features
+Network errors, unsuccessful HTTP responses, backend error objects, invalid JSON, and incomplete recipe data show readable messages. Empty recommendations display the existing no-results state. No secrets or credentials are required; only the public backend URL is configured.
 
-- Ingredient chips, Enter-to-add, duplicate prevention, and clear all
-- Partial ingredient matching with match percentages and missing ingredients
-- Sort by match, total time, or rating; filter by cuisine, difficulty, meal type, and time
-- Recipe detail dialog with calories per serving, localStorage favorites, and Surprise Me
-- Helpful loading, empty-input, no-results, and failed-request messages
+## Run and test
+
+Run `python3 -m http.server 8000` from the repository root and visit `http://localhost:8000/recipe-finder/`. The backend must allow that origin for local testing and `https://whosamyy.github.io` for GitHub Pages.
+
+After reviewing, committing, pushing, and waiting for GitHub Pages deployment, hard-refresh <https://whosamyy.github.io/recipe-finder/>. In browser developer tools, check Network for a POST to the Render `/recommend` endpoint with a successful JSON response. Try `chicken, rice, garlic`, `rice`, several ingredients, empty input, and `zzzxxyyqq`. Test recipe details, hearts and Saved only, Surprise Me, each filter, and each sort. Use the browser's offline mode to check the network error message, then restore the connection and retry. Check Console for unexpected errors.
+
+The backend and its HW4 prompt log remain separate. Copy the full connection-request prompt verbatim into the backend repository's `prompt_log.md` as another Key Prompt; do not summarize it or create a second HW4 log here.
 
 ## AI Tools Used
 
 - Codex
-
-## Known Issues
-
-<!-- Add issues found during your own testing here. -->
