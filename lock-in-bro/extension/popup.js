@@ -68,9 +68,19 @@ $('start').onclick = async () => {
     if (!task || !Number.isInteger(minutes) || minutes < 1 || minutes > 480 || !state.blocklist?.length) throw Error('Enter a task, 1–480 whole minutes, and at least one site.');
     // Request only chosen sites, directly from this button's user gesture.
     const origins = state.blocklist.flatMap(d => [`http://*.${d}/*`, `https://*.${d}/*`]);
-    if (!await chrome.permissions.request({origins})) throw Error('Allow access to your chosen sites to start blocking.');
+    console.info('[Lock In Bro] Requesting chosen-site access', {blocklist: state.blocklist, origins});
+    const granted = await chrome.permissions.request({origins});
+    console.info('[Lock In Bro] Permission request result', {granted});
+    if (!granted) throw Error('Allow access to your chosen sites to start blocking.');
+    const confirmed = await chrome.permissions.contains({origins});
+    console.info('[Lock In Bro] Permission confirmation', {confirmed});
+    if (!confirmed) throw Error('Chrome has not granted the required website access. Try starting again.');
     await send({type: 'start', task, minutes});
-  } catch (error) { showError(error); }
+  } catch (error) {
+    // Promise rejection contains the Chrome API error (no callback lastError needed).
+    console.error('[Lock In Bro] Session start failed:', error);
+    showError(error);
+  }
   finally { $('start').disabled = false; }
 };
 $('end').onclick = () => send({type: 'end'}).catch(showError);

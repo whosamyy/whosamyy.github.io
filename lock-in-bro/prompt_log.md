@@ -478,6 +478,150 @@ Stop and give me:
 
 Do NOT continue to Phase 2 until I ask.
 
+### Prompt 2
+
+The Lock In Bro extension loads, the popup works, and I can start a session, but it does NOT actually block or redirect instagram.com or reddit.com.
+
+Do not add any new features yet. Fix ONLY the blocking functionality.
+
+Please inspect:
+
+- extension/manifest.json
+- extension/background.js
+- extension/popup.js
+- extension/blocked.html
+- any declarativeNetRequest rules
+
+I am using Chrome Extension Manifest V3.
+
+The expected behavior is:
+
+1. I add:
+   instagram.com
+   reddit.com
+
+2. I start a focus session.
+
+3. If I navigate to:
+   [https://instagram.com](https://instagram.com)
+   [https://www.instagram.com](https://www.instagram.com)
+   [https://reddit.com](https://reddit.com)
+   [https://www.reddit.com](https://www.reddit.com)
+
+the tab should be redirected to the extension's blocked.html page.
+
+4. Sites that are not on the blocklist should still work normally.
+
+Please debug this carefully instead of rewriting the whole extension.
+
+Specifically check:
+
+A. HOST PERMISSIONS
+
+Verify that the extension actually has host permission for the selected domains before installing declarativeNetRequest redirect rules.
+
+I am currently using declarativeNetRequestWithHostAccess, so do not assume that declaring that permission alone gives access to every website.
+
+If optional\_host\_permissions are being used:
+
+- make sure manifest.json declares the appropriate patterns
+- make sure popup.js actually calls chrome.permissions.request(...)
+- confirm that the permission request succeeds before starting the session
+- handle both the root domain and subdomains correctly
+
+For example, if reddit.com is blocked, permission/rules should correctly cover:
+[https://reddit.com/](https://reddit.com/)\*
+[https://](https://.reddit.com/)[*.reddit.com/*](https://.reddit.com/)
+
+and the same for http if necessary.
+
+If the current permission strategy is unnecessarily fragile, explain whether using declarativeNetRequest with broader host permissions would be simpler for this class project, but do not silently increase permissions without explaining it.
+
+B. DYNAMIC / SESSION RULES
+
+Inspect the rules created by:
+chrome.declarativeNetRequest.updateDynamicRules(...)
+or
+chrome.declarativeNetRequest.updateSessionRules(...)
+
+Verify that:
+
+- each rule has a unique positive integer id
+- action.type is "redirect"
+- redirect uses extensionPath correctly
+- the condition matches the target domain
+- resourceTypes includes "main\_frame"
+- the URL filter actually matches both the domain and subdomains
+- old rules are removed before replacement if needed
+
+Use a Chrome-supported pattern such as an appropriate urlFilter or requestDomains condition.
+
+C. BLOCKED PAGE
+
+If redirecting to blocked.html using:
+
+redirect: {
+extensionPath: "/blocked.html"
+}
+
+make sure blocked.html is declared correctly under web\_accessible\_resources in manifest.json if required.
+
+D. SESSION STATE
+
+Confirm that blocking rules are actually installed AFTER Start Focus Session is pressed.
+
+Add temporary development logging so I can see:
+
+- normalized blocklist
+- whether host permission was granted
+- generated DNR rules
+- result of updateDynamicRules/updateSessionRules
+- currently installed rules after installation
+
+Do not log general browsing history or unrelated URLs.
+
+E. DEBUGGING
+
+Add a temporary developer function or console output using:
+
+chrome.declarativeNetRequest.getDynamicRules()
+
+or getSessionRules(), depending on which strategy this project uses.
+
+After starting a session with reddit.com and instagram.com, I should be able to inspect the service worker console and see that the appropriate rules exist.
+
+Also check chrome.runtime.lastError / caught Promise errors around all permission and rule update calls.
+
+F. DO NOT CHANGE
+
+Do not:
+
+- change the app design
+- change the timer system unless it is directly causing the issue
+- change the Flask backend
+- add database features
+- add Phase 2 features
+- commit or push anything
+
+G. AFTER FIXING
+
+Tell me:
+
+1. What specifically was wrong.
+2. Which files you changed.
+3. What permissions the extension now requests.
+4. Why those permissions are necessary.
+5. What exact DNR rule is generated for instagram.com.
+6. What exact DNR rule is generated for reddit.com.
+7. How to verify those rules in Chrome.
+8. How to reload the unpacked extension correctly after changing manifest.json/background.js.
+9. A manual test checklist.
+
+Also append THIS ENTIRE PROMPT verbatim to prompt\_log.md as the next Key Prompt.
+
+Do not summarize or rewrite it.
+
+
 ## Code I Wrote or Substantially Modified Myself
 
 ## Which Tool I Used for Which Job
