@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lock In Bro</title><link rel="stylesheet" href="popup.css"><script src="popup.js" defer></script></head>
+<body><header><span class="tag">YOUR FOCUS ZONE</span><h1>LOCK IN BRO<span>.</span></h1><p>Lock in now. Scroll later.</p></header>
+<p id="error" role="alert"></p>
+<section id="setup"><label for="task">What are we studying?</label><input id="task" maxlength="160" placeholder="Study probability">
+<label for="duration">Focus duration</label><select id="duration"><option value="25">25 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="custom">Custom</option></select><input id="custom" type="number" min="1" max="480" step="1" placeholder="1–480 minutes" aria-label="Custom minutes" hidden>
+<label for="domain">Sites to put on pause</label><form id="add-form"><div class="row"><input id="domain" placeholder="instagram.com" aria-describedby="site-help"><button>Add</button></div></form><p id="site-help" class="small">Only these domains and their subdomains. Up to 100 sites.</p><ul id="sites"></ul><button id="start" class="primary">Start Focus Session</button></section>
+<section id="active" hidden><span class="tag">CURRENT MISSION</span><h2 id="current-task"></h2><div id="timer" class="timer" aria-label="Time remaining"></div><p><strong id="count">0</strong> blocked attempts. Keep going.</p><button id="end">End Session</button></section>
+<section id="summary" hidden><span class="tag">SESSION RECAP</span><h2 id="summary-task"></h2><p id="summary-details"></p></section><footer>Chosen by you. Stored on this device.</footer></body></html>
