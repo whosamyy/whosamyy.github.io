@@ -46,6 +46,11 @@
             <div id="status" class="status" role="status">Add ingredients, then choose Find recipes to see your best matches.</div>
             <div id="recipe-grid" class="recipe-grid"></div>
         </section>
+        <section class="results-section" aria-labelledby="saved-title">
+            <div class="results-heading"><div><p class="eyebrow">YOUR COLLECTION</p><h2 id="saved-title">Saved Recipes</h2></div><button id="refresh-saved" class="secondary" type="button">Refresh saved recipes</button></div>
+            <p id="saved-status" class="status" role="status"></p>
+            <div id="saved-grid" class="recipe-grid"></div>
+        </section>
     </main>
     <dialog id="recipe-modal" aria-labelledby="modal-title"><button id="close-modal" class="close" type="button" aria-label="Close recipe details">×</button><div id="modal-content"></div></dialog>
     <footer>Built with a Flask backend deployed on Render and the public DummyJSON Recipes API · <a href="https://whosamyy.github.io/">Back to portfolio</a></footer>

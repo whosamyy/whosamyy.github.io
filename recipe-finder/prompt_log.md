@@ -182,3 +182,33 @@ DESIGN / API / README / PORTFOLIO / WORKFLOW
 Build a polished, accessible, responsive food app without large libraries. Use async/await and fetch(), inspect the real API response first, fetch only once, and comment the request for future code explanation. Add the project to the main portfolio as Recipe Finder with a relative `recipe-finder/` Try It link. Create a clear README covering what it does, the API, how the call works, how to run, features, AI tools, and an empty Known Issues section. Do not commit or push anything; report files changed, endpoint and JSON fields, matching, localStorage, local testing, edge cases, security findings, and what to understand before release.
 
 Is it possible to add nutrition info for the recipe finder as well?
+
+## Key Prompt — SQLite Saved Recipes (2026-09-30)
+
+Please inspect my existing recipe finder frontend and backend before making changes. Add a real SQLite-backed “Saved Recipes” feature without breaking any current functionality.
+
+Backend requirements:
+
+- Create a SQLite database automatically when the server starts.
+- Add a `favorites` table containing an anonymous client ID, recipe ID, recipe name, image URL, ingredients, and creation time.
+- Use a uniqueness constraint so the same client cannot save the same recipe twice.
+- Add API endpoints to save a favorite, retrieve a client’s favorites, and delete a favorite.
+- Use parameterized SQL queries, validate incoming data, and return clear JSON responses and HTTP status codes.
+- Allow the SQLite file location to be configured with a `DATABASE_PATH` environment variable.
+- Add the database file to `.gitignore`. Do not commit generated database files, API keys, or other secrets.
+
+Frontend requirements:
+
+- Generate and store an anonymous client ID in the browser. Local storage may hold this ID, but favorite recipe data must be stored in SQLite through the backend.
+- Add a Save/Unsave button to each recipe.
+- Add a Saved Recipes section where users can view and remove saved recipes.
+- Include loading, empty, and error states.
+- Match the design of the existing website and keep it mobile-friendly.
+
+After implementing the feature:
+
+- Test all new API endpoints and the main frontend flow.
+- Update the README with the database schema, endpoint descriptions, local setup instructions, and deployment notes.
+- Explain that SQLite files may not persist on Render’s free filesystem after a restart or redeployment and describe how `DATABASE_PATH` can be used with persistent storage.
+- Copy this entire prompt verbatim into `prompt_log.md` as a new Key Prompt.
+- Give me a concise summary of the files changed, tests performed, and any deployment steps I must complete manually.

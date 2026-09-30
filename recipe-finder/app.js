@@ -1,8 +1,10 @@
 // The separate Flask backend fetches DummyJSON and ranks ingredient matches.
-const API_URL = "https://recipe-finder-backend-o6bk.onrender.com/recommend";
+const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
+  ? "http://127.0.0.1:5001" : "https://recipe-finder-backend-o6bk.onrender.com";
+const API_URL = `${API_BASE}/recommend`;
 const INITIAL_MESSAGE = "Add ingredients, then choose Find recipes to see your best matches.";
 let activeRequest = null;
-const state = { recipes: [], ingredients: [], favorites: loadFavorites(), searched: false, resultIngredients: [] };
+const state = { recipes: [], ingredients: [], favorites: [], savedRecipes: [], savedReady: false, savedBusy: false, searched: false, resultIngredients: [] };
 const $ = (selector) => document.querySelector(selector);
 const el = {
   input: $("#ingredient-input"), chips: $("#ingredient-chips"), message: $("#input-message"),
@@ -10,8 +12,56 @@ const el = {
   sort: $("#sort"), cuisine: $("#cuisine"), difficulty: $("#difficulty"), mealType: $("#meal-type"), maxTime: $("#max-time"), favoritesOnly: $("#favorites-only"), surprise: $("#surprise-me")
 };
 
-function loadFavorites() { try { const saved = JSON.parse(localStorage.getItem("recipe-finder-favorites")); return Array.isArray(saved) ? saved.filter(Number.isFinite) : []; } catch { return []; } }
-function saveFavorites() { try { localStorage.setItem("recipe-finder-favorites", JSON.stringify(state.favorites)); } catch { el.message.textContent = "Your favorite is saved for this visit, but browser storage is unavailable."; } }
+let clientId;
+let storageNotice = "";
+try {
+  clientId = localStorage.getItem("recipe-finder-client-id");
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clientId || "")) {
+    clientId = crypto.randomUUID();
+    localStorage.setItem("recipe-finder-client-id", clientId);
+  }
+  localStorage.removeItem("recipe-finder-favorites");
+} catch {
+  clientId ||= crypto.randomUUID();
+  storageNotice = "Browser storage is unavailable; saved recipes will only be accessible during this visit. ";
+}
+async function favoritesRequest(path = "", options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000);
+  try {
+    const response = await fetch(`${API_BASE}/favorites${path}`, { ...options, signal: controller.signal });
+    const data = await response.json();
+    if (!response.ok || data.success !== true) throw new Error(data.error || "Couldn't update saved recipes.");
+    return data;
+  } catch (error) {
+    if (error.name === "AbortError") throw new Error("Saved recipes timed out. Please retry.");
+    if (error instanceof TypeError || error instanceof SyntaxError) throw new Error("Couldn't reach saved recipes. Check your connection and retry.");
+    throw error;
+  } finally { clearTimeout(timeout); }
+}
+function renderSaved(message = "") {
+  $("#saved-status").textContent = storageNotice + message;
+  $("#saved-grid").setAttribute("aria-busy", String(state.savedBusy));
+  $("#refresh-saved").disabled = state.savedBusy;
+  $("#saved-grid").innerHTML = state.savedRecipes.map(recipe => `<article class="recipe-card"><img class="recipe-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}" loading="lazy"><div class="card-body"><h3>${escapeHtml(recipe.name)}</h3><ul>${recipe.ingredients.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul><button class="details-button" data-favorite="${recipe.id}" ${state.savedBusy || !state.savedReady ? "disabled" : ""}>Unsave ${escapeHtml(recipe.name)}</button></div></article>`).join("");
+  if (state.savedReady && !state.savedRecipes.length && !state.savedBusy) $("#saved-grid").innerHTML = '<p class="empty">No saved recipes yet. Save a recipe from your search results.</p>';
+  $("#saved-grid").querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", () => toggleFavorite(Number(button.dataset.favorite))));
+  renderResults();
+}
+async function loadFavorites() {
+  if (state.savedBusy) return;
+  state.savedBusy = true;
+  renderSaved("Loading saved recipes… The server may take a moment to wake up.");
+  let message = "";
+  try {
+    const data = await favoritesRequest(`?clientId=${encodeURIComponent(clientId)}`);
+    if (!Array.isArray(data.favorites) || !data.favorites.every(r => Number.isSafeInteger(r.id) && typeof r.name === "string" && typeof r.image === "string" && Array.isArray(r.ingredients) && r.ingredients.every(i => typeof i === "string"))) throw new Error("The server returned incomplete saved recipes. Please retry.");
+    state.savedRecipes = data.favorites;
+    state.favorites = data.favorites.map(r => r.id);
+    state.savedReady = true;
+  } catch (error) { message = error.message; state.savedReady = false; }
+  finally { state.savedBusy = false; renderSaved(message); }
+}
 function normalized(text) { return String(text).toLowerCase().replace(/[^a-z0-9 ]/g, " ").trim(); }
 function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value; return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
 
@@ -120,9 +170,28 @@ function renderResults() {
 }
 function card({ recipe, matched, score }) {
   const saved = state.favorites.includes(recipe.id), needed = recipe.missingIngredients.slice(0, 3);
-  return `<article class="recipe-card"><img class="recipe-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}" loading="lazy"><div class="card-body"><div class="card-top"><h3>${escapeHtml(recipe.name)}</h3><button class="heart" data-favorite="${recipe.id}" aria-label="${saved ? "Remove" : "Save"} ${escapeHtml(recipe.name)}">${saved ? "♥" : "♡"}</button></div><p class="meta">${escapeHtml(recipe.cuisine)} · ${escapeHtml(recipe.difficulty)} · ★ ${recipe.rating}<br>Prep ${recipe.prepTimeMinutes} min · Cook ${recipe.cookTimeMinutes} min · Serves ${recipe.servings}</p><p class="nutrition">⚡ ${recipe.caloriesPerServing} calories per serving</p><span class="match">${recipe.matchCount} of ${state.resultIngredients.length} ingredients match (${Math.round(score * 100)}%)</span><p class="matched"><strong>You have:</strong> ${escapeHtml(matched.join(", "))}<br><strong>Still need:</strong> ${escapeHtml(needed.join(", ") || "nothing listed")}</p><button class="details-button" data-details="${recipe.id}" type="button">View recipe</button></div></article>`;
+  return `<article class="recipe-card"><img class="recipe-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}" loading="lazy"><div class="card-body"><div class="card-top"><h3>${escapeHtml(recipe.name)}</h3><button class="heart" data-favorite="${recipe.id}" ${state.savedBusy || !state.savedReady ? "disabled" : ""} aria-pressed="${saved}" aria-label="${saved ? "Unsave" : "Save"} ${escapeHtml(recipe.name)}">${saved ? "♥ Unsave" : "♡ Save"}</button></div><p class="meta">${escapeHtml(recipe.cuisine)} · ${escapeHtml(recipe.difficulty)} · ★ ${recipe.rating}<br>Prep ${recipe.prepTimeMinutes} min · Cook ${recipe.cookTimeMinutes} min · Serves ${recipe.servings}</p><p class="nutrition">⚡ ${recipe.caloriesPerServing} calories per serving</p><span class="match">${recipe.matchCount} of ${state.resultIngredients.length} ingredients match (${Math.round(score * 100)}%)</span><p class="matched"><strong>You have:</strong> ${escapeHtml(matched.join(", "))}<br><strong>Still need:</strong> ${escapeHtml(needed.join(", ") || "nothing listed")}</p><button class="details-button" data-details="${recipe.id}" type="button">View recipe</button></div></article>`;
 }
-function toggleFavorite(id) { state.favorites = state.favorites.includes(id) ? state.favorites.filter(item => item !== id) : [...state.favorites, id]; saveFavorites(); renderResults(); }
+async function toggleFavorite(id) {
+  if (state.savedBusy || !state.savedReady) return;
+  const saved = state.favorites.includes(id);
+  const recipe = state.recipes.find(r => r.id === id);
+  state.savedBusy = true;
+  renderSaved(saved ? "Removing saved recipe…" : "Saving recipe…");
+  let message = "";
+  try {
+    if (saved) {
+      try { await favoritesRequest(`/${id}?clientId=${encodeURIComponent(clientId)}`, { method: "DELETE" }); }
+      catch (error) { if (error.message !== "Saved recipe not found for this client.") throw error; }
+      state.savedRecipes = state.savedRecipes.filter(r => r.id !== id);
+    } else {
+      const data = await favoritesRequest("", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clientId, recipe: { id: recipe.id, name: recipe.name, image: recipe.image, ingredients: recipe.ingredients } }) });
+      state.savedRecipes = [data.favorite, ...state.savedRecipes.filter(r => r.id !== id)];
+    }
+    state.favorites = state.savedRecipes.map(r => r.id);
+  } catch (error) { message = `${error.message} Use Refresh saved recipes to check the server before retrying.`; }
+  finally { state.savedBusy = false; renderSaved(message); }
+}
 function openDetails(id) {
   const recipe = state.recipes.find(item => item.id === id); if (!recipe) return;
   el.modalContent.innerHTML = `<img class="modal-image" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.name)}"><div class="modal-body"><h2 id="modal-title">${escapeHtml(recipe.name)}</h2><p class="meta">${escapeHtml(recipe.cuisine)} · ${escapeHtml(recipe.difficulty)} · ★ ${recipe.rating} (${recipe.reviewCount} reviews)</p><div class="detail-grid"><div><strong>Prep</strong>${recipe.prepTimeMinutes} min</div><div><strong>Cook</strong>${recipe.cookTimeMinutes} min</div><div><strong>Serves</strong>${recipe.servings}</div><div><strong>Meal</strong>${escapeHtml((recipe.mealType || []).join(", "))}</div></div><section class="nutrition-panel" aria-label="Nutrition information"><p class="eyebrow">NUTRITION</p><p><strong>${recipe.caloriesPerServing} calories</strong> per serving</p><small>Nutrition values are provided by DummyJSON and are shown for general information.</small></section><h3>Ingredients</h3><ul>${recipe.ingredients.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul><h3>Instructions</h3><ol>${recipe.instructions.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol></div>`;
@@ -133,3 +202,6 @@ function clearAll() { invalidateResults(); state.ingredients = []; state.searche
 
 $("#add-ingredient").addEventListener("click", addIngredient); el.input.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); addIngredient(); } }); $("#find-recipes").addEventListener("click", findRecipes); $("#clear-all").addEventListener("click", clearAll); el.surprise.addEventListener("click", () => { const results = currentResults(); if (results.length) openDetails(results[Math.floor(Math.random() * results.length)].recipe.id); }); $("#close-modal").addEventListener("click", () => el.modal.close()); document.querySelectorAll(".controls select, #favorites-only").forEach(control => control.addEventListener("change", renderResults));
 el.status.textContent = INITIAL_MESSAGE;
+
+$("#refresh-saved").addEventListener("click", loadFavorites);
+loadFavorites();

@@ -10,3 +10,7 @@ dialog { width:min(760px, 92vw); max-height:90vh; padding:0; border:0; border-ra
 .nutrition-panel { margin:22px 0; padding:16px 18px; border-left:4px solid var(--orange); border-radius:7px; background:#fff1e8; }
 .nutrition-panel p { margin:4px 0; }
 .nutrition-panel small { color:var(--muted); }
+
+.heart { font-size:14px; padding:8px 0; min-height:40px; font-weight:700; }
+button:disabled { opacity:.5; cursor:not-allowed; }
+#saved-grid li, .recipe-card h3 { overflow-wrap:anywhere; }
