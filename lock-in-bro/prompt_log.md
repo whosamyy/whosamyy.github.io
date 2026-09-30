@@ -627,3 +627,463 @@ Do not summarize or rewrite it.
 ## Which Tool I Used for Which Job
 
 ## One Place AI Got Something Wrong
+
+
+## Key Prompt — Phase 2
+
+Phase 1 of Lock In Bro is now working.
+
+The Chrome extension can:
+- add/remove blocked domains
+- start a focus session
+- persist the active session when the popup closes
+- block selected distracting websites
+- redirect blocked sites to blocked.html
+- count blocked attempts
+- end sessions manually or automatically
+
+Now I want to build Phase 2.
+
+Do NOT rewrite the working extension from scratch.
+Preserve the blocking and timer behavior that already works.
+
+The goal of this phase is to:
+
+1. connect the Chrome extension to the Flask backend
+2. save completed focus sessions to a database
+3. save blocked attempts
+4. build a useful analytics dashboard
+5. keep everything working locally before deployment
+
+==================================================
+ARCHITECTURE
+==================================================
+
+The intended architecture is:
+
+Chrome Extension
+        ↓
+      fetch()
+        ↓
+Flask Backend
+        ↓
+Database
+        ↓
+Public Focus Analytics Dashboard
+
+The extension should continue using chrome.storage.local for ACTIVE session state because blocking must keep working even if the backend is temporarily unavailable.
+
+The database should be used for historical session data and analytics.
+
+==================================================
+BACKEND API
+==================================================
+
+Expand the Flask backend.
+
+Use these endpoints:
+
+GET /api/health
+
+Keep the existing health endpoint.
+
+POST /api/sessions
+
+Called when a focus session starts.
+
+Accept JSON similar to:
+
+{
+  "client_id": "...",
+  "task": "Study probability",
+  "planned_minutes": 45,
+  "blocked_domains": [
+    "instagram.com",
+    "reddit.com"
+  ],
+  "started_at": "..."
+}
+
+Create a FocusSession row.
+
+Return structured JSON including the database session ID:
+
+{
+  "success": true,
+  "session_id": 12
+}
+
+POST /api/sessions/<session_id>/blocked
+
+Called when the user attempts to visit a blocked site.
+
+Accept:
+
+{
+  "domain": "instagram.com",
+  "timestamp": "..."
+}
+
+Create a BlockedAttempt row and update the session's blocked_count.
+
+POST /api/sessions/<session_id>/finish
+
+Called when the focus session ends.
+
+Accept useful summary information such as:
+
+{
+  "ended_at": "...",
+  "completed": true,
+  "actual_minutes": 43.5,
+  "blocked_count": 4,
+  "focus_score": 87
+}
+
+Update the existing FocusSession record.
+
+GET /api/stats/<client_id>
+
+Return structured analytics for that anonymous client.
+
+Include:
+
+- total focus minutes
+- total sessions
+- completed sessions
+- total blocked attempts
+- average focus score
+- average session length
+- recent sessions
+- most frequently blocked domains
+- focus time grouped by day if practical
+
+Return useful JSON errors and proper status codes.
+
+==================================================
+ANONYMOUS CLIENT ID
+==================================================
+
+The extension should NOT require user accounts.
+
+Generate a random anonymous client ID the first time the extension is used.
+
+Store it in:
+
+chrome.storage.local
+
+Reuse the same client ID for future sessions.
+
+Do not use:
+- name
+- email
+- password
+- Google account
+- browsing identity
+
+==================================================
+EXTENSION → BACKEND CONNECTION
+==================================================
+
+Update the extension so that when a session starts:
+
+1. Keep the local active-session state exactly as it already does.
+2. Send a POST request to /api/sessions.
+3. Store the returned backend session_id inside the local active session.
+
+If the backend is unavailable:
+- DO NOT prevent the user from starting a focus session.
+- The blocking feature should still work locally.
+- Show/log a reasonable warning instead.
+- Do not crash.
+
+When a blocked attempt happens:
+
+- continue incrementing the local blocked count
+- if there is a valid backend session_id, send the blocked attempt to the backend
+- if the backend request fails, do not break site blocking
+
+When the session finishes:
+
+- compute the final summary locally
+- if there is a backend session_id, POST it to /finish
+- if the backend is unavailable, preserve the local summary
+
+The extension's core blocking functionality must NOT depend on the backend being online.
+
+==================================================
+DATABASE
+==================================================
+
+Use the existing SQLAlchemy models or improve them cleanly.
+
+FocusSession should include at least:
+
+- id
+- client_id
+- task
+- planned_minutes
+- actual_minutes
+- started_at
+- ended_at
+- completed
+- blocked_count
+- focus_score
+
+BlockedAttempt should include:
+
+- id
+- session_id
+- domain
+- timestamp
+
+Use a proper relationship.
+
+For LOCAL development:
+- SQLite is fine.
+
+Keep support for:
+
+DATABASE_URL
+
+so I can later use PostgreSQL on Render.
+
+Do not hardcode database credentials.
+
+==================================================
+FOCUS SCORE — DO NOT IMPLEMENT FOR ME
+==================================================
+
+I still need to write or meaningfully modify part of this project myself.
+
+Do NOT implement the final focus-score algorithm.
+
+Keep the existing computeFocusScore(...) TODO.
+
+I will implement it myself.
+
+However:
+- make sure the rest of the code is ready to call it
+- clearly tell me what parameters it should take
+- clearly tell me what output type it should return
+- tell me where the returned score will be saved
+
+Do not implement the algorithm elsewhere.
+
+==================================================
+ANALYTICS DASHBOARD
+==================================================
+
+Turn the Flask root page into a useful Lock In Bro dashboard.
+
+The dashboard should feel like part of the same project.
+
+Use a fun but clean style.
+
+Show:
+
+LOCK IN BRO
+
+"Lock in now. Scroll later."
+
+Then analytics such as:
+
+- Total Focus Time
+- Sessions Completed
+- Distractions Blocked
+- Average Focus Score
+
+Also show:
+
+RECENT SESSIONS
+
+For each session:
+- task
+- planned time
+- actual time
+- blocked attempts
+- focus score
+- completed vs ended early
+- date
+
+MOST BLOCKED SITES
+
+Example:
+
+instagram.com — 14
+reddit.com — 9
+x.com — 6
+
+FOCUS TIME OVER TIME
+
+Add one simple chart.
+
+Use Chart.js from a CDN if appropriate.
+
+A bar chart showing focus minutes by day would be good.
+
+Do not create lots of unnecessary charts.
+
+==================================================
+DASHBOARD CLIENT IDENTIFICATION
+==================================================
+
+Because there are no accounts, decide on a simple development-friendly way for the dashboard to know which anonymous client to display.
+
+For example:
+
+/?client_id=abc123
+
+or another similarly simple approach.
+
+Explain the tradeoff.
+
+Do not pretend this is secure authentication.
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+- invalid JSON
+- missing client_id
+- missing task
+- invalid planned_minutes
+- nonexistent session IDs
+- malformed blocked-attempt requests
+- database errors
+- backend unavailable from extension
+- empty analytics data
+
+The dashboard should show a friendly empty state if no sessions exist yet.
+
+==================================================
+PRIVACY
+==================================================
+
+Continue to preserve the privacy design.
+
+Do NOT store:
+
+- general browsing history
+- allowed sites
+- page contents
+- search queries
+- passwords
+- names
+- emails
+
+Only store:
+
+- user-created blocked domains
+- attempts to access those blocked domains during active sessions
+- focus-session metadata
+- task name
+- session analytics
+
+Do not add tracking or analytics libraries.
+
+==================================================
+TESTING
+==================================================
+
+Before stopping, test everything LOCALLY.
+
+Test:
+
+1. Flask backend starts.
+2. Database initializes.
+3. POST /api/sessions creates a session.
+4. POST /blocked creates a blocked attempt.
+5. POST /finish updates the session.
+6. GET /api/stats/<client_id> returns correct statistics.
+7. Dashboard loads.
+8. Dashboard handles no-data state.
+9. Extension still starts sessions normally.
+10. Extension still blocks sites correctly.
+11. Extension gets a backend session_id when Flask is running.
+12. Blocked attempts appear in the database.
+13. Ending a session updates the database.
+14. Extension still works if Flask is completely turned off.
+15. No browser console errors.
+16. No Flask tracebacks during normal use.
+
+==================================================
+SECURITY
+==================================================
+
+Do not add:
+- API keys
+- credentials
+- tokens
+- passwords
+- database passwords
+
+Continue respecting .gitignore.
+
+Search files you modify for secrets before stopping.
+
+==================================================
+README
+==================================================
+
+Do NOT write the final README prose for me.
+
+You may update the README HEADINGS/placeholder structure if the architecture changed.
+
+Keep it for me to write in my own words.
+
+==================================================
+PROMPT LOG
+==================================================
+
+Append THIS ENTIRE PROMPT verbatim to:
+
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize or rewrite it.
+
+Do not invent development history.
+
+==================================================
+DO NOT DEPLOY YET
+==================================================
+
+Do NOT:
+- deploy to Render yet
+- configure PostgreSQL yet
+- publish to Chrome Web Store
+- add user accounts
+- add strict mode
+- add streaks
+- add AI features
+- add notification systems
+- redesign the whole extension
+- commit or push anything
+
+I want Phase 2 working locally first.
+
+==================================================
+WHEN YOU FINISH
+==================================================
+
+Tell me:
+
+1. Every file you changed.
+2. The database schema.
+3. Every backend endpoint and what it does.
+4. How the extension talks to Flask.
+5. What happens if Flask is offline.
+6. How the anonymous client ID works.
+7. How the dashboard gets its data.
+8. How the chart works.
+9. Exactly where computeFocusScore() is still unfinished.
+10. What inputs computeFocusScore() should take.
+11. How I can manually test the entire system locally.
+12. Any remaining bugs or limitations.
+13. A suggested second commit message.
+
+Do NOT continue to deployment until I ask.

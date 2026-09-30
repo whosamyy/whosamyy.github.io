@@ -15,6 +15,7 @@ function normalize(value) {
   return domain;
 }
 function render() {
+  $('dashboard-link').href = `http://127.0.0.1:5000/?client_id=${encodeURIComponent(state.client_id || '')}`;
   const session = state.session;
   $('setup').hidden = !!session?.active;
   $('active').hidden = !session?.active;
@@ -37,7 +38,7 @@ function render() {
   if (summary) {
     $('summary-task').textContent = summary.task;
     const seconds = Math.max(0, Math.floor((summary.endedAt - summary.startedAt) / 1000));
-    $('summary-details').textContent = `${summary.completed ? 'Completed' : 'Ended early'} · Planned ${summary.plannedMinutes} min · Actual ${Math.floor(seconds / 60)}m ${seconds % 60}s · ${summary.blockedCount} blocked attempts`;
+    $('summary-details').textContent = `${summary.completed ? 'Completed' : 'Ended early'} · Planned ${summary.plannedMinutes} min · Actual ${Math.floor(seconds / 60)}m ${seconds % 60}s · ${summary.blockedCount} blocked attempts · Score: ${summary.focusScore ?? "Not scored yet"}`;
   }
 }
 let refreshing = false;
@@ -87,10 +88,3 @@ $('end').onclick = () => send({type: 'end'}).catch(showError);
 chrome.storage.onChanged.addListener(() => send({type: 'state'}).catch(showError));
 send({type: 'state'}).catch(showError);
 setInterval(tick, 1000);
-
-// STUDENT TODO: Receive completion status, planned/actual duration and blocked
-// count; return a numeric Focus Score. Eventually call this for the recap and
-// saved dashboard sessions. The student will design and implement the algorithm.
-function computeFocusScore(sessionSummary) {
-  return null;
-}
