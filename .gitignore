@@ -13,3 +13,6 @@ secrets.json
 
 # macOS metadata
 .DS_Store
+
+# Local editor workspaces
+*.code-workspace
