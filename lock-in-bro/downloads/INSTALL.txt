@@ -1,0 +1,14 @@
+Install Lock In Bro in Chrome
+
+1. Download lock-in-bro-extension.zip.
+2. Unzip it and keep the lock-in-bro-extension folder somewhere permanent.
+3. Open chrome://extensions in Chrome.
+4. Turn on Developer mode (top right).
+5. Click Load unpacked.
+6. Select the unzipped lock-in-bro-extension folder containing manifest.json.
+7. Pin Lock In Bro using Chrome's Extensions menu if you want easy access.
+8. Open Lock In Bro, choose websites to block, and start a focus session.
+   Grant access to the websites you choose when Chrome asks.
+
+This is a manual installation, not a Chrome Web Store installation.
+Keep the folder on your computer while using the extension.

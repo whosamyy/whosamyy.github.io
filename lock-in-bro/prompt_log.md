@@ -1580,3 +1580,260 @@ Give me:
 16. A suggested commit message.
 
 Stop after preparing the code. Do not deploy anything.
+
+
+## Key Prompt — Downloadable Extension
+
+I want to make the Lock In Bro Chrome extension directly downloadable from my portfolio.
+
+The project is inside:
+
+/Users/whosamy/Documents/whosamyy.github.io/lock-in-bro
+
+My portfolio is the whosamyy.github.io repository.
+
+The deployed dashboard is:
+
+https://lock-in-bro.onrender.com
+
+IMPORTANT:
+- The extension is already working.
+- Do NOT change extension functionality.
+- Do NOT change blocking, timer, backend syncing, database logic, or focus-score logic.
+- Do NOT deploy anything.
+- Do NOT commit or push yet.
+
+==================================================
+GOAL
+==================================================
+
+I want my Lock In Bro portfolio project to have three buttons:
+
+[Open Dashboard]
+[Download Extension]
+[View Code]
+
+The Download Extension button should directly download a clean ZIP file that a user can unzip and load through Chrome's Developer Mode.
+
+==================================================
+1. CREATE A CLEAN EXTENSION ZIP
+==================================================
+
+Create:
+
+lock-in-bro/downloads/lock-in-bro-extension.zip
+
+The ZIP should contain ONLY the files required for the Chrome extension to run.
+
+Include the contents of:
+
+lock-in-bro/extension/
+
+including files such as:
+
+- manifest.json
+- config.js
+- popup.html
+- popup.css
+- popup.js
+- background.js
+- blocked.html
+- blocked.css
+- blocked.js
+- focus-score.js
+- any other extension assets that are actually referenced by manifest.json or the extension code
+
+Do NOT include:
+
+- backend/
+- database files
+- .git/
+- .env
+- .venv/
+- __pycache__/
+- prompt_log.md
+- README.md
+- tests
+- .DS_Store
+- unrelated portfolio files
+
+Before packaging, verify that config.js is currently using the production backend:
+
+https://lock-in-bro.onrender.com
+
+Do not change it if it is already correct.
+
+==================================================
+2. ZIP STRUCTURE
+==================================================
+
+Make the ZIP easy to install.
+
+When the user unzips it, I want the result to look like:
+
+lock-in-bro-extension/
+├── manifest.json
+├── config.js
+├── popup.html
+├── popup.css
+├── popup.js
+├── background.js
+├── blocked.html
+├── blocked.css
+├── blocked.js
+├── focus-score.js
+└── any other required extension assets
+
+I do NOT want an unnecessary extra nesting level such as:
+
+lock-in-bro-extension/extension/manifest.json
+
+manifest.json should be directly inside the unzipped extension folder.
+
+==================================================
+3. INSTALLATION INSTRUCTIONS
+==================================================
+
+Create a short installation instruction file at:
+
+lock-in-bro/downloads/INSTALL.txt
+
+Keep it concise and student-friendly.
+
+It should explain:
+
+1. Download lock-in-bro-extension.zip
+2. Unzip it
+3. Open chrome://extensions
+4. Turn on Developer mode
+5. Click Load unpacked
+6. Select the unzipped lock-in-bro-extension folder
+7. Pin Lock In Bro if desired
+8. Start a focus session and grant access to the websites the user chooses to block
+
+Do not claim the extension is published on the Chrome Web Store.
+
+==================================================
+4. PORTFOLIO BUTTON
+==================================================
+
+Inspect my existing portfolio and the Lock In Bro project card/page that was already added.
+
+Add a third button:
+
+Download Extension
+
+The three buttons should now be:
+
+Open Dashboard
+Download Extension
+View Code
+
+Match the existing portfolio styling exactly.
+
+The Download Extension button should link directly to:
+
+/lock-in-bro/downloads/lock-in-bro-extension.zip
+
+Use the correct relative/absolute path for GitHub Pages so that clicking the button from:
+
+https://whosamyy.github.io/
+
+downloads the ZIP successfully.
+
+If appropriate, use the HTML download attribute, but make sure the link still works normally if the browser ignores it.
+
+==================================================
+5. OPTIONAL INSTALL INSTRUCTIONS LINK
+==================================================
+
+If the Lock In Bro project page already has space for it, add a small:
+
+"How to install"
+
+link pointing to:
+
+/lock-in-bro/downloads/INSTALL.txt
+
+Do not clutter the main project card if it would look awkward.
+
+==================================================
+6. VERIFY THE ZIP
+==================================================
+
+After creating the ZIP:
+
+- inspect its contents
+- confirm manifest.json is at the correct top level
+- confirm every file referenced by manifest.json exists
+- confirm no backend/database/private/unnecessary files are included
+- confirm config.js points to:
+  https://lock-in-bro.onrender.com
+- confirm there are no secrets or credentials
+- confirm the ZIP can be extracted successfully
+
+Do not modify the working extension just to make the ZIP.
+
+==================================================
+7. TEST PORTFOLIO LINKS
+==================================================
+
+Verify:
+
+Open Dashboard
+-> https://lock-in-bro.onrender.com
+
+Download Extension
+-> the new lock-in-bro-extension.zip
+
+View Code
+-> the existing GitHub source link
+
+Also verify that the new button does not break the desktop or mobile layout.
+
+==================================================
+8. DO NOT DO
+==================================================
+
+Do NOT:
+
+- publish to Chrome Web Store
+- modify the Flask backend
+- modify PostgreSQL
+- modify Render settings
+- rewrite the extension
+- change my focus score
+- change unrelated portfolio projects
+- write my final Project 2 README
+- commit
+- push
+
+==================================================
+9. PROMPT LOG
+==================================================
+
+Append THIS ENTIRE PROMPT verbatim to:
+
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize or rewrite it.
+
+==================================================
+WHEN FINISHED
+==================================================
+
+Tell me:
+
+1. Exactly which files were created or changed.
+2. The exact contents of the ZIP.
+3. Confirm manifest.json is at the top level after extraction.
+4. The exact URL the Download Extension button will use.
+5. Where the installation instructions are.
+6. How I can test the download locally.
+7. How I should test it after pushing to GitHub Pages.
+8. Any problems you found.
+9. A suggested commit message.
+
+Do not commit or push anything.
