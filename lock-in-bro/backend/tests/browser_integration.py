@@ -14,6 +14,8 @@ server=make_server('127.0.0.1',5000,app,threaded=True)
 threading.Thread(target=server.serve_forever,daemon=True).start()
 fixture=Path(tempfile.mkdtemp(prefix='phase2-extension-'))
 shutil.copytree(project / 'extension',fixture,dirs_exist_ok=True)
+# Keep integration traffic in the temporary local database, even for production builds.
+(fixture/'config.js').write_text("const BACKEND = 'http://127.0.0.1:5000';\n")
 manifest=json.loads((fixture/'manifest.json').read_text())
 manifest['host_permissions'] += ['http://*.reddit.com/*','https://*.reddit.com/*']
 (fixture/'manifest.json').write_text(json.dumps(manifest))

@@ -10,3 +10,6 @@ secrets.json
 *.sqlite-*
 *.sqlite3
 *.sqlite3-*
+
+# macOS metadata
+.DS_Store
