@@ -1,4 +1,4 @@
-importScripts('focus-score.js');
+importScripts('config.js', 'focus-score.js');
 // All state changes run in one queue, so simultaneous tabs cannot lose counts.
 let queue = Promise.resolve();
 function serial(work) {
@@ -7,7 +7,6 @@ function serial(work) {
   return result;
 }
 // Network work is ordered separately: no fetch can stall the local state queue.
-const BACKEND = 'http://127.0.0.1:5000';
 let networkQueue = Promise.resolve();
 const backendIds = new Map();
 async function clientId() {

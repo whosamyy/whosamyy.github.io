@@ -3,6 +3,28 @@
 ## Tools Used
 - Codex
 
+## Code I Wrote or Substantially Modified Myself
+I wrote the focus score calculation myself. It uses whether the session
+was completed, how long I actually focused compared to the planned time,
+and how many times I tried to visit a blocked site to calculate a score
+from 0–100. I also manually tested the extension and adjusted parts of
+the behavior based on what I found.
+
+## Which Tool I Used for Which Job
+I used Codex for most of the implementation, including setting up the
+Chrome extension, Flask backend, database, and analytics dashboard. I
+used ChatGPT to help plan the project architecture, think through
+features, and write/debug prompts for Codex. I manually tested the
+extension throughout development.
+
+## One Place AI Got Something Wrong
+The first version Codex generated looked like it was working, but it did
+not actually block the websites that I asked it to block. It also did not 
+show that a focus session was still active after I closed and reopened the 
+extension popup. I found both problems while manually testing it. I then gave 
+Codex a more specific debugging prompt about Chrome permissions, blocking 
+rules, and persistent session state, and tested the fixes again.
+
 ## Key Prompts
 
 ### Prompt 1
@@ -358,16 +380,6 @@ Do not summarize it.
 Do not rewrite it.
 Do not shorten it.
 Do not invent any prompts.
-
-Also add EMPTY sections:
-
-## Code I Wrote or Substantially Modified Myself
-
-## Which Tool I Used for Which Job
-
-## One Place AI Got Something Wrong
-
-Do not invent content for those sections. I will fill them in later.
 
 ==================================================
 GITIGNORE / SECURITY
@@ -1087,3 +1099,484 @@ Tell me:
 13. A suggested second commit message.
 
 Do NOT continue to deployment until I ask.
+
+## Key Prompt — Focus Score Implementation
+
+Implement the unfinished computeFocusScore() function in:
+
+lock-in-bro/extension/focus-score.js
+
+Do NOT modify any other part of the project unless it is absolutely necessary for the function to work.
+
+The function currently receives:
+
+computeFocusScore({
+completed,
+plannedMinutes,
+actualMinutes,
+blockedCount
+})
+
+Requirements:
+
+1. Return an integer focus score from 0 to 100.
+
+2. Start the score at 100.
+
+3. Subtract 5 points for every attempt to visit a blocked website.
+
+Example:
+0 blocked attempts -> lose 0 points
+1 blocked attempt  -> lose 5 points
+3 blocked attempts -> lose 15 points
+
+4. If actualMinutes is less than plannedMinutes, subtract a time penalty based on the percentage of the planned session that was missed.
+
+Use:
+
+percentMissed =
+(plannedMinutes - actualMinutes) / plannedMinutes
+
+The maximum time penalty should be 30 points.
+
+For example:
+
+- completing 100% of the planned time -> lose 0 points
+- completing 50% of the planned time -> lose 15 points
+- completing 0% -> lose 30 points
+
+5. If completed is false, subtract an additional 10 points.
+
+6. Clamp the final score so it can never be below 0 or above 100.
+
+7. Round the final score to the nearest integer.
+
+8. Handle invalid values safely, including:
+
+- plannedMinutes <= 0
+- negative actualMinutes
+- negative blockedCount
+- missing/non-numeric values
+
+Do not allow invalid inputs to produce NaN or Infinity.
+
+9. Keep the implementation simple and readable. Do not create an overly complicated scoring system.
+
+10. Do not change the Flask backend, dashboard, blocking behavior, timer behavior, or database schema.
+
+11. After implementing it, test the function with examples including:
+
+A.
+completed = true
+plannedMinutes = 45
+actualMinutes = 45
+blockedCount = 1
+
+Expected score: 95
+
+B.
+completed = false
+plannedMinutes = 60
+actualMinutes = 30
+blockedCount = 3
+
+Expected score:
+100
+
+- 15 for blocked attempts
+- 15 for missing half the planned time
+- 10 for ending early
+  \= 60
+
+C.
+completed = true
+plannedMinutes = 25
+actualMinutes = 25
+blockedCount = 0
+
+Expected score: 100
+
+D.
+A case with enough penalties that the result would otherwise be negative.
+Confirm that it returns 0.
+
+When finished:
+
+- show me the final computeFocusScore() implementation
+- explain each part briefly
+- show the test results
+- tell me exactly which files were changed
+- do not commit or push anything
+
+Also append THIS ENTIRE PROMPT verbatim to prompt\_log.md as the next Key Prompt.
+Do not summarize or rewrite it.
+
+
+## Key Prompt — Render Deployment Preparation
+
+Phase 2 of Lock In Bro is working locally. I now want to prepare the project for deployment to Render.
+
+Project location:
+
+/Users/whosamy/Documents/whosamyy.github.io/lock-in-bro
+
+Current structure:
+
+lock-in-bro/
+├── extension/
+├── backend/
+├── README.md
+├── prompt_log.md
+└── .gitignore
+
+The Chrome extension, Flask backend, SQLite database, and analytics dashboard are already working locally.
+
+IMPORTANT:
+- Do NOT rewrite working features.
+- Do NOT redesign the extension.
+- Do NOT deploy anything yet.
+- Do NOT commit or push.
+- Preserve local development behavior.
+- Do NOT write my README prose for me.
+
+==================================================
+GOAL
+==================================================
+
+Prepare Lock In Bro so that:
+
+1. The Flask backend/dashboard can be deployed on Render.
+2. Production can use PostgreSQL.
+3. Local development can continue using SQLite.
+4. The extension can easily switch from localhost to the final Render URL.
+5. The public dashboard continues working.
+6. Everything remains tested locally.
+
+==================================================
+1. PRODUCTION DEPENDENCIES
+==================================================
+
+Inspect:
+
+backend/requirements.txt
+
+Make sure it contains all dependencies required for production deployment, including:
+
+- Flask
+- Flask-SQLAlchemy
+- gunicorn
+- an appropriate PostgreSQL driver
+
+Use a modern PostgreSQL driver compatible with the existing SQLAlchemy setup.
+
+Do not add unnecessary packages.
+
+==================================================
+2. DATABASE CONFIGURATION
+==================================================
+
+Inspect the current SQLAlchemy configuration.
+
+Requirements:
+
+LOCAL:
+If DATABASE_URL is not set, continue using the existing SQLite database.
+
+PRODUCTION:
+If DATABASE_URL is set, use that database connection.
+
+Do NOT:
+- hardcode credentials
+- hardcode database passwords
+- commit a DATABASE_URL
+- store secrets in source code
+
+Make sure the configuration works correctly with Render PostgreSQL.
+
+If Render provides a PostgreSQL URL format that SQLAlchemy needs normalized, handle that safely.
+
+==================================================
+3. DATABASE INITIALIZATION
+==================================================
+
+Inspect the current:
+
+flask --app app init-db
+
+behavior.
+
+Make sure a completely new PostgreSQL database can initialize all required tables cleanly.
+
+The schema currently includes:
+
+FocusSession:
+- id
+- client_id
+- task
+- planned_minutes
+- actual_minutes
+- blocked_domains
+- started_at
+- ended_at
+- completed
+- blocked_count
+- focus_score
+
+BlockedAttempt:
+- id
+- session_id
+- domain
+- timestamp
+
+Do not rely on SQLite-specific ALTER TABLE behavior for a brand-new PostgreSQL deployment.
+
+Preserve existing local SQLite compatibility.
+
+==================================================
+4. GUNICORN
+==================================================
+
+Verify that the backend can be started from:
+
+lock-in-bro/backend
+
+with:
+
+gunicorn app:app
+
+Make any minimal changes necessary.
+
+Do not change the Flask app architecture unnecessarily.
+
+==================================================
+5. EXTENSION BACKEND URL
+==================================================
+
+The extension currently communicates with:
+
+http://127.0.0.1:5000
+
+Refactor the backend URL configuration so there is ONE obvious place where I can switch between:
+
+DEVELOPMENT:
+http://127.0.0.1:5000
+
+and later:
+
+PRODUCTION:
+https://MY-REAL-RENDER-URL.onrender.com
+
+For example, create a small configuration file or clearly defined constant if appropriate.
+
+Do NOT invent my Render URL.
+
+Tell me exactly which line/file I will edit after Render gives me the real URL.
+
+==================================================
+6. CHROME EXTENSION PERMISSIONS
+==================================================
+
+Inspect:
+
+extension/manifest.json
+
+The extension will eventually need to send fetch requests to the Render backend.
+
+Determine exactly what host permission will be needed once I receive the real Render URL.
+
+Do NOT use unnecessarily broad permissions such as:
+
+https://*/*
+
+if a specific Render origin can be used.
+
+For now, preserve localhost development access.
+
+Explain exactly what I need to add/change after I receive the production URL.
+
+Do not break the existing website-blocking permissions.
+
+==================================================
+7. CORS
+==================================================
+
+Determine whether the Flask backend needs CORS configuration for requests originating from the Chrome extension.
+
+If it does, configure it narrowly and safely.
+
+Do not allow every origin unless technically necessary.
+
+Explain what origin rules apply to Chrome extensions and why.
+
+Keep local development working.
+
+==================================================
+8. DASHBOARD
+==================================================
+
+The Flask root route:
+
+/
+
+must continue serving the Lock In Bro analytics dashboard.
+
+Make sure it handles:
+
+- valid client_id
+- no client_id
+- invalid/nonexistent client_id
+- a client with no sessions
+
+The dashboard should never crash just because there is no data.
+
+Do not redesign it.
+
+==================================================
+9. HEALTH CHECK
+==================================================
+
+Keep:
+
+GET /api/health
+
+Make sure it is suitable for checking whether the deployed Render service is alive.
+
+It should return simple JSON and HTTP 200 when healthy.
+
+==================================================
+10. PRODUCTION DATABASE SETUP
+==================================================
+
+Do not create a real database yet.
+
+Instead, make the application ready so that later I can set:
+
+DATABASE_URL=<Render PostgreSQL connection string>
+
+as a Render environment variable.
+
+Tell me whether any other environment variables are needed.
+
+==================================================
+11. FOCUS SCORE
+==================================================
+
+Do not change the focus-score formula unless required for deployment compatibility.
+
+If computeFocusScore() has already been implemented, preserve it exactly unless there is a bug.
+
+Do not redesign the scoring algorithm.
+
+==================================================
+12. TESTING
+==================================================
+
+After making deployment-preparation changes, run all existing backend tests.
+
+Also verify:
+
+1. Flask works with SQLite when DATABASE_URL is absent.
+2. /api/health works.
+3. Dashboard loads.
+4. Session creation still works.
+5. Blocked-attempt saving still works.
+6. Finishing a session still works.
+7. Stats endpoint still works.
+8. Extension still communicates with localhost.
+9. Extension blocking still works.
+10. Extension still works when the backend is offline.
+11. gunicorn app:app starts successfully.
+12. No credentials or secrets are present in tracked files.
+
+If practical, test the database configuration against SQLAlchemy's PostgreSQL URL handling without requiring a real production database.
+
+==================================================
+13. .GITIGNORE
+==================================================
+
+Inspect .gitignore.
+
+Make sure it excludes things such as:
+
+.env
+.env.*
+.venv/
+venv/
+__pycache__/
+*.pyc
+instance/
+*.db
+.DS_Store
+
+Do not ignore source files that need to be deployed.
+
+==================================================
+14. README
+==================================================
+
+Do NOT write my final README prose.
+
+If necessary, update only placeholder headings or technical setup placeholders.
+
+I will write the README in my own words.
+
+==================================================
+15. PROMPT LOG
+==================================================
+
+Append THIS ENTIRE PROMPT verbatim to:
+
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize it.
+Do not rewrite it.
+Do not invent any development history.
+
+==================================================
+16. DO NOT DO YET
+==================================================
+
+Do NOT:
+
+- deploy to Render
+- create a Render account/service
+- create a PostgreSQL database
+- change my portfolio
+- package the extension
+- create a GitHub release
+- record a demo
+- publish to the Chrome Web Store
+- commit
+- push
+
+==================================================
+WHEN FINISHED
+==================================================
+
+Give me:
+
+1. Every file you changed.
+2. What each change was for.
+3. Whether gunicorn app:app works.
+4. Which PostgreSQL driver is being used.
+5. Exactly how DATABASE_URL is handled.
+6. Whether a new PostgreSQL database can initialize correctly.
+7. Where the extension backend URL is configured.
+8. Exactly what I need to change once I get my Render URL.
+9. Any manifest permission changes I will need after getting the Render URL.
+10. Whether CORS is needed and how it is configured.
+11. Exact Render settings I should enter:
+
+   - Root Directory
+   - Build Command
+   - Start Command
+
+12. Every Render environment variable I need.
+13. How to initialize the production database after deployment.
+14. A manual deployment checklist for me.
+15. Any remaining deployment risks or bugs.
+16. A suggested commit message.
+
+Stop after preparing the code. Do not deploy anything.

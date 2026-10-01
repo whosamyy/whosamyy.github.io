@@ -10,11 +10,19 @@ from werkzeug.exceptions import HTTPException
 from models import db, FocusSession, BlockedAttempt
 
 
+def as_utc(value):
+    # SQLite returns naive UTC values; PostgreSQL returns timezone-aware values.
+    return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+
+
 def create_app(config=None):
     app = Flask(__name__)
     database_url = os.environ.get('DATABASE_URL', 'sqlite:///lock_in_bro.db')
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    # Select psycopg 3 explicitly; preserve credentials and query parameters verbatim.
+    for prefix in ('postgres://', 'postgresql://'):
+        if database_url.startswith(prefix):
+            database_url = 'postgresql+psycopg://' + database_url[len(prefix):]
+            break
     app.config.update(SQLALCHEMY_DATABASE_URI=database_url,
                       SQLALCHEMY_TRACK_MODIFICATIONS=False, MAX_CONTENT_LENGTH=32768)
     if config:
@@ -45,7 +53,7 @@ def create_app(config=None):
             parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
             if parsed.tzinfo is None:
                 raise ValueError()
-            return parsed.astimezone(timezone.utc).replace(tzinfo=None)
+            return parsed.astimezone(timezone.utc)
         except ValueError:
             raise ValueError(f'{key} must be an ISO timestamp with a timezone.')
 
@@ -96,7 +104,7 @@ def create_app(config=None):
         name, timestamp = domain(data.get('domain')), date(data, 'timestamp')
         if name not in session.blocked_domains:
             raise ValueError('This domain is not in the session blocklist.')
-        if timestamp < session.started_at or (session.ended_at and timestamp > session.ended_at):
+        if timestamp < as_utc(session.started_at) or (session.ended_at and timestamp > as_utc(session.ended_at)):
             raise ValueError('Attempt timestamp is outside the session.')
         if session.ended_at:
             return jsonify(success=False, error='Session already finished.'), 409
@@ -110,7 +118,7 @@ def create_app(config=None):
         session = db.get_or_404(FocusSession, session_id)
         data = body()
         ended = date(data, 'ended_at')
-        if ended < session.started_at:
+        if ended < as_utc(session.started_at):
             raise ValueError('ended_at cannot precede started_at.')
         if type(data.get('completed')) is not bool:
             raise ValueError('completed must be a boolean.')
@@ -132,11 +140,11 @@ def create_app(config=None):
         scores = [s.focus_score for s in finished if s.focus_score is not None]
         days = defaultdict(float)
         for s in finished:
-            days[s.started_at.date().isoformat()] += s.actual_minutes or 0
+            days[as_utc(s.started_at).date().isoformat()] += s.actual_minutes or 0
         domains = Counter(a.domain for s in sessions for a in s.attempts)
         total = sum(s.actual_minutes or 0 for s in finished)
         def iso(value):
-            return value.isoformat() + 'Z' if value else None
+            return as_utc(value).isoformat().replace('+00:00', 'Z') if value else None
         return jsonify(total_focus_minutes=total, total_sessions=len(sessions),
             completed_sessions=sum(s.completed for s in finished),
             total_blocked_attempts=sum(s.blocked_count for s in sessions),

@@ -15,7 +15,7 @@ function normalize(value) {
   return domain;
 }
 function render() {
-  $('dashboard-link').href = `http://127.0.0.1:5000/?client_id=${encodeURIComponent(state.client_id || '')}`;
+  $('dashboard-link').href = `${BACKEND}/?client_id=${encodeURIComponent(state.client_id || '')}`;
   const session = state.session;
   $('setup').hidden = !!session?.active;
   $('active').hidden = !session?.active;

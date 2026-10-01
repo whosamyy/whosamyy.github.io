@@ -42,7 +42,7 @@ with sync_playwright() as p:
     popup.locator('#end').click();popup.locator('#summary').wait_for(state='visible');worker.evaluate('networkQueue')
     assert worker.evaluate('chrome.declarativeNetRequest.getDynamicRules()')==[]
     with app.app_context():
-        s=db.session.get(FocusSession,session['backendSessionId']);assert s.ended_at and s.blocked_count==2 and s.focus_score is None
+        s=db.session.get(FocusSession,session['backendSessionId']);assert s.ended_at and s.blocked_count==2 and s.focus_score == 50
         assert db.session.query(BlockedAttempt).count()==2
     dashboard=context.new_page();dashboard.goto(f'http://127.0.0.1:5000/?client_id={cid}')
     dashboard.wait_for_function('document.getElementById("blocked").textContent==="2"')
@@ -51,6 +51,10 @@ with sync_playwright() as p:
     dashboard.screenshot(path='/tmp/phase2-dashboard.png',full_page=True)
     dashboard.goto('http://127.0.0.1:5000/?client_id=empty')
     dashboard.wait_for_function('document.getElementById("status").textContent.includes("No sessions yet")')
+    for suffix in ['', '?client_id=invalid%2Fid']:
+        dashboard.goto('http://127.0.0.1:5000/' + suffix)
+        dashboard.wait_for_function('!document.getElementById("status").textContent.includes("Loading")')
+        assert dashboard.locator('h1').inner_text() == 'LOCK IN BRO.'
     print('PASS online: real DNR redirects, popup closure, backend ID, attempt rows, finish, dashboard, chart, empty state')
     server.shutdown();server.server_close()
     popup.locator('#task').fill('Phase 2 offline test')
