@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200" shape-rendering="crispEdges">
+  <!-- A cozy pixel coding desk with a cat, matcha, and a miniature website. -->
+  <rect width="600" height="200" fill="#e9dff1"/>
+  <path d="M0 163h600v37H0z" fill="#d6cedf"/>
+  <path d="M0 163h600v4H0z" fill="#bdaecb"/>
+  <!-- Window. -->
+  <path d="M75 23h103v104H75z" fill="#bcaac7"/>
+  <path d="M81 29h91v91H81z" fill="#d7e9e9"/>
+  <path d="M93 47h12v-6h19v6h12v9H93zM130 90h12v-6h20v15h-32z" fill="#fff9ef"/>
+  <path d="M123 29h6v91h-6zM81 72h91v6H81zM69 120h116v7H69z" fill="#fff2eb"/>
+  <!-- Wall shelf, books, plant. -->
+  <path d="M422 61h108v8H422z" fill="#b195b6"/>
+  <path d="M434 32h10v29h-10zM447 38h11v23h-11z" fill="#dfa5bd"/>
+  <path d="M461 28h10v33h-10z" fill="#fff0cc"/>
+  <path d="M491 46h25v6h-25zM495 52h17v9h-17z" fill="#c89cb8"/>
+  <path d="M500 29h6v17h-6zM489 27h11v10h-11zM506 21h11v12h-11z" fill="#a5bf97"/>
+  <!-- Monitor with a tiny portfolio layout. -->
+  <path d="M248 42h111v84H248z" fill="#9c86ad"/>
+  <path d="M255 49h97v67h-97z" fill="#fff9f2"/>
+  <path d="M255 49h97v10h-97z" fill="#e4b6ca"/>
+  <path d="M260 52h4v4h-4zM267 52h4v4h-4zM274 52h4v4h-4z" fill="#fff9f2"/>
+  <path d="M263 67h44v5h-44zM263 78h35v3h-35zM263 85h29v3h-29z" fill="#baa7c6"/>
+  <path d="M318 66h25v24h-25zM263 96h23v13h-23z" fill="#e9bdd0"/>
+  <path d="M292 96h23v13h-23z" fill="#c5d7b7"/>
+  <path d="M321 96h23v13h-23z" fill="#d6c7e6"/>
+  <path d="M297 126h13v11h-13zM283 137h42v6h-42z" fill="#9c86ad"/>
+  <!-- Desk and keyboard. -->
+  <path d="M192 147h220v11H192zM202 158h9v37h-9zM393 158h9v37h-9z" fill="#b597af"/>
+  <path d="M192 147h220v4H192z" fill="#d7b7ca"/>
+  <path d="M267 141h67v6h-67z" fill="#fff9f2"/>
+  <path d="M274 142h4v3h-4zM283 142h4v3h-4zM292 142h4v3h-4zM301 142h4v3h-4zM310 142h4v3h-4zM319 142h4v3h-4z" fill="#c6b4d2"/>
+  <!-- Tiny cat desk companion. -->
+  <path d="M357 100h9v9h20v-9h9v42h-38zM362 142h34v5h-34zM395 127h6v17h-6z" fill="#fff3de"/>
+  <path d="M360 104h4v7h-4zM388 104h4v7h-4z" fill="#e9b6c7"/>
+  <path d="M365 118h4v5h-4zM383 118h4v5h-4z" fill="#665267"/>
+  <path d="M374 126h5v3h-5z" fill="#c68ba5"/>
+  <path d="M360 127h8v4h-8zM385 127h8v4h-8z" fill="#e9b6c7"/>
+  <!-- Matcha mug. -->
+  <path d="M214 125h23v22h-23zM237 130h7v12h-7z" fill="#fff9f2"/>
+  <path d="M217 125h17v4h-17z" fill="#a5bf97"/>
+  <path d="M219 114h4v6h-4zM229 107h4v12h-4z" fill="#fff9f2"/>
+  <!-- Pixel heart and sparkles. -->
+  <path d="M204 48h7v5h5v-5h7v12h-5v5h-9v-5h-5z" fill="#d69bb8"/>
+  <path d="M380 59h4v12h-4zM376 63h12v4h-12zM233 91h4v12h-4zM229 95h12v4h-12z" fill="#fff9f2"/>
+</svg>

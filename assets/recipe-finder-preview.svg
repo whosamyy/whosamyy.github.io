@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200" shape-rendering="crispEdges">
+  <!-- A tiny chef in a pastel kitchen, drawn with the same blocks as the other cards. -->
+  <rect width="600" height="200" fill="#f9e7d2"/>
+  <path d="M0 78h600M0 108h600M0 138h600M90 78v60M150 78v60M210 78v60M270 78v60M330 78v60M390 78v60M450 78v60M510 78v60" stroke="#efdbc6" stroke-width="3"/>
+  <path d="M0 171h600v29H0z" fill="#e3d4c6"/>
+  <!-- Shelf of ingredients. -->
+  <path d="M72 61h117v8H72z" fill="#bc9c97"/>
+  <path d="M84 33h22v28H84zM115 40h22v21h-22zM148 31h24v30h-24z" fill="#fff9ed"/>
+  <path d="M83 29h24v6H83zM114 36h24v6h-24z" fill="#dda0b4"/>
+  <path d="M90 44h10v10H90zM121 47h10v9h-10z" fill="#e9bf85"/>
+  <path d="M148 31h24v6h-24zM152 43h16v12h-16z" fill="#a9c69d"/>
+  <!-- Recipe pinned to the wall. -->
+  <path d="M427 31h55v60h-55z" fill="#fff9ed"/>
+  <path d="M446 27h17v8h-17z" fill="#dda0b4"/>
+  <path d="M438 47h31v4h-31zM438 57h22v4h-22zM438 67h28v4h-28zM438 77h17v4h-17z" fill="#c6b4b4"/>
+  <!-- Bear chef and fluffy hat. -->
+  <path d="M271 72h15v18h-15zM320 72h15v18h-15zM278 78h50v37h-50zM284 115h38v8h-38z" fill="#dcb995"/>
+  <path d="M280 69V54h9V44h26v6h13v19zM284 69h40v10h-40z" fill="#fffaf2"/>
+  <path d="M287 89h5v6h-5zM313 89h5v6h-5z" fill="#665267"/>
+  <path d="M298 101h8v5h-8z" fill="#8c6a70"/>
+  <path d="M280 101h10v5h-10zM317 101h10v5h-10z" fill="#eaa9b4"/>
+  <path d="M279 123h48v23h-48z" fill="#fff9ed"/>
+  <path d="M287 121h6v12h20v-12h6v27h-32z" fill="#a9c69d"/>
+  <!-- Counter and cupboard doors. -->
+  <path d="M189 143h222v12H189z" fill="#bd969e"/>
+  <path d="M198 155h204v39H198z" fill="#e5b5c2"/>
+  <path d="M265 156v37M335 156v37" stroke="#cfa0b1" stroke-width="3"/>
+  <path d="M250 168h5v9h-5zM276 168h5v9h-5zM346 168h5v9h-5z" fill="#fff3df"/>
+  <!-- Mixing bowl and spoon. -->
+  <path d="M275 129h54v8h-54zM280 137h44v6h-44z" fill="#b6a3cc"/>
+  <path d="M314 110h5v21h-5zM311 106h11v8h-11z" fill="#bc9692"/>
+  <path d="M267 123h12v10h-12zM328 120h12v10h-12z" fill="#dcb995"/>
+  <!-- Strawberry and little carrot on a cutting board. -->
+  <path d="M349 137h47v6h-47z" fill="#f3d39e"/>
+  <path d="M353 121h17v10h-4v5h-9v-5h-4z" fill="#db8ca5"/>
+  <path d="M358 117h7v7h-7zM353 119h17v4h-17z" fill="#92b18a"/>
+  <path d="M378 122h10v9h-4v6h-6z" fill="#e8b27d"/>
+  <path d="M378 117h4v7h-4zM386 116h4v8h-4z" fill="#92b18a"/>
+  <!-- A smiling milk carton. -->
+  <path d="M213 119h23v24h-23zM218 111h13v8h-13z" fill="#fff9ed"/>
+  <path d="M213 123h23v7h-23z" fill="#c0d8d8"/>
+  <path d="M218 133h3v3h-3zM228 133h3v3h-3z" fill="#665267"/>
+  <path d="M242 51h4v12h-4zM238 55h12v4h-12zM375 75h4v12h-4zM371 79h12v4h-12z" fill="#fffaf2"/>
+</svg>

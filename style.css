@@ -195,24 +195,11 @@ p { color: var(--muted); }
     background: #d9e8cd url("assets/crossy-road-preview.svg") center / cover no-repeat;
 }
 .recipe-preview {
-    position: relative;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at 18% 23%, #fff8d8 0 7%, transparent 7.5%),
-        radial-gradient(circle at 75% 75%, #ffd2df 0 10%, transparent 10.5%),
-        linear-gradient(135deg, #ffe8bd, #ffd5d9 48%, #d9efd8);
+    background: #f9e7d2 url("assets/recipe-finder-preview.svg") center / cover no-repeat;
 }
-.recipe-preview::after { content: "🍓  🥕  🍋"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 36px; letter-spacing: 10px; text-shadow: 2px 2px 0 #fff9f2; transform: rotate(-8deg); }
 .portfolio-preview {
-    position: relative;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at 20% 20%, #fff 0 5%, transparent 5.5%),
-        radial-gradient(circle at 78% 73%, #ffd7e8 0 13%, transparent 13.5%),
-        repeating-linear-gradient(45deg, transparent 0 19px, rgba(255,255,255,.45) 20px 22px),
-        linear-gradient(135deg, #f8d6e5, #eadcff 54%, #cfebed);
+    background: #e9dff1 url("assets/portfolio-preview.svg") center / cover no-repeat;
 }
-.portfolio-preview::after { content: "⌨️  { }  ✿"; position: absolute; inset: 0; display: grid; place-items: center; color: #a52c61; font: 700 34px "Courier New", monospace; letter-spacing: 8px; text-shadow: 2px 2px 0 #fff; transform: rotate(7deg); }
 .focus-preview {
     background: #f5dce8 url("assets/lock-in-bro-preview.svg") center / cover no-repeat;
 }
