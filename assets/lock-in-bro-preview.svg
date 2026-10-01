@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200" shape-rendering="crispEdges">
+  <!-- Pastel block shapes match the Crossy Road card: a bunny study nook. -->
+  <rect width="600" height="200" fill="#f5dce8"/>
+  <path d="M0 160h600v40H0z" fill="#e6d8ed"/>
+  <path d="M0 160h600v5H0z" fill="#cfbad5"/>
+  <!-- Window and pixel clouds. -->
+  <path d="M72 20h112v106H72z" fill="#c9b0c6"/>
+  <path d="M78 26h100v94H78z" fill="#d8eaf0"/>
+  <path d="M88 47h17v-7h20v7h12v10H88zM133 89h12v-7h18v7h10v9h-40z" fill="#fffaf1"/>
+  <path d="M125 26h6v94h-6zM78 71h100v6H78zM65 120h126v8H65z" fill="#fff3ec"/>
+  <!-- Shelf, books, and a little plant. -->
+  <path d="M413 65h124v8H413zM426 73h6v9h-6zM520 73h6v9h-6z" fill="#b899b1"/>
+  <path d="M425 35h11v30h-11z" fill="#a99bc7"/>
+  <path d="M438 29h13v36h-13z" fill="#de91b1"/>
+  <path d="M453 39h12v26h-12z" fill="#f5d49b"/>
+  <path d="M499 44h6v13h-6zM487 34h12v12h-12zM505 28h12v14h-12zM499 38h6v9h-6z" fill="#a1bc90"/>
+  <path d="M488 51h28v8h-28zM492 59h20v6h-20z" fill="#c28dac"/>
+  <!-- Chair and bunny ears. -->
+  <path d="M267 95h67v69h-67z" fill="#b6a2cb"/>
+  <path d="M276 30h16v43h-16zM313 26h16v47h-16z" fill="#fff9ed"/>
+  <path d="M281 37h6v28h-6zM318 33h6v32h-6z" fill="#efb1c6"/>
+  <!-- Bunny face and sweater. -->
+  <path d="M274 67h55v6h8v37h-8v8h-55v-8h-8V78h8z" fill="#fff9ed"/>
+  <path d="M281 86h5v7h-5zM315 86h5v7h-5z" fill="#665267"/>
+  <path d="M273 98h12v6h-12zM317 98h12v6h-12z" fill="#efb1c6"/>
+  <path d="M298 97h6v4h-6zM295 104h5v3h-5zM303 104h5v3h-5z" fill="#b77b92"/>
+  <path d="M276 118h50v27h-50zM269 125h64v19h-64z" fill="#a9c6a0"/>
+  <!-- Desk and legs. -->
+  <path d="M209 142h189v12H209zM217 154h9v39h-9zM381 154h9v39h-9z" fill="#bc94a5"/>
+  <path d="M209 142h189v5H209z" fill="#e2b6c3"/>
+  <!-- Open book, paws, and pencil. -->
+  <path d="M270 124h28l5 5 5-5h28v18h-66z" fill="#fff9ed"/>
+  <path d="M301 129h4v13h-4zM278 130h15v3h-15zM313 130h15v3h-15zM278 136h15v2h-15zM313 136h15v2h-15z" fill="#c6b5c7"/>
+  <path d="M261 128h12v10h-12zM334 128h12v10h-12z" fill="#fff9ed"/>
+  <path d="M340 116h4v18h-4z" fill="#e7bb73"/>
+  <!-- Matcha mug and stack of notebooks. -->
+  <path d="M231 119h19v22h-19zM250 124h7v12h-7z" fill="#fff9ed"/>
+  <path d="M234 119h13v4h-13z" fill="#9eb986"/>
+  <path d="M235 108h3v6h-3zM243 102h3v9h-3z" fill="#fff9ed"/>
+  <path d="M354 135h31v7h-31z" fill="#a99bc7"/>
+  <path d="M358 128h29v7h-29z" fill="#e6a3bb"/>
+  <!-- Floating pixel heart and little sparkles. -->
+  <path d="M354 47h7v5h5v-5h7v12h-5v5h-9v-5h-5z" fill="#db91af"/>
+  <path d="M234 53h4v12h-4zM230 57h12v4h-12zM389 96h4v12h-4zM385 100h12v4h-12z" fill="#fff9ed"/>
+</svg>
