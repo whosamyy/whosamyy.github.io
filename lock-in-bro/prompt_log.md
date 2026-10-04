@@ -2348,3 +2348,252 @@ Tell me:
 
 Stop after implementing and testing locally.
 Do not deploy or push.
+
+
+## Key Prompt — Lock In Pig Rewards
+
+I want to add a cute reward feature to Lock In Bro: a super cute little pig on the focus dashboard.
+
+IMPORTANT:
+- The existing Chrome extension, Flask backend, PostgreSQL/SQLite setup, dashboard, and deployment already work.
+- Do NOT rewrite the project.
+- Do NOT break the existing blocking, timer, session-saving, focus-score, or dashboard functionality.
+- Do NOT redesign the whole app.
+- Do NOT commit, push, or deploy anything yet.
+
+==================================================
+GOAL
+==================================================
+
+Add a cute dashboard reward system centered around a little pig character.
+
+The pig should make the dashboard feel more fun and rewarding.
+
+The pig should be:
+- super cute
+- pastel pink
+- round/chubby
+- simple and polished
+- expressive and friendly
+- visually consistent with the current pink Lock In Bro aesthetic
+
+I want this to feel like a "focus pet" / "study buddy" feature.
+
+==================================================
+CORE FEATURE
+==================================================
+
+Add a "Lock In Pig" section to the focus dashboard.
+
+The user should see:
+
+- a cute pig character
+- pig level
+- pig XP
+- unlocked accessories or rewards
+- a short encouraging message
+
+This pig should reward the user for completing focus sessions.
+
+==================================================
+REWARD LOGIC
+==================================================
+
+Use existing session data to power the pig rewards.
+
+A simple system is fine.
+
+For example:
+
+- completed focus session -> gain XP
+- more focused minutes -> more XP
+- higher focus score -> bonus XP
+- good streak / low blocked attempts -> optional bonus
+
+Keep it simple and easy to explain.
+
+I do NOT want overly complicated game logic.
+
+You may implement something like:
+
+- XP earned per completed session
+- pig level increases at XP thresholds
+- small cosmetic unlocks at certain levels
+
+Example unlocks:
+- Level 2: blush sparkle
+- Level 3: pink bow
+- Level 5: headphones
+- Level 7: tiny strawberry
+- Level 10: heart glasses
+
+These rewards are just examples. Keep them cute and simple.
+
+==================================================
+VISUAL DESIGN
+==================================================
+
+The pig must be VERY cute.
+
+Visual guidance:
+- big shiny eyes
+- round pink body
+- darker pink snout
+- little ears
+- blush cheeks
+- tiny hooves
+- happy expression
+- optional sparkle/hearts nearby
+
+Do NOT use a realistic pig.
+Do NOT use a corporate mascot style.
+Do NOT use anything creepy, overly detailed, or childish in a low-quality way.
+
+I want something that looks polished, adorable, and charming.
+
+Implement the pig using local HTML/CSS/SVG or inline SVG if appropriate.
+Do NOT depend on external image APIs.
+Do NOT use copyrighted character art.
+
+The pig should scale nicely on desktop and mobile.
+
+==================================================
+DASHBOARD UI
+==================================================
+
+Add a new dashboard section/card, something like:
+
+LOCK IN PIG
+
+[ super cute pig ]
+Level 3
+XP: 85 / 120
+
+Unlocked:
+- Pink Bow
+- Sparkle Blush
+
+Message:
+"bro you actually locked in today 💖"
+
+This should fit nicely into the current dashboard layout.
+Match the current pink style.
+
+Do NOT redesign the rest of the dashboard unless small layout adjustments are necessary.
+
+==================================================
+PERSISTENCE
+==================================================
+
+Persist the pig progress.
+
+Use the cleanest reasonable option.
+
+If the app already has authentication, associate the pig with the signed-in user.
+If the app is still using the client_id dashboard model, associate it with the same user/client data model already used for analytics.
+
+You may:
+- derive XP/level directly from focus sessions, OR
+- create a small pig profile table if needed
+
+Prefer the simplest clean architecture.
+
+If adding a database table is useful, something like this is fine:
+
+PigProfile
+- id
+- user_id OR client_id
+- total_xp
+- level
+- unlocked_items (JSON or similar)
+- updated_at
+
+But if the same result can be achieved cleanly from existing data, that is also acceptable.
+
+Explain which approach you chose and why.
+
+==================================================
+ENCOURAGING MESSAGES
+==================================================
+
+Show a short fun message near the pig.
+
+Examples of the tone I want:
+- "bro you locked in 💖"
+- "piggy is proud of you"
+- "one more session and piggy gets a new accessory"
+- "you resisted the scroll... legendary behavior"
+- "academic weapon energy"
+
+Keep the tone cute, playful, and consistent with "Lock In Bro."
+
+Do not make it cringe or overly long.
+
+==================================================
+DO NOT CHANGE
+==================================================
+
+Do NOT:
+- change the extension blocking behavior
+- change timer behavior
+- change backend endpoints unless needed for pig data
+- change the focus-score formula unless absolutely necessary
+- change the auth system unless needed to attach pig progress
+- add new external services
+- add paid APIs
+- add unnecessary complexity
+- replace the dashboard analytics
+
+The existing dashboard analytics should remain and still work.
+
+==================================================
+TESTING
+==================================================
+
+After implementing, verify:
+
+1. Existing dashboard analytics still load.
+2. Pig section appears correctly.
+3. Pig looks cute on desktop.
+4. Pig looks good on mobile.
+5. XP/level/rewards display correctly.
+6. Pig progress persists correctly.
+7. Existing session data still works.
+8. Existing tests still pass if possible.
+9. No console errors.
+10. No broken CSS/layout issues.
+
+If you add pig-specific backend logic, add reasonable tests.
+
+==================================================
+README / PROMPT LOG
+==================================================
+
+Do NOT rewrite my README.
+
+If this feature means I should update a README section later, tell me what to update.
+
+Append THIS ENTIRE PROMPT verbatim to:
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize or rewrite it.
+
+==================================================
+WHEN FINISHED
+==================================================
+
+Tell me:
+1. Every file you changed or created.
+2. How the pig reward system works.
+3. Whether pig progress is derived or stored.
+4. How XP is calculated.
+5. How levels/unlocks work.
+6. How persistence works.
+7. How the pig is rendered (CSS/SVG/etc.).
+8. Any tests you added or updated.
+9. Any limitations.
+10. A suggested commit message.
+
+Do not commit, push, or deploy anything.

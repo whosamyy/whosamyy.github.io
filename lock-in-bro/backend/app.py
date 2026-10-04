@@ -12,6 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException, SecurityError
 from models import db, FocusSession, BlockedAttempt, ClientInstallation
 from auth import init_auth, current_user, claim_client, valid_client_id, auth_configured
+from pig import pig_progress
 
 
 def as_utc(value):
@@ -220,7 +221,7 @@ def create_app(config=None):
         total = sum(s.actual_minutes or 0 for s in finished)
         def iso(value):
             return as_utc(value).isoformat().replace('+00:00', 'Z') if value else None
-        return jsonify(total_focus_minutes=total, total_sessions=len(sessions),
+        return jsonify(pig=pig_progress(sessions), total_focus_minutes=total, total_sessions=len(sessions),
             completed_sessions=sum(s.completed for s in finished),
             total_blocked_attempts=sum(s.blocked_count for s in sessions),
             average_focus_score=sum(scores)/len(scores) if scores else None,

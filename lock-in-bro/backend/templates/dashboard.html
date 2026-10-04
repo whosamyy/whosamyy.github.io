@@ -5,6 +5,16 @@
 <p class="privacy">Your dashboard shows history from installations linked to your Google account. Open this page from your extension to link another installation.</p>
 <p id="status" role="status">Loading your focus history…</p>
 <section class="cards" aria-label="Focus totals"><article><h2>Total Focus Time</h2><strong id="minutes">0 min</strong></article><article><h2>Sessions Completed</h2><strong id="completed">0</strong></article><article><h2>Distractions Blocked</h2><strong id="blocked">0</strong></article><article><h2>Average Focus Score</h2><strong id="score">Not scored yet</strong></article></section>
+<section class="panel pig-panel" aria-labelledby="pig-heading">
+<div class="pig-art">{% include 'pig.html' %}</div>
+<div class="pig-details"><span class="tag">YOUR LITTLE STUDY BUDDY</span><h2 id="pig-heading">LOCK IN PIG</h2>
+<p id="pig-message">Piggy is getting comfy…</p>
+<div class="pig-level-row"><strong id="pig-level">Level —</strong><span id="pig-xp">XP: — / 100</span></div>
+<progress id="pig-progress" max="100" value="0" aria-label="Pig XP toward the next level"></progress>
+<p id="pig-total" class="privacy"></p><h3 class="pig-unlocked-heading">Unlocked goodies</h3><ul id="pig-unlocks" class="pig-unlocks"></ul>
+<p id="pig-next" class="privacy"></p>
+<details class="pig-rules"><summary>How piggy grows</summary><p>Each completed session earns 10 XP + 1 XP per full focused minute + 1 bonus XP per 10 focus-score points. Every 100 XP raises piggy’s level. Sessions ended early don’t earn XP; your existing completed sessions count too.</p></details>
+</div></section>
 <section class="panel"><h2>FOCUS TIME OVER TIME</h2><p>Minutes by session start date (UTC). Finished sessions only.</p><div id="chart" class="chart" role="img" aria-label="No focus time yet"></div></section>
 <section class="panel"><h2>RECENT SESSIONS</h2><p id="session-count"></p><div class="table-wrap"><table><thead><tr><th>Task</th><th>Planned</th><th>Actual</th><th>Blocked</th><th>Score</th><th>Status</th><th>Date</th></tr></thead><tbody id="sessions"></tbody></table></div></section>
 <section class="panel"><h2>MOST BLOCKED SITES</h2><ul id="domains"></ul><p class="privacy">Only recorded blocked attempts appear here. Offline attempts can contribute to session totals without domain details.</p></section>

@@ -70,14 +70,51 @@ with sync_playwright() as p:
     dashboard.wait_for_function('document.getElementById("blocked").textContent==="2"')
     assert dashboard.locator('#sessions tr').count()==1
     assert dashboard.locator('.bar').count()==1
+    assert dashboard.locator('#pig-level').inner_text()=='Level 1'
+    assert dashboard.locator('#pig-progress').get_attribute('value')=='0'
     dashboard.screenshot(path='/tmp/phase2-dashboard.png',full_page=True)
+    # Completed sessions update the same open dashboard; early finishes earned no XP.
+    for index, minutes in enumerate([40, 40, 80]):
+        response=dashboard.request.post('http://127.0.0.1:5000/api/sessions',data={
+            'client_id':cid,'task':'Pig reward test','planned_minutes':minutes,
+            'blocked_domains':['reddit.com'],'started_at':f'2026-10-04T10:0{index}:00Z'})
+        sid=response.json()['session_id']
+        assert dashboard.request.post(f'http://127.0.0.1:5000/api/sessions/{sid}/finish',data={
+            'ended_at':'2026-10-04T12:00:00Z','completed':True,'actual_minutes':minutes,
+            'blocked_count':0,'focus_score':100}).ok
+    dashboard.wait_for_function('document.getElementById("pig-level").textContent==="Level 3"')
+    assert dashboard.locator('#pig-xp').inner_text()=='XP: 20 / 100'
+    assert dashboard.locator('#pig-unlocks li').count()==2
+    assert dashboard.locator('[data-pig-item="bow"]').get_attribute('display')=='inline'
+    assert dashboard.locator('#sessions tr').count()==4
+    dashboard.locator('.pig-panel').screenshot(path='/tmp/lock-pig-desktop.png')
+    dashboard.set_viewport_size({'width':390,'height':844})
+    dashboard.locator('.pig-panel').screenshot(path='/tmp/lock-pig-mobile.png')
+    assert dashboard.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    dashboard.reload()
+    dashboard.wait_for_function('document.getElementById("pig-level").textContent==="Level 3"')
+    assert dashboard.locator('#pig-unlocks li').count()==2
+    dashboard.emulate_media(reduced_motion='reduce')
+    assert dashboard.locator('.pig-float').evaluate('el=>getComputedStyle(el).animationName')=='none'
+    for index, minutes in enumerate([480, 160], start=3):
+        response=dashboard.request.post('http://127.0.0.1:5000/api/sessions',data={
+            'client_id':cid,'task':'More pig rewards','planned_minutes':minutes,
+            'blocked_domains':['reddit.com'],'started_at':f'2026-10-04T10:0{index}:00Z'})
+        sid=response.json()['session_id']
+        assert dashboard.request.post(f'http://127.0.0.1:5000/api/sessions/{sid}/finish',data={
+            'ended_at':'2026-10-04T23:00:00Z','completed':True,'actual_minutes':minutes,
+            'blocked_count':0,'focus_score':100}).ok
+    dashboard.wait_for_function('document.getElementById("pig-level").textContent==="Level 10"')
+    assert dashboard.locator('#pig-unlocks li').count()==5
+    assert dashboard.locator('[data-pig-item][display="inline"]').count()==5
+    dashboard.locator('.pig-panel').screenshot(path='/tmp/lock-pig-all-goodies.png')
     dashboard.get_by_role('button',name='Sign out').click()
     assert dashboard.url.endswith('/login')
     assert dashboard.request.get('http://127.0.0.1:5000/api/me/stats').status==401
     dashboard.goto('http://127.0.0.1:5000/?client_id=invalid%2Fid')
     assert dashboard.get_by_role('alert').is_visible()
     assert dashboard.locator('h1').inner_text() == 'LOCK IN BRO.'
-    print('PASS online: anonymous writes, real DNR redirects, popup closure, backend ID, attempt rows, mocked Google login, clean dashboard URL, live refresh, chart, logout, invalid link')
+    print('PASS online: anonymous writes, real DNR redirects, popup closure, backend ID, attempt rows, mocked Google login, clean dashboard URL, live analytics/pig refresh, all accessories, persistent XP, responsive layout, reduced motion, logout, invalid link')
     server.shutdown();server.server_close()
     popup.locator('#task').fill('Phase 2 offline test')
     popup.locator('#start').click();popup.locator('#active').wait_for(state='visible')

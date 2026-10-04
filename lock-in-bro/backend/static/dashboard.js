@@ -1,6 +1,30 @@
 const $ = id => document.getElementById(id);
 const minutes = value => `${Number(value || 0).toFixed(1)} min`;
 let loading = false;
+function renderPig(pig) {
+  $('pig-level').textContent = `Level ${pig.level}`;
+  $('pig-xp').textContent = `XP: ${pig.level_xp} / ${pig.xp_to_level}`;
+  $('pig-progress').value = pig.level_xp;
+  $('pig-progress').max = pig.xp_to_level;
+  $('pig-total').textContent = `${pig.total_xp.toLocaleString()} total XP · grows with your completed sessions`;
+  $('pig-message').textContent = pig.message;
+  $('pig-unlocks').replaceChildren();
+  for (const item of pig.unlocked_items) {
+    const badge = document.createElement('li'); badge.textContent = item.name;
+    $('pig-unlocks').append(badge);
+  }
+  if (!pig.unlocked_items.length) {
+    const item = document.createElement('li'); item.textContent = 'A little pig. A big future.';
+    $('pig-unlocks').append(item);
+  }
+  const unlocked = new Set(pig.unlocked_items.map(item => item.id));
+  document.querySelectorAll('[data-pig-item]').forEach(item => {
+    item.setAttribute('display', unlocked.has(item.dataset.pigItem) ? 'inline' : 'none');
+  });
+  $('pig-next').textContent = pig.next_unlock
+    ? `${pig.next_unlock.xp_remaining} XP until ${pig.next_unlock.name} at level ${pig.next_unlock.level}`
+    : 'Every goodie unlocked. Keep that lock-in energy 💖';
+}
 async function load() {
   if (loading) return;
   loading = true;
@@ -13,11 +37,13 @@ async function load() {
       // Clear any visible history before navigating after session expiry.
       for (const id of ['sessions', 'domains', 'chart']) $(id).replaceChildren();
       for (const id of ['minutes', 'completed', 'blocked', 'score', 'session-count']) $(id).textContent = '—';
+      document.querySelector('.pig-panel').hidden = true;
       location.replace('/login');
       return;
     }
     if (!response.ok) throw Error('Could not load your history. Check Flask and refresh.');
     const data = await response.json();
+    renderPig(data.pig);
     // Each refresh replaces the previous snapshot, including empty states.
     for (const id of ['sessions', 'domains', 'chart']) $(id).replaceChildren();
     $('status').textContent = data.total_sessions ? 'Every focused minute counts. Keep going.' : 'No sessions yet. Start one in the extension, then come back here!';
