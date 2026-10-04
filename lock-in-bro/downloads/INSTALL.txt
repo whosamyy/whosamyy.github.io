@@ -12,3 +12,12 @@ Install Lock In Bro in Chrome
 
 This is a manual installation, not a Chrome Web Store installation.
 Keep the folder on your computer while using the extension.
+
+Updating an existing installation:
+Replace the files in your current extension folder with the updated ZIP contents,
+then click Reload for Lock In Bro at chrome://extensions. Keep the same folder
+and installation so Chrome preserves your client ID and saved session recap.
+Open the extension to retry syncing its most recent completed session.
+
+Open the dashboard using the link inside the extension to select your history.
+If a session is waiting to sync, leave Chrome running while it retries.

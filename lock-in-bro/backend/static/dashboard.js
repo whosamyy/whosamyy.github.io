@@ -1,14 +1,25 @@
 const $ = id => document.getElementById(id);
-const client = new URLSearchParams(location.search).get('client_id');
 const minutes = value => `${Number(value || 0).toFixed(1)} min`;
+let loading = false;
 async function load() {
-  if (!client) return;
-  $('client').value = client;
+  if (loading) return;
+  loading = true;
   $('status').textContent = 'Loading your focus history…';
   try {
-    const response = await fetch(`/api/stats/${encodeURIComponent(client)}`);
+    const response = await fetch('/api/me/stats', {
+      cache: 'no-store', signal: AbortSignal.timeout(15000)
+    });
+    if (response.status === 401) {
+      // Clear any visible history before navigating after session expiry.
+      for (const id of ['sessions', 'domains', 'chart']) $(id).replaceChildren();
+      for (const id of ['minutes', 'completed', 'blocked', 'score', 'session-count']) $(id).textContent = '—';
+      location.replace('/login');
+      return;
+    }
     if (!response.ok) throw Error('Could not load your history. Check Flask and refresh.');
     const data = await response.json();
+    // Each refresh replaces the previous snapshot, including empty states.
+    for (const id of ['sessions', 'domains', 'chart']) $(id).replaceChildren();
     $('status').textContent = data.total_sessions ? 'Every focused minute counts. Keep going.' : 'No sessions yet. Start one in the extension, then come back here!';
     $('minutes').textContent = minutes(data.total_focus_minutes);
     $('completed').textContent = data.completed_sessions;
@@ -38,6 +49,11 @@ async function load() {
       column.append(label, bar, date); $('chart').append(column);
     }
     if (!days.length) $('chart').textContent = 'Your first finished session will start this chart.';
-  } catch (error) { $('status').textContent = error.message; }
+  } catch (error) { $('status').textContent = `${error.message} Retrying automatically…`; }
+  finally { loading = false; }
 }
 load();
+// Keep an open dashboard current when a session finishes in the extension.
+setInterval(() => { if (!document.hidden) load(); }, 5000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+window.addEventListener('focus', load);

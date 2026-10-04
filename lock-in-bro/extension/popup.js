@@ -16,6 +16,12 @@ function normalize(value) {
 }
 function render() {
   $('dashboard-link').href = `${BACKEND}/?client_id=${encodeURIComponent(state.client_id || '')}`;
+  const pending = Object.keys(state.pendingHistory || {}).length;
+  $('history-status').textContent = pending
+    ? `Saved on this device. ${pending} session${pending === 1 ? '' : 's'} waiting to sync.${state.historySyncError ? ' Server unavailable; retrying automatically.' : ''}`
+    : state.summary?.historySynced
+      ? 'History synced. Open the dashboard from this link to see your sessions.'
+      : 'Open the dashboard from this link to see your sessions.';
   const session = state.session;
   $('setup').hidden = !!session?.active;
   $('active').hidden = !session?.active;

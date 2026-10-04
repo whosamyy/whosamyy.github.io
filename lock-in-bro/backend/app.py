@@ -1,13 +1,17 @@
 import math
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from collections import Counter, defaultdict
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, abort, jsonify, redirect, render_template, request, session as login_session, url_for
+from flask_session import Session
+from cachelib.file import FileSystemCache
+from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.exceptions import HTTPException
-from models import db, FocusSession, BlockedAttempt
+from werkzeug.exceptions import HTTPException, SecurityError
+from models import db, FocusSession, BlockedAttempt, ClientInstallation
+from auth import init_auth, current_user, claim_client, valid_client_id, auth_configured
 
 
 def as_utc(value):
@@ -17,6 +21,7 @@ def as_utc(value):
 
 def create_app(config=None):
     app = Flask(__name__)
+    on_render = os.environ.get('RENDER') == 'true'
     database_url = os.environ.get('DATABASE_URL', 'sqlite:///lock_in_bro.db')
     # Select psycopg 3 explicitly; preserve credentials and query parameters verbatim.
     for prefix in ('postgres://', 'postgresql://'):
@@ -24,10 +29,44 @@ def create_app(config=None):
             database_url = 'postgresql+psycopg://' + database_url[len(prefix):]
             break
     app.config.update(SQLALCHEMY_DATABASE_URI=database_url,
-                      SQLALCHEMY_TRACK_MODIFICATIONS=False, MAX_CONTENT_LENGTH=32768)
+                      SQLALCHEMY_TRACK_MODIFICATIONS=False, MAX_CONTENT_LENGTH=32768,
+                      SECRET_KEY=os.environ.get('SECRET_KEY'),
+                      GOOGLE_CLIENT_ID=os.environ.get('GOOGLE_CLIENT_ID'),
+                      GOOGLE_CLIENT_SECRET=os.environ.get('GOOGLE_CLIENT_SECRET'),
+                      SESSION_TYPE='cachelib', SESSION_USE_SIGNER=True,
+                      SESSION_PERMANENT=False, SESSION_COOKIE_NAME='lock_dashboard',
+                      SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax',
+                      SESSION_COOKIE_SECURE=on_render,
+                      PERMANENT_SESSION_LIFETIME=timedelta(hours=12),
+                      SESSION_REFRESH_EACH_REQUEST=False,
+                      TRUSTED_HOSTS=['lock-in-bro.onrender.com'] if on_render else ['127.0.0.1', 'localhost'],
+                      OAUTH_REDIRECT_URI=('https://lock-in-bro.onrender.com/auth/callback' if on_render
+                                          else 'http://127.0.0.1:5000/auth/callback'))
     if config:
         app.config.update(config)
     db.init_app(app)
+    if 'SESSION_CACHELIB' not in app.config:
+        # All Gunicorn workers on one Render instance share this transient store.
+        # No OAuth tokens are saved; restarts may sign users out, never lose analytics.
+        cache_dir = os.path.join(app.instance_path, 'dashboard_sessions')
+        os.makedirs(cache_dir, mode=0o700, exist_ok=True)
+        app.config['SESSION_CACHELIB'] = FileSystemCache(cache_dir=cache_dir, threshold=10000)
+    if app.config.get('SECRET_KEY'):
+        Session(app)
+    if on_render:
+        # Render terminates TLS. Trust only its single forwarded scheme hop,
+        # not a forwarded host; callback URLs are fixed above.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=0, x_proto=1, x_host=0, x_port=0, x_prefix=0)
+    init_auth(app)
+
+    @app.after_request
+    def protect_read_responses(response):
+        if request.endpoint not in ('static', 'health'):
+            response.headers['Cache-Control'] = 'no-store'
+            response.headers['Referrer-Policy'] = 'no-referrer'
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['X-Frame-Options'] = 'DENY'
+        return response
 
     def body():
         data = request.get_json(silent=True)
@@ -70,11 +109,19 @@ def create_app(config=None):
     def database_error(error):
         db.session.rollback()
         app.logger.error('Database operation failed: %s', type(error).__name__)
-        return jsonify(success=False, error='Database unavailable. Please try again.'), 503
+        message = 'Database unavailable. Please try again.'
+        if request.path.startswith('/api/'):
+            return jsonify(success=False, error=message), 503
+        return render_template('auth_error.html', message=message), 503
 
     @app.errorhandler(HTTPException)
     def http_error(error):
-        return jsonify(success=False, error=error.description), error.code
+        if isinstance(error, SecurityError):
+            # An untrusted host has no URL adapter for rendering templates.
+            return 'Invalid request host.', 400
+        if request.path.startswith('/api/'):
+            return jsonify(success=False, error=error.description), error.code
+        return render_template('auth_error.html', message=error.description), error.code
 
     @app.get('/api/health')
     def health():
@@ -93,6 +140,13 @@ def create_app(config=None):
             planned_minutes=number(data, 'planned_minutes', 1, 480, True),
             blocked_domains=list(dict.fromkeys(domain(d) for d in domains)),
             started_at=date(data, 'started_at'))
+        # A retry (including recovery of a locally saved recap) must reuse the
+        # original row rather than count the same session twice.
+        existing = db.session.scalar(db.select(FocusSession).where(
+            FocusSession.client_id == client_id,
+            FocusSession.started_at == session.started_at))
+        if existing:
+            return jsonify(success=True, session_id=existing.id), 200
         db.session.add(session)
         db.session.commit()
         return jsonify(success=True, session_id=session.id), 201
@@ -135,7 +189,28 @@ def create_app(config=None):
 
     @app.get('/api/stats/<client_id>')
     def stats(client_id):
-        sessions = db.session.scalars(db.select(FocusSession).where(FocusSession.client_id == client_id).order_by(FocusSession.started_at.desc())).all()
+        user = current_user()
+        if user is None:
+            abort(401, description='Sign in to view your focus history.')
+        if not valid_client_id(client_id):
+            abort(400, description='Invalid installation ID.')
+        owned = db.session.scalar(db.select(ClientInstallation).where(
+            ClientInstallation.client_id == client_id, ClientInstallation.user_id == user.id))
+        if owned is None:
+            abort(403, description='This history is not available to your account.')
+        return stats_for_clients([client_id])
+
+    @app.get('/api/me/stats')
+    def my_stats():
+        user = current_user()
+        if user is None:
+            abort(401, description='Sign in to view your focus history.')
+        clients = db.session.scalars(db.select(ClientInstallation.client_id).where(
+            ClientInstallation.user_id == user.id)).all()
+        return stats_for_clients(clients)
+
+    def stats_for_clients(clients):
+        sessions = db.session.scalars(db.select(FocusSession).where(FocusSession.client_id.in_(clients)).order_by(FocusSession.started_at.desc())).all()
         finished = [s for s in sessions if s.ended_at is not None]
         scores = [s.focus_score for s in finished if s.focus_score is not None]
         days = defaultdict(float)
@@ -159,6 +234,17 @@ def create_app(config=None):
 
     @app.get('/')
     def dashboard():
+        client_id = request.args.get('client_id')
+        if client_id is not None and not valid_client_id(client_id):
+            abort(400, description='This dashboard link has an invalid installation ID. Open it from your extension.')
+        user = current_user()
+        if user is None:
+            if client_id and auth_configured():
+                login_session['pending_client_id'] = client_id
+            return redirect(url_for('auth.login'))
+        if client_id:
+            claim_client(client_id, user)
+            return redirect(url_for('dashboard'))
         return render_template('dashboard.html')
 
     @app.cli.command('init-db')

@@ -11,6 +11,9 @@ secrets.json
 *.sqlite3
 *.sqlite3-*
 
+# Transient server-side dashboard login sessions
+dashboard_sessions/
+
 # macOS metadata
 .DS_Store
 

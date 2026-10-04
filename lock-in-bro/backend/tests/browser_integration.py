@@ -1,14 +1,23 @@
 # Requires Playwright and its Chromium browser. Port 5000 must be free.
 # Temporary fixture pre-grants reddit.com; manually verify native permission prompts.
 import os, sys, tempfile, json, shutil, threading
+from unittest.mock import patch
 from pathlib import Path
 project = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project / 'backend'))
 from app import create_app
 from models import db, FocusSession, BlockedAttempt
+from flask import redirect
 from werkzeug.serving import make_server
 from playwright.sync_api import sync_playwright
-app=create_app({'SQLALCHEMY_DATABASE_URI':'sqlite:///'+tempfile.mktemp(suffix='.db')})
+app=create_app({'SQLALCHEMY_DATABASE_URI':'sqlite:///'+tempfile.mktemp(suffix='.db'),
+    'SECRET_KEY':'browser-test-only-key', 'GOOGLE_CLIENT_ID':'browser-test-client',
+    'GOOGLE_CLIENT_SECRET':'browser-test-secret'})
+# Only test fixtures stub Google. The extension still writes anonymously.
+google=app.extensions['lock_oauth'].google
+oauth_start=patch.object(google,'authorize_redirect',return_value=redirect('/auth/callback?code=mock'))
+oauth_token=patch.object(google,'authorize_access_token',return_value={'userinfo':{'sub':'browser-test-google-sub'}})
+oauth_start.start();oauth_token.start()
 with app.app_context(): db.create_all()
 server=make_server('127.0.0.1',5000,app,threaded=True)
 threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -41,23 +50,34 @@ with sync_playwright() as p:
         worker.evaluate('queue');worker.evaluate('networkQueue');tab.close()
     assert worker.evaluate('chrome.storage.local.get("session")')['session']['blockedCount']==2
     popup=context.new_page();popup.goto(f'chrome-extension://{eid}/popup.html')
+    dashboard=context.new_page();dashboard.goto(f'http://127.0.0.1:5000/?client_id={cid}')
+    assert dashboard.url.endswith('/login')
+    dashboard.screenshot(path='/tmp/lock-auth-login.png',full_page=True)
+    dashboard.set_viewport_size({'width':390,'height':844})
+    assert dashboard.get_by_role('link',name='Continue with Google').is_visible()
+    dashboard.screenshot(path='/tmp/lock-auth-login-mobile.png',full_page=True)
+    dashboard.set_viewport_size({'width':1280,'height':900})
+    dashboard.get_by_role('link',name='Continue with Google').click()
+    dashboard.wait_for_function('document.getElementById("sessions").textContent.includes("In progress")')
+    assert dashboard.url == 'http://127.0.0.1:5000/'
     popup.locator('#end').click();popup.locator('#summary').wait_for(state='visible');worker.evaluate('networkQueue')
+    # The already-open dashboard must reflect completion without a reload.
+    dashboard.wait_for_function('document.getElementById("sessions").textContent.includes("Ended early")')
     assert worker.evaluate('chrome.declarativeNetRequest.getDynamicRules()')==[]
     with app.app_context():
         s=db.session.get(FocusSession,session['backendSessionId']);assert s.ended_at and s.blocked_count==2 and s.focus_score == 50
         assert db.session.query(BlockedAttempt).count()==2
-    dashboard=context.new_page();dashboard.goto(f'http://127.0.0.1:5000/?client_id={cid}')
     dashboard.wait_for_function('document.getElementById("blocked").textContent==="2"')
     assert dashboard.locator('#sessions tr').count()==1
     assert dashboard.locator('.bar').count()==1
     dashboard.screenshot(path='/tmp/phase2-dashboard.png',full_page=True)
-    dashboard.goto('http://127.0.0.1:5000/?client_id=empty')
-    dashboard.wait_for_function('document.getElementById("status").textContent.includes("No sessions yet")')
-    for suffix in ['', '?client_id=invalid%2Fid']:
-        dashboard.goto('http://127.0.0.1:5000/' + suffix)
-        dashboard.wait_for_function('!document.getElementById("status").textContent.includes("Loading")')
-        assert dashboard.locator('h1').inner_text() == 'LOCK IN BRO.'
-    print('PASS online: real DNR redirects, popup closure, backend ID, attempt rows, finish, dashboard, chart, empty state')
+    dashboard.get_by_role('button',name='Sign out').click()
+    assert dashboard.url.endswith('/login')
+    assert dashboard.request.get('http://127.0.0.1:5000/api/me/stats').status==401
+    dashboard.goto('http://127.0.0.1:5000/?client_id=invalid%2Fid')
+    assert dashboard.get_by_role('alert').is_visible()
+    assert dashboard.locator('h1').inner_text() == 'LOCK IN BRO.'
+    print('PASS online: anonymous writes, real DNR redirects, popup closure, backend ID, attempt rows, mocked Google login, clean dashboard URL, live refresh, chart, logout, invalid link')
     server.shutdown();server.server_close()
     popup.locator('#task').fill('Phase 2 offline test')
     popup.locator('#start').click();popup.locator('#active').wait_for(state='visible')
@@ -73,3 +93,4 @@ with sync_playwright() as p:
     assert not errors,errors
     print('PASS offline: start, redirect, count, manual finish, automatic expiry, stable client ID; no uncaught browser errors')
     context.close()
+oauth_start.stop();oauth_token.stop()

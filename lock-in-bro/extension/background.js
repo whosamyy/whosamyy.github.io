@@ -19,7 +19,7 @@ async function clientId() {
 async function post(path, data) {
   const response = await fetch(`${BACKEND}${path}`, {
     method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data), signal: AbortSignal.timeout(4000)
+    body: JSON.stringify(data), signal: AbortSignal.timeout(25000)
   });
   if (!response.ok) throw Error(`Backend returned ${response.status}`);
   return response.json();
@@ -38,7 +38,11 @@ function syncStart(session, id) {
     if (!Number.isInteger(result.session_id)) throw Error('Invalid backend session ID');
     backendIds.set(session.id, result.session_id);
     await serial(async () => {
-      const state = await chrome.storage.local.get(['session', 'summary']);
+      const state = await chrome.storage.local.get(['session', 'summary', 'pendingHistory']);
+      if (state.pendingHistory?.[session.id]) {
+        state.pendingHistory[session.id].backendSessionId = result.session_id;
+        await chrome.storage.local.set({pendingHistory: state.pendingHistory});
+      }
       for (const key of ['session', 'summary']) {
         if (state[key]?.id === session.id) {
           state[key].backendSessionId = result.session_id;
@@ -54,16 +58,62 @@ function syncAttempt(session, domain, timestamp) {
     if (id) await post(`/api/sessions/${id}/blocked`, {domain, timestamp});
   });
 }
-function syncFinish(summary) {
+// Persist finished sessions before attempting upload; service-worker restarts and
+// failed requests must not discard a completed recap.
+async function queueHistory(summary) {
+  const {pendingHistory = {}} = await chrome.storage.local.get('pendingHistory');
+  pendingHistory[summary.id] = {...summary};
+  await chrome.storage.local.set({pendingHistory});
+  await chrome.alarms.create('history-sync', {periodInMinutes: 1});
+  retryHistory();
+}
+let historySyncQueued = false;
+function retryHistory() {
+  if (historySyncQueued) return;
+  historySyncQueued = true;
   sync(async () => {
-    const id = summary.backendSessionId || backendIds.get(summary.id);
     try {
-      if (id) await post(`/api/sessions/${id}/finish`, {
-        ended_at: new Date(summary.endedAt).toISOString(), completed: summary.completed,
-        actual_minutes: summary.actualMinutes, blocked_count: summary.blockedCount,
-        focus_score: summary.focusScore
+      const {pendingHistory = {}} = await chrome.storage.local.get('pendingHistory');
+      for (const summary of Object.values(pendingHistory)) {
+        let id = summary.backendSessionId || backendIds.get(summary.id);
+        if (!id) {
+          const result = await post('/api/sessions', {
+            client_id: await clientId(), task: summary.task,
+            planned_minutes: summary.plannedMinutes, blocked_domains: summary.blocklist,
+            started_at: new Date(summary.startedAt).toISOString()
+          });
+          if (!Number.isInteger(result.session_id)) throw Error('Invalid backend session ID');
+          id = result.session_id;
+        }
+        // Checkpoint the ID before finish so retries reuse the same server row.
+        await serial(async () => {
+          const state = await chrome.storage.local.get(['pendingHistory', 'summary']);
+          if (state.pendingHistory?.[summary.id]) state.pendingHistory[summary.id].backendSessionId = id;
+          if (state.summary?.id === summary.id) state.summary.backendSessionId = id;
+          await chrome.storage.local.set(state);
+        });
+        await post(`/api/sessions/${id}/finish`, {
+          ended_at: new Date(summary.endedAt).toISOString(), completed: summary.completed,
+          actual_minutes: summary.actualMinutes, blocked_count: summary.blockedCount,
+          focus_score: summary.focusScore
+        });
+        await serial(async () => {
+          const state = await chrome.storage.local.get(['pendingHistory', 'summary']);
+          delete state.pendingHistory[summary.id];
+          if (state.summary?.id === summary.id) state.summary.historySynced = true;
+          await chrome.storage.local.set(state);
+        });
+        backendIds.delete(summary.id);
+      }
+      await serial(async () => {
+        const {pendingHistory = {}} = await chrome.storage.local.get('pendingHistory');
+        if (!Object.keys(pendingHistory).length) await chrome.alarms.clear('history-sync');
       });
-    } finally { backendIds.delete(summary.id); }
+      await chrome.storage.local.set({historySyncError: null});
+    } catch (error) {
+      await chrome.storage.local.set({historySyncError: error.message});
+      throw error;
+    } finally { historySyncQueued = false; }
   });
 }
 // Temporary development diagnostics: chosen domains and rules only, never browsing history.
@@ -170,10 +220,16 @@ async function finish(completed) {
   } catch (error) { console.warn('[Lock In Bro] Score unavailable:', error.message); }
   delete summary.countedDocuments;
   await chrome.storage.local.set({session: null, summary});
-  syncFinish(summary);
+  await queueHistory(summary);
 }
 async function reconcile() {
-  const {session} = await chrome.storage.local.get('session');
+  const {session, summary, pendingHistory = {}} = await chrome.storage.local.get(['session', 'summary', 'pendingHistory']);
+  // Recover the most recent recap from versions that discarded failed uploads.
+  if (summary && !summary.historySynced && !pendingHistory[summary.id]) await queueHistory(summary);
+  else if (Object.keys(pendingHistory).length) {
+    await chrome.alarms.create('history-sync', {periodInMinutes: 1});
+    retryHistory();
+  }
   if (session?.active && Date.now() >= session.plannedEnd) await finish(true);
   else if (session?.active) {
     // Reload/startup can leave stored state without rules. Restore blocking too.
@@ -189,7 +245,7 @@ function validDomain(domain) {
 }
 async function handle(message, sender) {
   await reconcile();
-  const state = await chrome.storage.local.get(['session', 'summary', 'blocklist']);
+  const state = await chrome.storage.local.get(['session', 'summary', 'blocklist', 'pendingHistory', 'historySyncError']);
   const anonymousId = await clientId();
   if (message.type === 'state') return {...state, client_id: anonymousId};
   // Only our popup may change configuration or start/end sessions.
@@ -233,12 +289,14 @@ async function handle(message, sender) {
       syncAttempt({...session}, domain, timestamp);
     }
   }
-  return {...await chrome.storage.local.get(['session', 'summary', 'blocklist']), client_id: anonymousId};
+  return {...await chrome.storage.local.get(['session', 'summary', 'blocklist', 'pendingHistory', 'historySyncError']), client_id: anonymousId};
 }
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
   serial(() => handle(message, sender)).then(state => respond({ok: true, ...state}), error => respond({ok: false, error: error.message}));
   return true;
 });
-chrome.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'focus-end') serial(reconcile); });
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name === 'focus-end' || alarm.name === 'history-sync') serial(reconcile);
+});
 chrome.runtime.onStartup.addListener(() => serial(reconcile));
 chrome.runtime.onInstalled.addListener(() => serial(reconcile));

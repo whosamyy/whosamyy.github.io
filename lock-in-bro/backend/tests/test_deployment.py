@@ -17,8 +17,10 @@ class DeploymentTest(unittest.TestCase):
         self.assertEqual(app.config['SQLALCHEMY_DATABASE_URI'], 'sqlite:///lock_in_bro.db')
         client = app.test_client()
         self.assertEqual(client.get('/api/health').json, {'status': 'healthy'})
-        for path in ['/', '/?client_id=', '/?client_id=missing', '/?client_id=invalid%2Fid']:
-            self.assertEqual(client.get(path).status_code, 200)
+        self.assertEqual(client.get('/').status_code, 302)
+        self.assertEqual(client.get('/login').status_code, 503)
+        for path in ['/?client_id=', '/?client_id=missing', '/?client_id=invalid%2Fid']:
+            self.assertEqual(client.get(path).status_code, 400)
 
     def test_postgres_driver_and_url(self):
         for scheme in ['postgres', 'postgresql', 'postgresql+psycopg']:
@@ -39,6 +41,10 @@ class DeploymentTest(unittest.TestCase):
         ddl = '\n'.join(statements)
         self.assertIn('CREATE TABLE focus_session', ddl)
         self.assertIn('CREATE TABLE blocked_attempt', ddl)
+        self.assertIn('CREATE TABLE "user"', ddl)
+        self.assertIn('CREATE TABLE client_installation', ddl)
+        self.assertIn('UNIQUE (google_sub)', ddl)
+        self.assertIn('UNIQUE (client_id)', ddl)
         self.assertIn('FOREIGN KEY(session_id)', ddl)
         self.assertIn('blocked_domains JSON', ddl)
         self.assertIn('TIMESTAMP WITH TIME ZONE', ddl)

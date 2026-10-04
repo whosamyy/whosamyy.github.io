@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lock In Bro",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lock in now. Scroll later. Block only the sites you choose.",
   "permissions": [
     "storage",

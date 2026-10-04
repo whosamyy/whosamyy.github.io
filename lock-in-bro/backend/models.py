@@ -6,6 +6,17 @@ db = SQLAlchemy()
 def utc_now():
     return datetime.now(timezone.utc)
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    google_sub = db.Column(db.String(255), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utc_now)
+
+class ClientInstallation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.String(64), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utc_now)
+
 class FocusSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.String(64), nullable=False)

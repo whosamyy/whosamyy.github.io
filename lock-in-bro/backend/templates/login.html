@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Lock In Bro — Sign in</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"></head>
+<body><main class="auth-page"><header><span class="tag">YOUR FOCUS ZONE</span><h1>LOCK IN BRO<span>.</span></h1><p>Lock in now. Scroll later.</p></header>
+<section class="panel"><h2>YOUR FOCUS HISTORY IS PRIVATE.</h2><p>Sign in to view your focus dashboard.</p>
+{% if configured %}<a class="auth-button" href="{{ url_for('auth.google') }}">Continue with Google</a>
+{% else %}<p role="status">Google sign-in is not configured yet. Please try again later.</p>{% endif %}
+<p class="privacy">We use your Google account identifier to link your focus history. We do not store your email, name, photo, or password.</p></section></main></body></html>
