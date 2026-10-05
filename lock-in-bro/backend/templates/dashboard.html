@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><link rel="icon" href="data:,"><title>Lock In Bro — Focus dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='weather.css') }}"><script src="{{ url_for('static', filename='dashboard.js') }}" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><link rel="icon" href="data:,"><title>Lock In Bro — Focus dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='weather.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='shop.css') }}"><script src="{{ url_for('static', filename='dashboard.js') }}" defer></script></head>
 <body class="dashboard-weather" data-weather="cloudy">
 {% include 'weather_background.html' %}
 <main><header><span class="tag">YOUR FOCUS, IN NUMBERS</span><h1>LOCK IN BRO<span>.</span></h1><p>Lock in now. Scroll later.</p></header>
@@ -23,8 +23,9 @@
 <section class="panel"><h2>MOST BLOCKED SITES</h2><ul id="domains"></ul><p class="privacy">Only recorded blocked attempts appear here. Offline attempts can contribute to session totals without domain details.</p></section>
 <dialog id="pig-customizer" aria-labelledby="customizer-heading">
 <div class="customizer-header"><div><span class="tag">MAKE YOURSELF COMFY</span><h2 id="customizer-heading">Piggy’s little room</h2></div><button id="close-customizer" type="button" aria-label="Close room customization">×</button></div>
-<p class="privacy">One full completed focus minute = one coin. Your XP accessories unlock as usual. Everything is optional.</p>
+<p class="privacy">One full completed focus minute = one coin. Weekly finds return, earned goodies grow with your focus, and every purchase is yours to keep. Equip one style of each item at a time.</p>
 <p id="customizer-coins"></p><p id="customizer-status" role="status" aria-live="polite"></p>
+<p id="shop-week" class="shop-week"></p><nav id="shop-navigation" aria-label="Pig shop collections"></nav>
 <div id="pig-item-cards" class="pig-item-cards"></div>
 </dialog>
 </main></body></html>

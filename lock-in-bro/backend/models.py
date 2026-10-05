@@ -50,11 +50,11 @@ class PigProfile(db.Model):
 
     @validates('purchased_items', 'equipped_items')
     def validate_items(self, key, value):
-        from pig_room import ITEM_BY_ID
+        from pig_shop import ITEM_BY_ID
         if value is None and key == 'equipped_items':
             return None
         if not isinstance(value, list) or any(not isinstance(item, str) or item not in ITEM_BY_ID for item in value):
             raise ValueError('Room items must be a list of known catalog IDs.')
-        if key == 'purchased_items' and any(ITEM_BY_ID[item]['category'] == 'accessory' for item in value):
-            raise ValueError('Accessories unlock through XP, not coin purchases.')
+        if key == 'purchased_items' and any(ITEM_BY_ID[item]['kind'] in ('xp', 'milestone') for item in value):
+            raise ValueError('XP and milestone cosmetics are earned, not purchased.')
         return sorted(set(value))

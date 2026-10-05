@@ -14,6 +14,7 @@ from werkzeug.exceptions import HTTPException, SecurityError
 from models import db, FocusSession, BlockedAttempt, ClientInstallation, PigProfile, User
 from auth import init_auth, current_user, claim_client, valid_client_id, auth_configured
 from pig_room import ITEM_BY_ID, room_state
+from pig_shop import equip_selection
 
 
 def as_utc(value):
@@ -249,8 +250,10 @@ def create_app(config=None):
         unlocked = False
         if request.path.endswith('/unlock'):
             if not item['unlocked']:
-                if item['category'] == 'accessory':
-                    raise ValueError('This accessory unlocks through XP levels.')
+                if item['kind'] in ('xp', 'milestone'):
+                    raise ValueError(item.get('requirement', 'This accessory unlocks through XP levels.'))
+                if not item['available']:
+                    raise ValueError('This find is not in the shop right now. It can return later.')
                 if state['coins'] < item['cost']:
                     raise ValueError('A few more focused minutes will unlock this item.')
                 profile.purchased_items = list(profile.purchased_items) + [item_id]
@@ -263,7 +266,7 @@ def create_app(config=None):
                 raise ValueError('Unlock this item before equipping it.')
             equipped = set(profile.equipped_items or [])
             if data['equipped']:
-                equipped.add(item_id)
+                equipped = set(equip_selection(equipped, item_id))
             else:
                 equipped.discard(item_id)
             profile.equipped_items = sorted(equipped)

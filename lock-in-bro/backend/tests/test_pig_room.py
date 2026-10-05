@@ -94,7 +94,8 @@ class RoomAPITest(unittest.TestCase):
     def test_unlock_equip_unequip_and_persistence(self):
         initial = self.client.get('/api/me/pig').json['pig']
         self.assertEqual(initial['coins'], 150)
-        self.assertEqual(len(initial['items']), 12)
+        self.assertEqual(len(initial['items']), 29)
+        self.assertTrue({'sparkles', 'bow', 'headphones', 'strawberry', 'glasses', 'laptop', 'mug', 'lamp', 'books', 'poster', 'lights', 'plant'} <= {item['id'] for item in initial['items']})
         self.assertIn('sparkles', initial['equipped_items'])
         bought = self.post('unlock', {'item_id': 'plant'})
         self.assertEqual(bought.status_code, 200)

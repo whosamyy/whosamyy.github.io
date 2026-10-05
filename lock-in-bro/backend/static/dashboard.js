@@ -41,30 +41,37 @@ function renderPig(pig) {
     const item = document.createElement('li'); item.textContent = 'A little pig. A big future.';
     $('pig-unlocks').append(item);
   }
-  const unlocked = new Set(pig.equipped_items);
-  document.querySelectorAll('[data-pig-item]').forEach(item => {
-    item.setAttribute('display', unlocked.has(item.dataset.pigItem) ? 'inline' : 'none');
+  const equipment = new Map(pig.items.filter(item => item.equipped).map(item => [item.asset, item]));
+  document.querySelectorAll('[data-pig-item], [data-pig-base]').forEach(art => {
+    const asset = art.dataset.pigItem || art.dataset.pigBase;
+    const item = equipment.get(asset);
+    art.setAttribute('display', item || art.dataset.pigBase ? 'inline' : 'none');
+    art.dataset.style = item?.style || 'classic';
   });
   $('pig-next').textContent = pig.next_unlock
     ? `${pig.next_unlock.xp_remaining} XP until ${pig.next_unlock.name} at level ${pig.next_unlock.level}`
-    : 'Every XP goodie unlocked. Keep that lock-in energy 💖';
+    : 'XP favorites collected. Weekly finds return each Monday 💗';
   updateItemCards(pig);
 }
 const previewBoxes = {
   sparkles: '35 90 260 80', bow: '174 35 82 78', headphones: '45 50 231 138',
   strawberry: '186 190 55 77', glasses: '78 108 165 60', laptop: '170 218 124 70',
   mug: '276 221 65 65', lamp: '315 180 109 109', books: '108 247 63 38',
-  poster: '32 62 85 102', lights: '19 20 444 53', plant: '29 227 76 116'
+  poster: '32 62 85 102', lights: '19 20 444 53', plant: '29 227 76 116',
+  rug: '64 310 342 78', star_glasses: '78 108 165 60', blanket: '143 288 184 50',
+  vase: '394 218 50 90', pennant: '123 52 78 58', plushie: '375 267 81 93'
 };
 function itemPreview(item) {
   const preview = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  preview.setAttribute('viewBox', previewBoxes[item.id]);
+  preview.setAttribute('viewBox', previewBoxes[item.asset]);
   preview.setAttribute('aria-hidden', 'true');
   preview.classList.add('item-preview');
-  const source = document.querySelector(`[data-pig-item="${item.id}"]`);
+  const source = document.querySelector(`[data-pig-item="${item.asset}"], [data-pig-base="${item.asset}"]`);
   if (source) {
     const copy = source.cloneNode(true);
     copy.removeAttribute('data-pig-item');
+    copy.removeAttribute('data-pig-base');
+    copy.dataset.style = item.style;
     copy.removeAttribute('display');
     if (item.id === 'strawberry') copy.removeAttribute('transform');
     // The lamp's translucent light cone refers to the existing SVG gradient.
@@ -72,25 +79,86 @@ function itemPreview(item) {
   }
   return preview;
 }
+function shopLockIcon() {
+  const ns = 'http://www.w3.org/2000/svg';
+  const icon = document.createElementNS(ns, 'svg');
+  icon.setAttribute('viewBox', '0 0 16 18'); icon.setAttribute('aria-hidden', 'true');
+  icon.classList.add('item-lock');
+  for (const [tag, attributes] of [
+    ['path', {d: 'M4 8V5a4 4 0 0 1 8 0v3', fill: 'none', stroke: '#9d728d', 'stroke-width': '1.4'}],
+    ['rect', {x: '2', y: '7', width: '12', height: '9', rx: '3', fill: '#efc7dc', stroke: '#9d728d', 'stroke-width': '1.2'}],
+    ['path', {d: 'M8 10c-3-3-6 1 0 4 6-3 3-7 0-4', fill: '#fff5fa'}]
+  ]) {
+    const shape = document.createElementNS(ns, tag);
+    for (const [name, value] of Object.entries(attributes)) shape.setAttribute(name, value);
+    icon.append(shape);
+  }
+  return icon;
+}
 function updateItemCards(pig) {
-  // Reuse controls across polls so keyboard focus never disappears on refresh.
+  const previouslyFocused = document.activeElement;
+  $('shop-week').textContent = `${pig.shop.week_key} · new finds in ${pig.shop.days_until_rotation} ${pig.shop.days_until_rotation === 1 ? 'day' : 'days'} · Monday, UTC`;
+  const visibleSections = new Set(pig.shop.sections.map(section => section.id));
+  for (const section of pig.shop.sections) {
+    let group = $('pig-item-cards').querySelector(`[data-shop-section="${section.id}"]`);
+    if (!group) {
+      group = document.createElement('section'); group.dataset.shopSection = section.id;
+      group.id = `shop-section-${section.id}`; group.className = 'shop-section';
+      const heading = document.createElement('h3'); heading.textContent = section.name;
+      const cards = document.createElement('div'); cards.className = 'shop-section-cards';
+      group.append(heading, cards); $('pig-item-cards').append(group);
+      const shortcut = document.createElement('button'); shortcut.type = 'button';
+      shortcut.textContent = section.name; shortcut.dataset.shopTarget = section.id;
+      shortcut.addEventListener('click', () => group.scrollIntoView({block: 'start', behavior: 'auto'}));
+      $('shop-navigation').append(shortcut);
+    }
+  }
+  for (const group of $('pig-item-cards').querySelectorAll('[data-shop-section]')) {
+    group.hidden = !visibleSections.has(group.dataset.shopSection);
+  }
+  for (const shortcut of $('shop-navigation').querySelectorAll('button')) {
+    shortcut.hidden = !visibleSections.has(shortcut.dataset.shopTarget);
+    if (shortcut.hidden && previouslyFocused === shortcut) $('close-customizer').focus();
+  }
+  // Preserve controls across polls, including owned finds that leave rotation.
   for (const item of pig.items) {
     let card = $('pig-item-cards').querySelector(`[data-item-card="${item.id}"]`);
+    if (!item.visible) {
+      if (card) {
+        if (card.contains(previouslyFocused)) $('close-customizer').focus();
+        card.hidden = true;
+      }
+      continue;
+    }
+    const destination = $('pig-item-cards').querySelector(`[data-shop-section="${item.section}"] .shop-section-cards`);
     if (!card) {
       card = document.createElement('article');
-      card.className = 'pig-item-card'; card.dataset.itemCard = item.id;
-      const name = document.createElement('h3'); name.textContent = item.name;
+      card.className = 'pig-item-card'; card.dataset.itemCard = item.id; card.dataset.kind = item.kind;
+      const name = document.createElement('h4'); name.textContent = item.name;
+      const badge = document.createElement('span'); badge.className = 'item-badge';
+      const badgeLabel = document.createElement('span'); badgeLabel.className = 'badge-label';
+      badge.append(shopLockIcon(), badgeLabel);
       const status = document.createElement('p'); status.className = 'item-state';
+      const requirement = document.createElement('p'); requirement.className = 'item-requirement';
       const button = document.createElement('button'); button.type = 'button';
       button.addEventListener('click', () => customizeItem(item.id));
-      card.append(itemPreview(item), name, status, button);
-      $('pig-item-cards').append(card);
+      card.append(itemPreview(item), badge, name, status, requirement, button);
     }
-    card.querySelector('.item-state').textContent = item.equipped ? 'Equipped · looking cozy' : item.unlocked ? 'Unlocked' : item.category === 'accessory' ? `Unlocks at level ${item.level}` : `${item.cost} coins`;
+    card.hidden = false;
+    if (card.parentElement !== destination) {
+      const focus = card.contains(previouslyFocused) ? previouslyFocused : null;
+      destination.append(card); if (focus) focus.focus();
+    }
+    card.dataset.owned = String(item.owned);
+    card.querySelector('.badge-label').textContent = item.owned ? (item.equipped ? 'Equipped' : 'Yours to keep') : item.kind === 'seasonal' ? item.season_label : item.kind === 'milestone' ? 'Earned with focus' : item.kind === 'weekly' ? 'Weekly find' : item.kind === 'rare' ? 'Rare treat' : item.kind === 'xp' ? 'XP goodie' : 'Little favorite';
+    card.querySelector('.item-state').textContent = item.owned ? (item.available ? 'Unlocked' : 'Owned · back in your keepsakes') : item.kind === 'xp' ? `Unlocks at level ${item.level}` : item.kind === 'milestone' ? `${item.progress} / ${item.target}` : `${item.cost} coins`;
+    const requirement = card.querySelector('.item-requirement');
+    requirement.textContent = item.requirement || '';
+    requirement.hidden = !item.requirement;
     const button = card.querySelector('button');
-    button.textContent = item.unlocked ? (item.equipped ? 'Unequip' : 'Equip') : item.category === 'accessory' ? `Level ${item.level}` : 'Unlock';
+    button.textContent = item.owned ? (item.equipped ? 'Unequip' : 'Equip') : item.kind === 'xp' ? `Level ${item.level}` : item.kind === 'milestone' ? 'Keep focusing' : 'Unlock';
     button.setAttribute('aria-label', `${button.textContent} ${item.name}`);
-    button.disabled = roomBusy || (!item.unlocked && (item.category === 'accessory' || pig.coins < item.cost));
+    button.disabled = roomBusy || (!item.owned && (!item.can_buy || pig.coins < item.cost));
   }
 }
 async function customizeItem(id) {
@@ -123,7 +191,7 @@ $('close-customizer').addEventListener('click', () => $('pig-customizer').close(
 $('pig-customizer').addEventListener('close', () => $('customize-pig').focus());
 $('pig-customizer').addEventListener('keydown', event => {
   if (event.key !== 'Tab') return;
-  const controls = [...$('pig-customizer').querySelectorAll('button:not(:disabled)')];
+  const controls = [...$('pig-customizer').querySelectorAll('button:not(:disabled)')].filter(control => control.getClientRects().length);
   const first = controls[0], last = controls[controls.length - 1];
   if (event.shiftKey && document.activeElement === first) {
     event.preventDefault(); last.focus();

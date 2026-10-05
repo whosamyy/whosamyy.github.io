@@ -1,0 +1,46 @@
+/* Shared SVG geometry, with small color and motif changes for each style. */
+[data-style="lavender"] { --item-main:#cbb5e4; --item-accent:#e2d2ee; --item-detail:#eee0f5; --item-outline:#a58abf; }
+[data-style="strawberry"] { --item-main:#eb9ab3; --item-accent:#f7c7d5; --item-detail:#b5c89e; --item-outline:#b96f8e; }
+[data-style="cloud"] { --item-main:#d4c7e5; --item-accent:#c1afda; --item-outline:#a391bd; }
+[data-style="ghost"] { --item-main:#fff1dc; --item-outline:#ba9ac0; }
+[data-style="cocoa"] { --item-main:#d8b6b3; --item-outline:#aa848b; }
+[data-style="heart"] { --item-main:#e6a1c0; }
+[data-style="checker"] { --item-main:url(#rug-checker); }
+[data-style="tulip"] { --item-main:#e3c6ed; --item-outline:#b699c2; --leaf-color:#b5c8a7; }
+.item-motif { display:none; }
+[data-style="cloud"] .item-motif-cloud,
+[data-style="heart"] .item-motif-heart,
+[data-style="ghost"] .item-motif-ghost,
+[data-style="cocoa"] .item-motif-cocoa,
+[data-style="tulip"] .item-motif-tulip,
+[data-style="strawberry"] .item-motif-strawberry { display:inline; }
+[data-style="ghost"] > .item-motif-heart,
+[data-style="cocoa"] > .item-motif-heart,
+[data-style="cloud"] > .item-motif-heart,
+[data-style="strawberry"] > .item-motif-heart { display:none; }
+.pig-item-cards { display:block; }
+.shop-section { margin:26px 0 0; scroll-margin-top:150px; }
+.shop-section > h3 { font-size:17px; margin:0 0 12px; letter-spacing:-.2px; }
+.shop-section-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.pig-item-card { position:relative; border-color:#ecd2e0; background:linear-gradient(150deg,#fff,#fff9fc); }
+.pig-item-card[data-kind="milestone"] { background:linear-gradient(150deg,#fff8ed,#fff3fb); }
+.pig-item-card[data-kind="rare"] { background:linear-gradient(150deg,#f9f1ff,#fff5e7); border-color:#d9c3e5; }
+.pig-item-card h4 { font-size:14px; margin:9px 0 4px; }
+.item-badge { font-size:10px; color:#785369; background:#f7e3ee; padding:3px 8px; border-radius:20px; margin-top:5px; }
+.item-state { margin-bottom:8px; }
+.item-requirement { font-size:12px; color:#79536b; margin:0 0 12px; line-height:1.5; }
+.pig-item-card[data-kind="milestone"] .item-badge::before { content:"✧ "; }
+.pig-item-card:hover { border-color:#d7a9c1; }
+.pig-item-card button { transition:background-color .15s ease; }
+.shop-week { font-size:12px; color:#79536b; margin:10px 0; }
+#shop-navigation { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 18px; }
+#shop-navigation button { border-radius:20px; font-size:11px; padding:6px 10px; color:#79536b; background:#f4e1ec; }
+@media(max-width:500px) { .shop-section-cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .pig-item-card { padding:10px; } .item-preview { max-width:100%; } }
+@media(prefers-reduced-motion:reduce) { .pig-item-card button { transition:none; } }
+.item-badge { display:inline-flex; align-items:center; gap:4px; }
+.item-lock { width:11px; height:13px; flex:none; }
+.pig-item-card[data-owned="true"] .item-lock { display:none; }
+/* Cover the dialog's top padding when the header sticks during collection jumps. */
+#pig-customizer { --shop-padding:24px; }
+.customizer-header { top:calc(-1 * var(--shop-padding)); }
+@media(max-width:400px) { #pig-customizer { --shop-padding:16px; } }

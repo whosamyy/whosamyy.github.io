@@ -1,5 +1,9 @@
 # Lock In Pig world
 
+The catalog has grown from the original 12 items documented below to 29 items.
+See [PIG_SHOP.md](PIG_SHOP.md) for the current shop, weekly and seasonal dates,
+new milestone unlocks, variant slots, and compatibility details.
+
 This extends the existing dashboard and SVG pig. Extension blocking, timers,
 Google OAuth architecture, session ingestion, focus-score calculation, analytics,
 and the original XP formula and accessory thresholds are unchanged.

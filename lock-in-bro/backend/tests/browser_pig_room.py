@@ -54,7 +54,7 @@ def main():
                 assert page.locator('#pig-coins').inner_text() == '900 focus coins'
                 page.get_by_role('button', name='Customize Pig Room').click()
                 assert page.locator('#pig-customizer').evaluate('el => el.open')
-                assert page.locator('.pig-item-card').count() == 12
+                assert page.locator('.pig-item-card:visible').count() == sum(item['visible'] for item in context.request.get(base+'/api/me/pig').json()['pig']['items'])
                 # A refresh preserves focused controls in the open panel.
                 # Existing accessories default to equipped, so focus the Unequip control.
                 button = page.get_by_role('button', name='Unequip Pink Bow', exact=True)

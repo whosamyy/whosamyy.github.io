@@ -3705,3 +3705,413 @@ Tell me:
 9. A suggested commit message.
 
 Do not commit, push, or deploy anything.
+
+
+## Key Prompt — A Growing Pig Shop
+
+I want to improve the Lock In Bro pig customization shop so it does not feel “finished” once the user buys all the items.
+
+IMPORTANT:
+- The existing pig, pig room, shop, moods, focus weather, Google auth, dashboard, extension, backend, and database already work.
+- Do NOT rewrite the app.
+- Do NOT break existing purchases, equipped items, focus sessions, analytics, or authentication.
+- Do NOT remove any current shop items.
+- Do NOT commit, push, or deploy yet.
+
+==================================================
+GOAL
+==================================================
+
+Expand the pig shop into a longer-term reward system using:
+
+1. Permanent shop items
+2. Rotating weekly shop items
+3. Milestone unlocks
+4. Seasonal items
+5. Color/style variants of existing items
+6. A few rare/expensive items
+
+The goal is to make the shop feel fresh over time without requiring hundreds of completely unique assets.
+
+Keep the vibe:
+- super cute
+- pastel pink
+- cozy
+- polished
+- playful
+- consistent with the Lock In Bro pig world
+
+==================================================
+1. PERMANENT SHOP
+==================================================
+
+Keep the current basic shop items always available.
+
+Examples:
+- pink bow
+- headphones
+- plant
+- lamp
+- rug
+- books
+- mug
+
+Do not remove any existing owned/unlocked items.
+
+==================================================
+2. WEEKLY ROTATING SHOP
+==================================================
+
+Add a “This Week” section to the shop.
+
+Show around 3–5 rotating items at a time.
+
+The rotation should be deterministic by calendar week, not random on every page refresh.
+
+For example, calculate a week key based on the current date and select a stable set of items for that week.
+
+Requirements:
+- same items should stay visible for the whole week
+- next week should rotate to a different set
+- user purchases should persist
+- an item can return in a future week
+- no duplicate cards in the same weekly rotation
+
+Show a label like:
+
+“This Week’s Finds ✨”
+
+and optionally:
+
+“New items in X days”
+
+Do not require a scheduled server job just to rotate the shop if it can be derived from the current date.
+
+==================================================
+3. MILESTONE UNLOCKS
+==================================================
+
+Add cosmetic items that cannot be bought directly.
+
+They unlock automatically when the user reaches focus milestones.
+
+Examples:
+
+Complete 5 sessions
+→ Fairy Lights
+
+Focus 300 total minutes
+→ Tiny Laptop
+
+Earn a 95+ focus score
+→ Star Glasses
+
+Block 50 distractions
+→ Strawberry Lamp
+
+Complete a 60-minute session
+→ Cozy Blanket
+
+Complete sessions on 3 different days
+→ Flower Vase
+
+Use existing analytics/session data where possible.
+
+Do not create expensive duplicate counters if these can be derived cleanly.
+
+Show locked milestone items in a separate section:
+
+“Earned by Locking In”
+
+Each locked item should show the requirement.
+
+Example:
+
+Star Glasses
+🔒 Get a focus score of 95+
+
+==================================================
+4. SEASONAL ITEMS
+==================================================
+
+Add a small seasonal item system.
+
+Seasonal cosmetics can appear during relevant times of year.
+
+Examples:
+
+October:
+- tiny pumpkin
+- ghost mug
+- orange bow
+
+Winter:
+- snowflake window
+- cozy scarf
+- hot cocoa
+
+Valentine’s:
+- heart rug
+- heart glasses
+- pink flower vase
+
+Spring:
+- flower crown
+- tulip plant
+
+Do NOT add dozens of seasonal items.
+
+Start with a very small set.
+
+The seasonal system should be date-based and easy to expand later.
+
+Seasonal items should not disappear from the user’s inventory after being purchased/unlocked.
+
+If the season ends, they may disappear from the shop, but owned items must remain usable.
+
+==================================================
+5. ITEM VARIANTS
+==================================================
+
+Add variants of some existing items instead of requiring completely new art for everything.
+
+Examples:
+
+Bow:
+- classic pink
+- lavender
+- strawberry
+- starry
+
+Lamp:
+- heart lamp
+- cloud lamp
+- moon lamp
+
+Rug:
+- pink
+- checkerboard
+- heart
+- cloud
+
+Plant:
+- basic plant
+- flower plant
+- strawberry pot
+
+Variants should share the same underlying item category when practical.
+
+Do not duplicate huge amounts of SVG/CSS if the same asset can be parameterized with color/style classes.
+
+==================================================
+6. RARE ITEMS
+==================================================
+
+Add a few higher-cost aspirational items.
+
+Examples:
+- Deluxe Study Desk
+- Giant Pig Plushie
+- Starry Window
+- Fancy Gaming Chair
+- Strawberry Computer Setup
+
+These should cost significantly more coins than basic items.
+
+They should feel special but remain cosmetic.
+
+Do not add pay-to-win mechanics.
+
+==================================================
+7. SHOP ORGANIZATION
+==================================================
+
+Organize the shop into clear cute sections such as:
+
+Permanent Favorites
+This Week’s Finds
+Earned by Locking In
+Seasonal
+Rare Treats
+
+Do not show empty sections.
+
+Keep the modal/panel easy to scan.
+
+Do not make the shop feel like an e-commerce site.
+
+==================================================
+8. OWNERSHIP / INVENTORY
+==================================================
+
+Preserve all current inventory and equipped items.
+
+The data model should distinguish between:
+
+- item definition
+- whether item is currently available in shop
+- whether user owns item
+- whether item is equipped
+- unlock requirement
+- season/rotation metadata if relevant
+
+Do not delete owned items when they leave rotation.
+
+Do not let a user buy the same item twice unless that is intentionally part of the design.
+
+==================================================
+9. DATABASE / STORAGE
+==================================================
+
+Inspect the existing pig/profile/customization schema first.
+
+Prefer extending the current structure rather than making duplicate systems.
+
+If item definitions currently live in code, it is okay to keep them in code if that is cleaner.
+
+User-specific state should persist server-side for authenticated users.
+
+Store only what needs to persist, such as:
+- owned item IDs
+- equipped item IDs
+- coin balance if already stored
+
+Do not unnecessarily store the entire shop catalog per user.
+
+==================================================
+10. COINS
+==================================================
+
+Preserve the current coin earning logic unless there is a bug.
+
+Do not remove coins from users for distractions.
+
+Keep rewards positive.
+
+If pricing needs balancing:
+- basic items: cheap
+- weekly/seasonal items: moderate
+- rare items: expensive
+
+Use simple prices that are easy to explain.
+
+==================================================
+11. VISUAL DESIGN
+==================================================
+
+Make the new shop sections feel extremely cute and cohesive.
+
+Use:
+- pastel cards
+- rounded corners
+- tiny sparkle/heart accents
+- cute lock icons
+- soft hover states
+- compact item previews
+
+Locked milestone items should still look appealing, not gray and boring.
+
+Seasonal items can have small decorative badges like:
+
+🎃 October
+❄ Winter
+💗 Valentine
+🌸 Spring
+
+But do not rely entirely on emoji for the actual item artwork if the current system uses SVG/CSS.
+
+==================================================
+12. TESTING
+==================================================
+
+Verify:
+
+1. Existing owned items are preserved.
+2. Existing equipped items are preserved.
+3. Permanent items remain available.
+4. Weekly rotation is stable during the same week.
+5. Weekly rotation changes for a different week.
+6. Purchased rotating items remain owned after rotation changes.
+7. Milestone items unlock correctly.
+8. Locked milestone items cannot be equipped.
+9. Seasonal items only appear during the right period.
+10. Owned seasonal items remain usable after the season ends.
+11. Item variants display correctly.
+12. Rare items can be purchased if the user has enough coins.
+13. Users cannot buy items they cannot afford.
+14. Users cannot buy the same item twice.
+15. Another signed-in user cannot access or change this user’s inventory.
+16. Mobile layout works.
+17. Existing pig room still works.
+18. Existing analytics still work.
+19. Existing auth still works.
+20. No console or Flask errors.
+
+==================================================
+DO NOT DO
+==================================================
+
+Do NOT:
+- remove current items
+- reset anyone’s coins
+- reset anyone’s inventory
+- change focus score logic
+- change blocking behavior
+- change Google login
+- add real-money purchases
+- add loot boxes that cost money
+- add leaderboards
+- add multiplayer
+- add external image APIs
+- add hundreds of items
+- deploy
+- commit
+- push
+
+==================================================
+README
+==================================================
+
+Do NOT rewrite my README.
+
+Tell me which small section I should update later to mention:
+- rotating shop
+- milestone unlocks
+- seasonal cosmetics
+- item variants
+
+==================================================
+PROMPT LOG
+==================================================
+
+Append THIS ENTIRE PROMPT verbatim to:
+
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize it.
+Do not rewrite it.
+
+==================================================
+WHEN FINISHED
+==================================================
+
+Tell me:
+
+1. Every file changed or created.
+2. How weekly rotation works.
+3. How you determine the current week.
+4. The first rotating items.
+5. All milestone unlocks and requirements.
+6. The first seasonal items and date ranges.
+7. The variants that were added.
+8. The rare items and prices.
+9. How owned items persist after rotation/season ends.
+10. Any database/model changes.
+11. How backwards compatibility with existing inventory was preserved.
+12. Test results.
+13. Any limitations.
+14. A suggested commit message.
+
+Do not commit, push, or deploy anything.

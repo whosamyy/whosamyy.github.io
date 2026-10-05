@@ -5,21 +5,10 @@ Priority and thresholds are documented in PIG_WORLD.md. No focus rows are mutate
 import math
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from pig import ACCESSORIES, pig_progress
+from pig import pig_progress
 
-ITEMS = tuple(
-    dict(id=item, name=name, category='accessory', level=level, cost=0)
-    for level, item, name in ACCESSORIES
-) + (
-    dict(id='laptop', name='Tiny Laptop', category='desk', cost=0, level=1),
-    dict(id='mug', name='Pink Mug', category='desk', cost=25, level=1),
-    dict(id='lamp', name='Heart Lamp', category='desk', cost=60, level=1),
-    dict(id='books', name='Little Book Stack', category='desk', cost=40, level=1),
-    dict(id='poster', name='Heart Poster', category='wall', cost=35, level=1),
-    dict(id='lights', name='Fairy Lights', category='wall', cost=80, level=1),
-    dict(id='plant', name='Desk Plant', category='decor', cost=50, level=1),
-)
-ITEM_BY_ID = {item['id']: item for item in ITEMS}
+from pig_shop import ITEMS, ITEM_BY_ID, shop_snapshot
+
 MESSAGES = dict(happy='piggy is proud of you 💗', proud='academic weapon behavior',
                 cozy='we’re locked in and comfy', sleepy='piggy needs a tiny coffee ☕',
                 distracted='a tiny detour? piggy saved your seat 💗',
@@ -97,17 +86,17 @@ def room_state(sessions, profile=None, now=None, zone='UTC', unlocked_something=
     state = pig_progress(sessions)
     legacy = {item['id'] for item in state['unlocked_items']}
     purchased = set(profile.purchased_items or []) if profile else set()
-    unlocked = legacy | purchased | {'laptop'}
     # None is a deliberate legacy-compatible default. [] means unequipped by user.
     equipped = (profile.equipped_items if profile and profile.equipped_items is not None
                 else sorted(legacy | {'laptop'}))
+    items, shop = shop_snapshot(sessions, state['level'], purchased, set(equipped), now)
+    unlocked = {item['id'] for item in items if item['owned']}
     state.update(coins=max(0, earned_coins(sessions) - (profile.coins_spent if profile else 0)),
                  earned_coins=earned_coins(sessions), equipped_items=sorted(set(equipped) & unlocked),
                  mood=determine_pig_mood(sessions, now, zone, unlocked_something),
                  weather=determine_focus_weather(sessions, now, zone, unlocked_something),
                  timezone=local_zone(zone).key,
-                 items=[dict(item, unlocked=item['id'] in unlocked, equipped=item['id'] in equipped)
-                        for item in ITEMS])
+                 items=items, shop=shop)
     state['message'] = MESSAGES[state['mood']]
     if unlocked_something:
         state['message'] = 'NEW ITEM UNLOCKED!! ✨'
