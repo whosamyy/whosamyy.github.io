@@ -2597,3 +2597,708 @@ Tell me:
 10. A suggested commit message.
 
 Do not commit, push, or deploy anything.
+
+
+## Key Prompt — Lock In Pig Moods, Room Customization, and Focus Weather
+
+I want to expand Lock In Bro’s existing cute pig reward system with three connected features:
+
+1. Pig Mood System
+2. Pig Room / Desk Customization
+3. Focus Weather
+
+IMPORTANT:
+- Lock In Bro already has a working Chrome extension, Flask backend, PostgreSQL database, Google sign-in, focus dashboard, and pig reward system.
+- Preserve all existing functionality.
+- Do NOT rewrite the app.
+- Do NOT break Google authentication.
+- Do NOT break extension blocking, timers, session saving, analytics, focus scores, or existing pig progression.
+- Do NOT commit, push, or deploy anything yet.
+
+==================================================
+OVERALL DESIGN GOAL
+==================================================
+
+I want these new features to feel like one cohesive, adorable “Lock In Pig” world.
+
+The vibe should be:
+
+- super cute
+- cozy
+- pastel pink
+- soft and polished
+- slightly playful
+- charming without looking childish or messy
+- consistent with the existing pink Lock In Bro dashboard
+
+Think:
+cute study buddy
+cozy desk setup
+soft pastel room
+little pig reacting to how the user studies
+
+Avoid:
+- corporate dashboard styling
+- realistic animals
+- overly complex game UI
+- loud neon colors
+- childish clip-art look
+- excessive animations
+- clutter
+
+The dashboard should still be usable as a real productivity dashboard.
+
+==================================================
+FEATURE 1 — PIG MOOD SYSTEM
+==================================================
+
+Add a mood system for the existing Lock In Pig.
+
+The pig’s mood should react to the user’s recent focus behavior.
+
+Use existing focus session data when possible.
+
+Possible moods:
+
+HAPPY
+- user completed a recent session
+- strong focus score
+- low distraction count
+
+PROUD
+- especially strong completed session
+- high focus score such as 90+
+- or completed multiple sessions recently
+
+COZY
+- average/normal session
+- user is making progress without anything extreme
+
+SLEEPY
+- very short session
+- late-night / low-energy vibe if time data is available
+- or no recent focus activity
+
+DISTRACTED / SIDE-EYE
+- many blocked attempts during the recent session
+- keep this funny, not mean
+
+EXCITED
+- level up
+- unlocked a new room item
+- hit a focus milestone
+
+Do NOT punish the user harshly.
+This should feel supportive and funny.
+
+Examples of pig messages:
+
+Happy:
+"piggy is proud of you 💗"
+
+Proud:
+"academic weapon behavior"
+
+Cozy:
+"we’re locked in and comfy"
+
+Sleepy:
+"piggy needs a tiny coffee ☕"
+
+Distracted:
+"bro… instagram again? 😭"
+
+Excited:
+"NEW ITEM UNLOCKED!! ✨"
+
+==================================================
+MOOD LOGIC
+==================================================
+
+Keep the mood logic simple and deterministic.
+
+Create a clearly named function or helper for calculating mood.
+
+For example:
+
+determinePigMood({
+  latestSession,
+  recentSessions,
+  focusScore,
+  blockedCount,
+  completed,
+  unlockedSomething
+})
+
+The exact parameters may differ based on the current architecture.
+
+Document the logic clearly.
+
+Do not make the mood random except for choosing between several equivalent messages for the same mood.
+
+==================================================
+PIG VISUAL STATES
+==================================================
+
+The pig itself should visually change slightly by mood.
+
+Examples:
+
+Happy:
+- closed happy eyes or smile
+- pink cheeks
+- tiny hearts
+
+Proud:
+- confident expression
+- little sparkle
+- maybe chest-out pose
+
+Cozy:
+- relaxed expression
+- sitting at desk
+- warm mug nearby
+
+Sleepy:
+- droopy eyes
+- tiny "zzz"
+- cozy blanket or mug
+
+Distracted:
+- side-eye expression
+- tiny sweat drop or confused face
+
+Excited:
+- sparkling eyes
+- little stars/hearts
+- arms/hooves raised if practical
+
+Do not create completely separate art styles for each state.
+It should always clearly be the same pig.
+
+If the pig is currently SVG/CSS-based, extend the existing implementation rather than replacing it.
+
+==================================================
+FEATURE 2 — PIG ROOM / DESK CUSTOMIZATION
+==================================================
+
+Add a cute little pig study room to the dashboard.
+
+The pig should sit or stand near a tiny study desk.
+
+The room should be visually integrated into the existing pig card.
+
+I want users to be able to unlock/equip cosmetic room items.
+
+Start with a SMALL set of items.
+
+Categories:
+
+DESK ITEMS
+- tiny laptop
+- pink mug
+- little lamp
+- stack of books
+- strawberry drink
+
+WALL / ROOM ITEMS
+- heart poster
+- little calendar
+- fairy lights
+- window
+- tiny shelf
+
+DECOR
+- plant
+- rug
+- plushie
+- cushion
+- flower vase
+
+PIG ACCESSORIES
+- bow
+- headphones
+- heart glasses
+- tiny beanie
+- strawberry accessory
+
+Keep everything very cute and visually consistent.
+
+==================================================
+ROOM ECONOMY
+==================================================
+
+Use the existing reward system if it already has coins/XP.
+
+If focus coins already exist:
+- use those
+
+If only XP exists:
+- do NOT create an overly complicated second economy unless necessary
+
+If adding coins makes sense:
+use a simple system such as:
+
+1 completed focus minute = 1 coin
+
+Optional small bonuses:
++10 coins for high focus score
++5 coins for completing the full session
++5 coins for very low distraction count
+
+Do not remove coins for distractions.
+
+Rewards should be positive.
+
+==================================================
+SHOP / UNLOCK UI
+==================================================
+
+Add a small customization button such as:
+
+"Customize Pig Room"
+
+Clicking it should open a cute modal/panel.
+
+Show available items as small cards.
+
+Example:
+
+🎀 Pink Bow
+Unlocked
+[Equip]
+
+🌱 Desk Plant
+50 coins
+[Unlock]
+
+💡 Heart Lamp
+100 coins
+[Unlock]
+
+Do not make a huge store page.
+
+Keep the first version to around 8–12 total items.
+
+Show:
+
+- item name
+- cute preview/icon/mini SVG if practical
+- cost if locked
+- unlocked status
+- equip/unequip state
+
+Users should be able to equip room items they have unlocked.
+
+==================================================
+ROOM PERSISTENCE
+==================================================
+
+Persist:
+
+- unlocked items
+- equipped items
+- current room configuration
+
+Since Google authentication now exists, associate customization with the authenticated user.
+
+If an existing pig profile model/table exists, extend it cleanly.
+
+Do NOT duplicate user ownership systems.
+
+Do not store customization only in browser local storage if authenticated server-side storage already exists.
+
+Use PostgreSQL in production and preserve SQLite local development.
+
+==================================================
+FEATURE 3 — FOCUS WEATHER
+==================================================
+
+Add subtle weather/atmosphere to the pig room.
+
+Weather should represent the user’s recent focus quality.
+
+Examples:
+
+SUNNY
+- strong focus session
+- high focus score
+- low distraction count
+
+SOFT CLOUDS
+- normal/average session
+
+RAINY
+- rough session / many distractions
+- should still look cozy, not depressing
+
+STAR NIGHT
+- evening/night session
+- or strong late-night focus session
+
+SPARKLE WEATHER
+- milestone
+- level up
+- perfect/near-perfect session
+
+Optional:
+SNOW
+- rare seasonal/cozy state if easy to support
+
+==================================================
+WEATHER VISUALS
+==================================================
+
+Weather should appear around/in the pig room.
+
+Examples:
+
+Sunny:
+- soft sunlight
+- tiny sun through window
+
+Cloudy:
+- pale clouds
+- muted soft sky
+
+Rainy:
+- rain outside window
+- pig cozy inside with warm lamp
+- perhaps mug steam
+
+Night:
+- dark lavender sky
+- little stars
+- moon
+- fairy lights glowing
+
+Sparkle:
+- subtle stars/hearts
+- celebratory glow
+
+Important:
+Rain should feel cozy, not sad.
+
+Keep animations lightweight.
+
+Examples:
+- slowly drifting cloud
+- tiny rain streaks
+- gentle sparkle
+- subtle lamp glow
+
+Respect prefers-reduced-motion.
+
+Do not use heavy canvas animations.
+
+==================================================
+WEATHER LOGIC
+==================================================
+
+Use simple rules based on:
+
+- latest focus score
+- completion status
+- blocked count
+- current local/session time if already available
+
+Example logic:
+
+focusScore >= 90 AND completed
+→ sunny or sparkle
+
+focusScore >= 70
+→ soft clouds / cozy
+
+many blocked attempts
+→ rainy
+
+nighttime session
+→ star night
+
+milestone/level-up
+→ sparkle
+
+Clearly document the priority when multiple conditions apply.
+
+For example:
+
+milestone > nighttime > high-focus > distracted > default
+
+Do not make weather confusing or random.
+
+==================================================
+INTEGRATION WITH DASHBOARD
+==================================================
+
+The dashboard should still prioritize useful information.
+
+Do not replace:
+
+- total focus time
+- sessions completed
+- distractions blocked
+- average focus score
+- charts
+- recent sessions
+
+The pig room should be a fun section near the top or between summary cards and analytics.
+
+A layout like this is fine:
+
+LOCK IN BRO
+
+[ analytics summary ]
+
+────────────────────────
+
+MY LOCK IN PIG
+
+[ cozy pig room scene ]
+
+🐷 Level 6
+Mood: Proud
+XP: 380 / 500
+Coins: 145
+
+"academic weapon behavior"
+
+[ Customize Pig Room ]
+
+────────────────────────
+
+[ analytics charts/history ]
+
+Keep it balanced.
+
+==================================================
+DATABASE / BACKEND
+==================================================
+
+Inspect the existing pig/account models first.
+
+Extend existing models rather than creating duplicate concepts.
+
+Possible fields if needed:
+
+PigProfile
+- id
+- user_id
+- total_xp
+- coins
+- level
+- mood
+- unlocked_items
+- equipped_items
+- updated_at
+
+If mood can be derived dynamically, do NOT store it unnecessarily.
+
+If unlocked/equipped items are stored as JSON, validate them.
+
+Do not delete existing pig data.
+
+Do not delete or modify existing focus history.
+
+==================================================
+AUTHENTICATION
+==================================================
+
+All pig customization should belong to the authenticated Google user.
+
+A logged-out user should not be able to modify another user's room.
+
+Protect any new customization API endpoints.
+
+Do not weaken the existing dashboard authentication.
+
+==================================================
+POSSIBLE API ENDPOINTS
+==================================================
+
+Only add endpoints if needed.
+
+Examples:
+
+GET /api/me/pig
+GET /api/me/pig/items
+POST /api/me/pig/unlock
+POST /api/me/pig/equip
+
+Use authenticated current-user context.
+
+Do not use user_id passed by the browser as proof of identity.
+
+Do not expose another user's pig data.
+
+==================================================
+CUTE VISUAL STYLE
+==================================================
+
+This part matters a lot.
+
+Please spend time making the pig room actually adorable.
+
+Use:
+- rounded shapes
+- pastel pink
+- cream/off-white
+- soft lavender accents
+- subtle shadows
+- tiny hearts/stars
+- cozy warm desk lighting
+- rounded furniture
+
+The pig should be the visual focus.
+
+Possible scene:
+
+window with weather
+      ↓
+☁️ / ☀️ / 🌙
+
+     🎀
+    🐷
+  ┌───────┐
+  │ 💻 ☕ │
+  └───────┘
+    🌱  💡
+  soft rug
+
+Do NOT literally use emoji as the final visual if the existing pig uses SVG/CSS.
+The final result should look intentionally designed.
+
+Use local SVG/CSS illustrations if that matches the existing implementation.
+
+==================================================
+MOBILE
+==================================================
+
+The room must work at:
+
+- desktop
+- tablet
+- 390px mobile
+- 320px mobile
+
+On mobile:
+- room can scale down
+- customization panel can stack
+- no horizontal overflow
+- analytics must remain readable
+
+==================================================
+ACCESSIBILITY
+==================================================
+
+Keep:
+- readable contrast
+- keyboard-accessible customization controls
+- visible focus states
+- alt/aria labels where appropriate
+- reduced motion support
+
+Decorative visuals should not confuse screen readers.
+
+==================================================
+TESTING
+==================================================
+
+Add tests where appropriate.
+
+Verify:
+
+1. Existing dashboard still works.
+2. Google sign-in still works.
+3. Pig mood changes based on session state.
+4. Mood messages match the mood.
+5. User can unlock an item if they have enough coins.
+6. User cannot unlock an item without enough coins.
+7. User can equip an unlocked item.
+8. User cannot equip a locked item.
+9. Equipped items persist.
+10. Another authenticated user cannot modify this user's pig room.
+11. Focus weather logic works.
+12. Mobile layout works.
+13. Reduced-motion preference is respected.
+14. Existing analytics and charts still work.
+15. Existing extension tests still pass.
+16. No console errors.
+17. No Flask errors.
+18. No existing database data is deleted.
+
+==================================================
+DO NOT DO
+==================================================
+
+Do NOT:
+
+- change extension website blocking
+- change focus timer behavior
+- change Google login architecture
+- change focus-score formula
+- replace PostgreSQL
+- remove existing analytics
+- add multiplayer/social features
+- add leaderboards
+- add real-money purchases
+- add external image APIs
+- add AI-generated pet dialogue
+- add dozens of items
+- add complex game mechanics
+- deploy
+- commit
+- push
+
+==================================================
+README
+==================================================
+
+Do NOT rewrite my README.
+
+Tell me what small sections should be updated later to mention:
+
+- Lock In Pig moods
+- Pig room customization
+- Focus weather
+
+==================================================
+PROMPT LOG
+==================================================
+
+Append THIS ENTIRE PROMPT verbatim to:
+
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize it.
+Do not rewrite it.
+
+==================================================
+WHEN FINISHED
+==================================================
+
+Tell me:
+
+1. Every file changed or created.
+2. How the pig mood system works.
+3. All moods and their conditions.
+4. How mood visuals differ.
+5. How the pig room is rendered.
+6. All initial customization items.
+7. How coins/unlocks work.
+8. How items are stored.
+9. How equipped items persist.
+10. How focus weather is determined.
+11. All weather states and priority rules.
+12. What database/model changes were made.
+13. Any new API endpoints.
+14. How authenticated ownership is enforced.
+15. Test results.
+16. Desktop/mobile results.
+17. Any limitations.
+18. What README sections I should update later.
+19. A suggested commit message.
+
+Do not commit, push, or deploy anything.

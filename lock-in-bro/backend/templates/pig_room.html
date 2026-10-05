@@ -1,0 +1,39 @@
+<svg class="pig-room" viewBox="0 0 480 400" role="img" aria-labelledby="room-title room-description" xmlns="http://www.w3.org/2000/svg">
+<title id="room-title">Your cozy Lock In Pig study room</title>
+<desc id="room-description">A peach-pink pig at a rounded pink desk, with a weather window and your equipped decorations.</desc>
+<defs>
+  <linearGradient id="room-wall" x2="0" y2="1"><stop stop-color="#fff4f4"/><stop offset="1" stop-color="#f7e2ed"/></linearGradient>
+  <linearGradient id="room-floor" x2="0" y2="1"><stop stop-color="#f3d4df"/><stop offset="1" stop-color="#fae9e9"/></linearGradient>
+  <linearGradient id="lamp-light" x2="0" y2="1"><stop stop-color="#ffe6ac" stop-opacity=".55"/><stop offset="1" stop-color="#ffe6ac" stop-opacity="0"/></linearGradient>
+  <clipPath id="window-clip"><rect x="339" y="55" width="100" height="116" rx="18"/></clipPath>
+</defs>
+<rect x="6" y="6" width="468" height="386" rx="30" fill="url(#room-wall)" stroke="#e9c8d7" stroke-width="2"/>
+<path d="M7 292h466v72q0 28-28 28H35q-28 0-28-28Z" fill="url(#room-floor)"/>
+<path d="M8 292h464" stroke="#e8c1d0" stroke-width="3"/>
+<!-- The permanent window makes even rainy focus days feel warm indoors. -->
+<g clip-path="url(#window-clip)">
+<rect class="window-sky" x="339" y="55" width="100" height="116" fill="#e6e2f5"/>
+<g data-weather="sunny" class="weather-state"><circle cx="397" cy="89" r="17" fill="#f7ce83"/><path d="M397 63v-5m0 62v-5m-26-26h-5m62 0h-5m-45-19-4-4m46 46-4-4m0-38 4-4m-46 46 4-4" stroke="#f7ce83" stroke-width="3" stroke-linecap="round"/></g>
+<g data-weather="cloudy" class="weather-state"><path class="room-cloud" d="M343 105c-2-13 13-19 22-11 5-20 33-18 36 0 16-2 22 16 11 22h-61q-12-2-8-11Z" fill="#fff8fc"/><path d="M398 142c-1-8 9-13 15-7 6-13 24-9 23 3 12 0 15 12 4 14h-37q-9-1-5-10" fill="#f7f1fb"/></g>
+<g data-weather="rainy" class="weather-state"><path d="M348 86c-2-10 11-18 20-10 6-18 32-16 34 1 16-2 23 15 10 20h-55q-12-1-9-11" fill="#c8bddb"/><path class="room-rain" d="m354 114-3 8m24-17-3 8m26 7-3 8m25-16-3 8m-58 20-3 8m27-8-3 8m31-10-3 8" stroke="#a495c4" stroke-width="2.5" stroke-linecap="round"/></g>
+<g data-weather="night" class="weather-state"><path d="M411 74c-16 4-20 24-6 33-24 6-32-25-14-35 7-4 14-3 20 2" fill="#fff0c6"/><path d="m356 77 2-5 2 5 5 2-5 2-2 5-2-5-5-2m58 61 2-5 2 5 5 2-5 2-2 5-2-5-5-2m-39-19 2-4 2 4 4 2-4 2-2 4-2-4-4-2" fill="#fff6df"/></g>
+<g data-weather="sparkle" class="weather-state"><circle cx="390" cy="96" r="27" fill="#ffe6bc" opacity=".55"/><path class="room-sparkle" d="m388 83 5-14 5 14 14 5-14 5-5 14-5-14-14-5m-31 45 3-8 3 8 8 3-8 3-3 8-3-8-8-3m59 3 3-8 3 8 8 3-8 3-3 8-3-8-8-3" fill="#e7b365"/></g>
+</g>
+<rect x="335" y="51" width="108" height="124" rx="21" fill="none" stroke="#d2aec5" stroke-width="7"/>
+<path d="M389 55v116M339 118h100" stroke="#fdf6f5" stroke-width="4"/>
+<rect x="328" y="175" width="122" height="9" rx="4.5" fill="#cfabc2"/>
+<g data-pig-item="poster" display="none" stroke="#c49aaa" stroke-width="2"><rect x="43" y="74" width="64" height="80" rx="8" fill="#fff9ef" transform="rotate(-5 75 114)"/><path d="M75 102c-18-17-30 6 0 24 30-18 18-41 0-24" fill="#eaa2b6" stroke="none"/><path d="M55 136h37" stroke="#dec3bc" stroke-width="3"/></g>
+<g data-pig-item="lights" display="none"><path d="M28 28q212 62 423 0" fill="none" stroke="#bb92aa" stroke-width="2"/><g class="fairy-glow" fill="#fff0c0" stroke="#d6b79a" stroke-width="1.5"><ellipse cx="59" cy="39" rx="5" ry="7"/><ellipse cx="113" cy="49" rx="5" ry="7"/><ellipse cx="174" cy="56" rx="5" ry="7"/><ellipse cx="238" cy="60" rx="5" ry="7"/><ellipse cx="303" cy="55" rx="5" ry="7"/><ellipse cx="364" cy="47" rx="5" ry="7"/><ellipse cx="420" cy="36" rx="5" ry="7"/></g></g>
+<!-- Rug and pig stay visible even with every cosmetic unequipped. -->
+<ellipse cx="234" cy="348" rx="161" ry="30" fill="#e9b9cd"/>
+<ellipse cx="234" cy="348" rx="145" ry="22" fill="none" stroke="#f8dbe7" stroke-width="2" stroke-dasharray="4 6"/>
+<g transform="translate(79 58) scale(.88)">{% include 'pig.html' %}</g>
+<g data-pig-item="plant" display="none" stroke="#819d80" stroke-width="2.5" stroke-linejoin="round"><path d="M65 302v-42c-28-21-35 7 0 17 31-27 36-3 0 10M65 266c-14-32 18-38 2 0" fill="#b1c5a0"/><path d="M42 301h46l-6 34H49Z" fill="#fff2dc" stroke="#ceaf9c"/><path d="M41 301h48" stroke="#ceaf9c" stroke-width="5"/></g>
+<!-- Rounded furniture is permanent; cosmetics sit on its surface. -->
+<g stroke="#ba8298" stroke-width="3" stroke-linejoin="round"><path d="M116 288h17v58q0 8-8 8h-9ZM335 288h17v58q0 8-8 8h-9Z" fill="#d8a4b6"/><rect x="106" y="280" width="256" height="19" rx="9.5" fill="#f4c4d4"/><path d="M136 309h198" stroke="#e6b4c7"/></g>
+<g data-pig-item="books" display="none" stroke="#b499ba" stroke-width="2"><rect x="115" y="265" width="49" height="12" rx="3" fill="#d5c3e4"/><rect x="119" y="254" width="45" height="11" rx="3" fill="#fff1d8"/><path d="M129 260h31M124 271h32" stroke="#eadde9"/></g>
+<g data-pig-item="laptop" display="inline" stroke="#a58cae" stroke-width="2.5" stroke-linejoin="round"><path d="M188 229h87q5 0 5 5v40h-97v-40q0-5 5-5Z" fill="#d4c2df"/><path d="M176 274h112l-7 6h-98Z" fill="#e7d9ef"/><path d="M231 247c-10-10-20 4 0 17 20-13 10-27 0-17" fill="#fff3f6" stroke="none"/></g>
+<g data-pig-item="mug" display="none" stroke="#bd889d" stroke-width="2.5"><path d="M306 253c24-6 26 20 4 18" fill="none"/><path d="M286 248h27v20q0 10-13 10t-14-10Z" fill="#f2b9ce"/><ellipse cx="299" cy="248" rx="13" ry="4" fill="#fff1e5"/><path d="M298 257c-6-5-10 2 0 8 10-6 6-13 0-8" fill="#fff4f6" stroke="none"/><path class="mug-steam" d="M293 238q-5-5 0-10m11 10q-5-5 0-10" fill="none" stroke="#c6a7bb" stroke-width="2"/></g>
+<g data-pig-item="lamp" display="none"><path d="m360 223-40 67h98l-47-67" fill="url(#lamp-light)"/><path d="M372 277v-53" stroke="#ba8e9d" stroke-width="4"/><ellipse cx="372" cy="277" rx="22" ry="4" fill="#d29bab"/><path d="M349 224l10-35h27l11 35Z" fill="#ffe6ba" stroke="#cda184" stroke-width="2.5"/><path d="M373 202c-8-8-16 3 0 12 16-9 8-20 0-12" fill="#e7a4b5"/></g>
+<path d="M44 359h32m328-8h27" stroke="#edcdd9" stroke-width="3" stroke-linecap="round"/>
+</svg>

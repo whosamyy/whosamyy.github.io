@@ -1,6 +1,7 @@
 import math
 import os
 import re
+import secrets
 from datetime import datetime, timezone, timedelta
 from collections import Counter, defaultdict
 from flask import Flask, abort, jsonify, redirect, render_template, request, session as login_session, url_for
@@ -10,9 +11,9 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException, SecurityError
-from models import db, FocusSession, BlockedAttempt, ClientInstallation
+from models import db, FocusSession, BlockedAttempt, ClientInstallation, PigProfile, User
 from auth import init_auth, current_user, claim_client, valid_client_id, auth_configured
-from pig import pig_progress
+from pig_room import ITEM_BY_ID, room_state
 
 
 def as_utc(value):
@@ -104,6 +105,7 @@ def create_app(config=None):
 
     @app.errorhandler(ValueError)
     def invalid(error):
+        db.session.rollback()
         return jsonify(success=False, error=str(error)), 400
 
     @app.errorhandler(SQLAlchemyError)
@@ -201,6 +203,73 @@ def create_app(config=None):
             abort(403, description='This history is not available to your account.')
         return stats_for_clients([client_id])
 
+    def owned_pig_sessions(user):
+        clients = db.select(ClientInstallation.client_id).where(ClientInstallation.user_id == user.id)
+        return db.session.scalars(db.select(FocusSession).where(FocusSession.client_id.in_(clients))).all()
+
+    def pig_user(write=False):
+        user = current_user()
+        if user is None:
+            abort(401, description='Sign in to customize your pig room.')
+        if write:
+            expected = login_session.get('csrf_token')
+            supplied = request.headers.get('X-CSRF-Token', '')
+            if not isinstance(expected, str) or not supplied or not secrets.compare_digest(expected.encode('utf-8'), supplied.encode('utf-8')):
+                abort(403, description='Please reload your dashboard before customizing.')
+            # Serialize purchases/equipment for this account before reading its profile.
+            # A row update locks on PostgreSQL and acquires SQLite's write lock.
+            db.session.execute(db.update(User).where(User.id == user.id).values(id=User.id))
+        return user
+
+    def current_pig_state(user, unlocked=False):
+        return room_state(owned_pig_sessions(user), db.session.get(PigProfile, user.id),
+                          zone=request.args.get('timezone'), unlocked_something=unlocked)
+
+    @app.get('/api/me/pig')
+    def my_pig():
+        return jsonify(pig=current_pig_state(pig_user()))
+
+    @app.post('/api/me/pig/unlock')
+    @app.post('/api/me/pig/equip')
+    def customize_pig():
+        user = pig_user(write=True)
+        data = body()
+        if set(data) - {'item_id', 'equipped'}:
+            raise ValueError('Only item_id and equipped are accepted; ownership comes from sign-in.')
+        item_id = data.get('item_id')
+        if not isinstance(item_id, str) or item_id not in ITEM_BY_ID:
+            raise ValueError('Choose an item from the pig room catalog.')
+        state = current_pig_state(user)
+        item = next(i for i in state['items'] if i['id'] == item_id)
+        profile = db.session.get(PigProfile, user.id)
+        if profile is None:
+            profile = PigProfile(user_id=user.id, coins_spent=0, purchased_items=[],
+                                 equipped_items=state['equipped_items'])
+            db.session.add(profile)
+        unlocked = False
+        if request.path.endswith('/unlock'):
+            if not item['unlocked']:
+                if item['category'] == 'accessory':
+                    raise ValueError('This accessory unlocks through XP levels.')
+                if state['coins'] < item['cost']:
+                    raise ValueError('A few more focused minutes will unlock this item.')
+                profile.purchased_items = list(profile.purchased_items) + [item_id]
+                profile.coins_spent += item['cost']
+                unlocked = True
+        else:
+            if type(data.get('equipped')) is not bool:
+                raise ValueError('equipped must be a boolean.')
+            if not item['unlocked']:
+                raise ValueError('Unlock this item before equipping it.')
+            equipped = set(profile.equipped_items or [])
+            if data['equipped']:
+                equipped.add(item_id)
+            else:
+                equipped.discard(item_id)
+            profile.equipped_items = sorted(equipped)
+        db.session.commit()
+        return jsonify(success=True, pig=current_pig_state(user, unlocked))
+
     @app.get('/api/me/stats')
     def my_stats():
         user = current_user()
@@ -221,7 +290,9 @@ def create_app(config=None):
         total = sum(s.actual_minutes or 0 for s in finished)
         def iso(value):
             return as_utc(value).isoformat().replace('+00:00', 'Z') if value else None
-        return jsonify(pig=pig_progress(sessions), total_focus_minutes=total, total_sessions=len(sessions),
+        user = current_user()
+        pig = room_state(sessions, db.session.get(PigProfile, user.id), zone=request.args.get('timezone'))
+        return jsonify(pig=pig, total_focus_minutes=total, total_sessions=len(sessions),
             completed_sessions=sum(s.completed for s in finished),
             total_blocked_attempts=sum(s.blocked_count for s in sessions),
             average_focus_score=sum(scores)/len(scores) if scores else None,

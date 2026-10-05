@@ -1,21 +1,28 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Lock In Bro — Focus dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"><script src="{{ url_for('static', filename='dashboard.js') }}" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><link rel="icon" href="data:,"><title>Lock In Bro — Focus dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"><script src="{{ url_for('static', filename='dashboard.js') }}" defer></script></head>
 <body><main><header><span class="tag">YOUR FOCUS, IN NUMBERS</span><h1>LOCK IN BRO<span>.</span></h1><p>Lock in now. Scroll later.</p></header>
 <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button>Sign out</button></form>
 <p class="privacy">Your dashboard shows history from installations linked to your Google account. Open this page from your extension to link another installation.</p>
 <p id="status" role="status">Loading your focus history…</p>
 <section class="cards" aria-label="Focus totals"><article><h2>Total Focus Time</h2><strong id="minutes">0 min</strong></article><article><h2>Sessions Completed</h2><strong id="completed">0</strong></article><article><h2>Distractions Blocked</h2><strong id="blocked">0</strong></article><article><h2>Average Focus Score</h2><strong id="score">Not scored yet</strong></article></section>
 <section class="panel pig-panel" aria-labelledby="pig-heading">
-<div class="pig-art">{% include 'pig.html' %}</div>
+<div class="pig-art" data-mood="cozy" data-weather="cloudy">{% include 'pig_room.html' %}<p class="room-caption">a little room for big focus</p></div>
 <div class="pig-details"><span class="tag">YOUR LITTLE STUDY BUDDY</span><h2 id="pig-heading">LOCK IN PIG</h2>
+<div class="pig-atmosphere"><span id="pig-mood">Mood: Cozy</span><span id="pig-weather">Soft clouds</span></div>
 <p id="pig-message">Piggy is getting comfy…</p>
 <div class="pig-level-row"><strong id="pig-level">Level —</strong><span id="pig-xp">XP: — / 100</span></div>
 <progress id="pig-progress" max="100" value="0" aria-label="Pig XP toward the next level"></progress>
-<p id="pig-total" class="privacy"></p><h3 class="pig-unlocked-heading">Unlocked goodies</h3><ul id="pig-unlocks" class="pig-unlocks"></ul>
+<p id="pig-total" class="privacy"></p><div class="pig-room-actions"><span id="pig-coins">— focus coins</span><button id="customize-pig" type="button" disabled>Customize Pig Room</button></div><h3 class="pig-unlocked-heading">Unlocked goodies</h3><ul id="pig-unlocks" class="pig-unlocks"></ul>
 <p id="pig-next" class="privacy"></p>
-<details class="pig-rules"><summary>How piggy grows</summary><p>Each completed session earns 10 XP + 1 XP per full focused minute + 1 bonus XP per 10 focus-score points. Every 100 XP raises piggy’s level. Sessions ended early don’t earn XP; your existing completed sessions count too.</p></details>
+<details class="pig-rules"><summary>How piggy grows</summary><p>Each completed session earns 10 XP + 1 XP per full focused minute + 1 bonus XP per 10 focus-score points. Every 100 XP raises piggy’s level. Sessions ended early don’t earn XP; your existing completed sessions count too. Each full completed focus minute also earns one coin for room decorations. Accessories still unlock at their original XP levels.</p></details>
 </div></section>
 <section class="panel"><h2>FOCUS TIME OVER TIME</h2><p>Minutes by session start date (UTC). Finished sessions only.</p><div id="chart" class="chart" role="img" aria-label="No focus time yet"></div></section>
 <section class="panel"><h2>RECENT SESSIONS</h2><p id="session-count"></p><div class="table-wrap"><table><thead><tr><th>Task</th><th>Planned</th><th>Actual</th><th>Blocked</th><th>Score</th><th>Status</th><th>Date</th></tr></thead><tbody id="sessions"></tbody></table></div></section>
 <section class="panel"><h2>MOST BLOCKED SITES</h2><ul id="domains"></ul><p class="privacy">Only recorded blocked attempts appear here. Offline attempts can contribute to session totals without domain details.</p></section>
+<dialog id="pig-customizer" aria-labelledby="customizer-heading">
+<div class="customizer-header"><div><span class="tag">MAKE YOURSELF COMFY</span><h2 id="customizer-heading">Piggy’s little room</h2></div><button id="close-customizer" type="button" aria-label="Close room customization">×</button></div>
+<p class="privacy">One full completed focus minute = one coin. Your XP accessories unlock as usual. Everything is optional.</p>
+<p id="customizer-coins"></p><p id="customizer-status" role="status" aria-live="polite"></p>
+<div id="pig-item-cards" class="pig-item-cards"></div>
+</dialog>
 </main></body></html>

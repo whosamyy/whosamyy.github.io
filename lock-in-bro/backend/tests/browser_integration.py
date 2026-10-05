@@ -106,7 +106,7 @@ with sync_playwright() as p:
             'blocked_count':0,'focus_score':100}).ok
     dashboard.wait_for_function('document.getElementById("pig-level").textContent==="Level 10"')
     assert dashboard.locator('#pig-unlocks li').count()==5
-    assert dashboard.locator('[data-pig-item][display="inline"]').count()==5
+    assert dashboard.locator('.pig-character [data-pig-item][display="inline"]').count()==5
     dashboard.locator('.pig-panel').screenshot(path='/tmp/lock-pig-all-goodies.png')
     dashboard.get_by_role('button',name='Sign out').click()
     assert dashboard.url.endswith('/login')
