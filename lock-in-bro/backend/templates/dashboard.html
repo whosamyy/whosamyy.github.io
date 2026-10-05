@@ -1,6 +1,8 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><link rel="icon" href="data:,"><title>Lock In Bro — Focus dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"><script src="{{ url_for('static', filename='dashboard.js') }}" defer></script></head>
-<body><main><header><span class="tag">YOUR FOCUS, IN NUMBERS</span><h1>LOCK IN BRO<span>.</span></h1><p>Lock in now. Scroll later.</p></header>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><link rel="icon" href="data:,"><title>Lock In Bro — Focus dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='weather.css') }}"><script src="{{ url_for('static', filename='dashboard.js') }}" defer></script></head>
+<body class="dashboard-weather" data-weather="cloudy">
+{% include 'weather_background.html' %}
+<main><header><span class="tag">YOUR FOCUS, IN NUMBERS</span><h1>LOCK IN BRO<span>.</span></h1><p>Lock in now. Scroll later.</p></header>
 <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button>Sign out</button></form>
 <p class="privacy">Your dashboard shows history from installations linked to your Google account. Open this page from your extension to link another installation.</p>
 <p id="status" role="status">Loading your focus history…</p>

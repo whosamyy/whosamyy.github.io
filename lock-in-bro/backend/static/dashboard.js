@@ -7,6 +7,13 @@ let roomRevision = 0;
 let celebrationUntil = 0;
 const zoneQuery = `?timezone=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC')}`;
 const weatherNames = {sunny: 'Soft sunshine', cloudy: 'Soft clouds', rainy: 'Cozy rain', night: 'Star night', sparkle: 'Sparkle skies'};
+function applyFocusWeather(weather) {
+  // One resolved state drives the room and the page, including celebrations.
+  const state = Object.hasOwn(weatherNames, weather) ? weather : 'cloudy';
+  document.body.dataset.weather = state;
+  document.querySelector('.pig-art').dataset.weather = state;
+  return state;
+}
 function renderPig(pig) {
   $('pig-level').textContent = `Level ${pig.level}`;
   $('pig-xp').textContent = `XP: ${pig.level_xp} / ${pig.xp_to_level}`;
@@ -16,10 +23,9 @@ function renderPig(pig) {
   pigState = pig;
   const celebrating = Date.now() < celebrationUntil;
   const mood = celebrating ? 'excited' : pig.mood;
-  const weather = celebrating ? 'sparkle' : pig.weather;
+  const weather = applyFocusWeather(celebrating ? 'sparkle' : pig.weather);
   $('pig-message').textContent = celebrating ? 'NEW ITEM UNLOCKED!! ✨' : pig.message;
   document.querySelector('.pig-art').dataset.mood = mood;
-  document.querySelector('.pig-art').dataset.weather = weather;
   $('pig-mood').textContent = `Mood: ${mood[0].toUpperCase() + mood.slice(1)}`;
   $('pig-weather').textContent = weatherNames[weather];
   $('room-description').textContent = `Your ${mood} pig at a cozy study desk, with ${weatherNames[weather].toLowerCase()} through the window and your equipped decorations.`;

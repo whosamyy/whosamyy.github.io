@@ -3302,3 +3302,406 @@ Tell me:
 19. A suggested commit message.
 
 Do not commit, push, or deploy anything.
+
+
+## Key Prompt — Global Focus Weather Atmosphere
+
+I want to improve the existing Focus Weather system so it changes the ENTIRE Lock In Bro dashboard background/atmosphere.
+
+Right now the dashboard background is mostly plain pink.
+
+I do NOT want Focus Weather to only appear inside the pig room card.
+
+I want the whole dashboard background to visually reflect the current focus weather while still keeping the cute pink Lock In Bro aesthetic.
+
+IMPORTANT:
+- Preserve all existing functionality.
+- Do NOT redesign the whole dashboard.
+- Do NOT change analytics logic.
+- Do NOT change Google auth.
+- Do NOT change extension behavior.
+- Do NOT change focus-score logic.
+- Do NOT change pig reward logic except what is needed for weather visuals.
+- Do NOT commit, push, or deploy yet.
+
+==================================================
+GOAL
+==================================================
+
+Make Focus Weather affect the main dashboard background.
+
+The dashboard should no longer look like one flat pink page.
+
+Instead, the background should feel alive and change based on the user’s current Focus Weather state.
+
+Keep the overall Lock In Bro identity:
+- pink
+- cute
+- soft
+- cozy
+- polished
+
+Weather should add atmosphere, not replace the pink theme completely.
+
+==================================================
+WEATHER STATES
+==================================================
+
+Use the existing Focus Weather states if they already exist.
+
+Support states like:
+
+SUNNY
+CLOUDY / SOFT CLOUDS
+RAINY
+STAR NIGHT
+SPARKLE / CELEBRATION
+
+If SNOW already exists, support that too.
+
+Do not create lots of extra weather states.
+
+==================================================
+GLOBAL BACKGROUND BEHAVIOR
+==================================================
+
+The ENTIRE dashboard page background should react to weather.
+
+Use:
+- layered gradients
+- soft decorative SVG/CSS elements
+- subtle animated weather
+- atmospheric lighting
+- soft overlays
+
+Do NOT use:
+- heavy canvas animation
+- video backgrounds
+- external image APIs
+- giant distracting effects
+
+The content cards should remain easy to read.
+
+==================================================
+SUNNY BACKGROUND
+==================================================
+
+Sunny should still feel pink.
+
+Example vibe:
+- pale blush pink base
+- soft peach / warm cream glow near the top
+- very subtle sun glow
+- maybe a few tiny floating light particles
+- soft warm highlight around the pig room
+
+Do NOT make the page bright yellow.
+
+Think:
+pink morning sunlight.
+
+==================================================
+CLOUDY BACKGROUND
+==================================================
+
+Cloudy should feel soft and calm.
+
+Example:
+- dusty pink base
+- pale lavender / cream gradients
+- soft translucent cloud shapes near the top/background
+- slightly muted lighting
+
+Clouds should be decorative and subtle.
+
+Do not cover text.
+
+==================================================
+RAINY BACKGROUND
+==================================================
+
+Rainy should feel COZY, not sad.
+
+Example:
+- muted rose / mauve background
+- soft lavender-gray gradient
+- subtle rain streaks in the page background
+- tiny blurred window/rain feeling
+- warm pink glow around cards
+- pig room can feel extra warm inside
+
+Do not make it dark/depressing.
+
+The goal is:
+"cozy rainy study day"
+
+not:
+"bad weather punishment"
+
+==================================================
+STAR NIGHT BACKGROUND
+==================================================
+
+Night should be one of the prettiest states.
+
+Use:
+- deep dusty pink
+- lavender
+- muted plum
+- darker rose gradient
+
+Add:
+- small stars
+- subtle moon glow
+- tiny sparkles
+- maybe soft fairy-light feeling
+
+Keep text readable.
+
+Cards can stay lighter pink/cream so the page is still easy to use.
+
+Do NOT turn the whole dashboard black/navy.
+
+It should still unmistakably look like Lock In Bro.
+
+==================================================
+SPARKLE / CELEBRATION BACKGROUND
+==================================================
+
+For milestones or level-ups:
+
+Use:
+- brighter pink gradient
+- tiny hearts/stars/sparkles
+- subtle glow
+- maybe a soft radial highlight behind the pig section
+
+Keep it tasteful.
+
+Do not use confetti everywhere.
+
+==================================================
+BACKGROUND LAYERS
+==================================================
+
+Prefer a layered approach.
+
+For example:
+
+body/dashboard wrapper:
+- base gradient
+
+pseudo-elements:
+- weather decoration layer
+
+weather container:
+- clouds/rain/stars/sparkles
+
+content:
+- normal cards above everything
+
+Use appropriate z-index layering.
+
+The decorative weather layer should:
+- not block clicks
+- use pointer-events: none
+- stay behind dashboard content
+
+==================================================
+TRANSITIONS
+==================================================
+
+When weather changes, visually transition between states smoothly.
+
+Use subtle CSS transitions for:
+- background gradients
+- opacity
+- atmospheric elements
+
+Do not animate huge layout changes.
+
+==================================================
+MOTION
+==================================================
+
+Use lightweight animations only.
+
+Examples:
+- slow drifting cloud
+- very subtle falling rain
+- twinkling star
+- tiny sparkle pulse
+
+Animations should be slow and soft.
+
+Respect:
+
+@media (prefers-reduced-motion: reduce)
+
+When reduced motion is enabled:
+- remove continuous motion
+- keep static weather visuals
+
+==================================================
+READABILITY
+==================================================
+
+This is extremely important.
+
+Weather backgrounds must NOT make analytics harder to read.
+
+Keep:
+- strong text contrast
+- light readable cards
+- card borders/shadows consistent
+- charts visible
+- recent session text readable
+
+If necessary, slightly adjust card background opacity depending on weather.
+
+Do not make cards transparent enough that text becomes hard to read.
+
+==================================================
+WEATHER CLASS / STATE
+==================================================
+
+Use a clean state/class approach.
+
+For example:
+
+body or main dashboard wrapper could receive:
+
+weather-sunny
+weather-cloudy
+weather-rainy
+weather-night
+weather-sparkle
+
+or equivalent.
+
+Do not duplicate entire dashboard markup for each weather state.
+
+==================================================
+INTEGRATION
+==================================================
+
+Use the SAME weather logic already used by Focus Weather.
+
+Do not create a second separate calculation.
+
+There should be one source of truth for the weather state.
+
+The pig room weather and global dashboard weather must always match.
+
+For example:
+
+Focus Weather = rainy
+
+should mean:
+- pig room window shows rain
+- entire dashboard becomes cozy rainy pink
+
+==================================================
+MOBILE
+==================================================
+
+Test the background at:
+
+- desktop
+- tablet
+- 390px
+- 320px
+
+On mobile:
+- decorative weather should not crowd content
+- rain/clouds/stars can be reduced
+- no horizontal overflow
+- no giant fixed SVGs breaking layout
+
+==================================================
+PERFORMANCE
+==================================================
+
+Keep this lightweight.
+
+Avoid:
+- giant SVG files
+- large raster images
+- canvas particle engines
+- external animation libraries
+
+Prefer:
+- CSS
+- small inline/local SVG
+- pseudo-elements
+
+==================================================
+TESTING
+==================================================
+
+Verify:
+
+1. Sunny changes the global dashboard atmosphere.
+2. Cloudy changes the global background.
+3. Rainy changes the global background.
+4. Night changes the global background.
+5. Sparkle changes the global background.
+6. Pig room and page always use the same weather state.
+7. Text/cards remain readable in every state.
+8. Dashboard analytics still work.
+9. Google auth still works.
+10. Mobile layouts still work.
+11. Reduced-motion mode works.
+12. No console errors.
+13. No Flask errors.
+14. Weather decoration does not block clicks.
+
+==================================================
+DO NOT DO
+==================================================
+
+Do NOT:
+- redesign dashboard cards
+- remove pink branding
+- make weather overly realistic
+- use stock backgrounds
+- add external APIs
+- use WebGL
+- use video
+- use heavy JavaScript animation
+- change backend weather rules unless absolutely necessary
+- change extension behavior
+- commit
+- push
+- deploy
+
+==================================================
+PROMPT LOG
+==================================================
+
+Append THIS ENTIRE PROMPT verbatim to:
+
+lock-in-bro/prompt_log.md
+
+as the next Key Prompt.
+
+Do not summarize it.
+Do not rewrite it.
+
+==================================================
+WHEN FINISHED
+==================================================
+
+Tell me:
+
+1. Which files changed.
+2. How each weather state changes the global dashboard background.
+3. How pig-room weather and global weather share one source of truth.
+4. What animations were added.
+5. How reduced-motion is handled.
+6. How readability is preserved.
+7. Desktop/mobile test results.
+8. Any limitations.
+9. A suggested commit message.
+
+Do not commit, push, or deploy anything.

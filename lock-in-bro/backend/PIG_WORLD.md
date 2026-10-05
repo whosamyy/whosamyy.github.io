@@ -174,3 +174,46 @@ Final verification: 40 backend unittest cases passed; history-sync Node test pas
 both browser scripts passed; JavaScript syntax and `git diff --check` passed.
 The room browser suite also verifies that a delayed pre-purchase stats response
 cannot overwrite newer customization state.
+
+## Global dashboard atmosphere
+
+The same resolved weather that `renderPig` already uses (including its existing
+15-second purchase celebration) now goes through `applyFocusWeather`, which sets
+both `body[data-weather]` and `.pig-art[data-weather]`. Backend weather rules,
+rewards, analytics, authentication, and extension behavior are unchanged. Before
+the first snapshot, both start in the existing cloudy state.
+
+`templates/weather_background.html` supplies five small decorative inline SVG
+layers; `static/weather.css` styles them:
+
+| State | Full-page atmosphere | Motion |
+| --- | --- | --- |
+| Sunny | Pink and peach gradients, cream light, translucent sun, sparse light specks | Gentle 18-second light drift |
+| Cloudy | Dusty blush and lavender, soft translucent clouds | 28-second cloud drift |
+| Rainy | Muted mauve and lavender, warm rose glow, sparse rain-glass streaks | Subtle five-second downward drift |
+| Star night | Dusty rose and muted plum, cream crescent and small stars | Nine-second star glow |
+| Sparkle | Brighter blush, warm radial light, tiny stars and hearts | Seven-second sparkle pulse |
+
+Layers cross-fade with a 1.4-second opacity transition. Only the current state's
+layers animate. The fixed container is clipped to the viewport, sits behind
+`main`, has `pointer-events: none` throughout, and is `aria-hidden`. It does not
+introduce layout movement or horizontal overflow. Mobile reduces decoration size
+and opacity. There is no canvas, raster background, video, external API, new
+animation library, or additional weather state.
+
+Cards retain opaque existing backgrounds, borders, geometry, and text colors;
+a small shared shadow adds separation. Night privacy text and the heading accent
+use darker colors against the dusty rose gradient. Reduced motion disables all
+global animations and transitions while keeping the selected static atmosphere.
+The existing reduced-motion rule continues to cover the pig room.
+
+The expanded local browser suite verifies all five states at all four requested
+widths (1280, 768, 390, 320), matching page/room/purchase weather, five distinct
+gradients, click-through decoration, fixed positioning while scrolling, opaque
+card readability, text contrast against all opaque gradient stops, and static
+reduced-motion behavior. Screenshots were visually reviewed. All 40 backend
+tests and the existing Node history-sync test passed; no browser console errors
+or local Flask HTTP 5xx occurred. Google browser sign-in still uses a mocked
+provider; this change does not exercise live Google or production services.
+
+Suggested commit: `Extend focus weather across the dashboard background`
