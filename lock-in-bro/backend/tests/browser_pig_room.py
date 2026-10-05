@@ -77,7 +77,7 @@ def main():
                 for route, response in held:
                     route.fulfill(response=response)
                 page.wait_for_function('!loading')
-                assert page.locator('#customizer-coins').inner_text() == '875 coins to make it cozy'
+                assert page.locator('#customizer-coins').inner_text() == '825 coins to make it cozy'
                 assert page.evaluate('document.body.dataset.weather === document.querySelector(".pig-art").dataset.weather && document.body.dataset.weather === "sparkle"')
                 page.get_by_role('button', name='Equip Pink Mug', exact=True).click()
                 page.get_by_role('button', name='Unequip Pink Mug', exact=True).wait_for()
@@ -86,12 +86,12 @@ def main():
                     page.get_by_role('button', name='Equip '+name, exact=True).wait_for()
                     page.get_by_role('button', name='Equip '+name, exact=True).click()
                     page.get_by_role('button', name='Unequip '+name, exact=True).wait_for()
-                assert page.locator('#customizer-coins').inner_text() == '610 coins to make it cozy'
+                assert page.locator('#customizer-coins').inner_text() == '30 coins to make it cozy'
                 page.locator('#pig-customizer').evaluate('el => el.scrollTop = 0')
                 page.locator('#pig-customizer').screenshot(path='/tmp/lock-pig-world-customizer.png')
                 page.keyboard.press('Escape')
                 assert page.locator('#customize-pig').evaluate('el => el === document.activeElement')
-                page.reload(); page.wait_for_function('document.getElementById("pig-coins").textContent === "610 focus coins"')
+                page.reload(); page.wait_for_function('document.getElementById("pig-coins").textContent === "30 focus coins"')
                 assert page.locator('[data-pig-item][display="inline"]').count() == 12
                 for mood in ['happy', 'proud', 'cozy', 'sleepy', 'distracted', 'excited']:
                     page.evaluate('(mood) => {celebrationUntil = 0; renderPig({...pigState, mood});}', mood)

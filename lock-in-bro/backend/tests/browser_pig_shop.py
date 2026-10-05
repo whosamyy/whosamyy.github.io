@@ -25,7 +25,7 @@ def main():
             db.create_all()
             user=User(google_sub='shop-browser'); db.session.add(user); db.session.flush()
             db.session.add(ClientInstallation(user_id=user.id,client_id=CLIENT))
-            for i in range(10):
+            for i in range(30):
                 db.session.add(FocusSession(client_id=CLIENT,task='A little daily focus',planned_minutes=480,
                     actual_minutes=480,focus_score=98,completed=True,
                     started_at=NOW-timedelta(days=i,minutes=480),ended_at=NOW-timedelta(days=i)))
@@ -43,7 +43,7 @@ def main():
                 page.on('console',lambda message:errors.append(message.text) if message.type=='error' else None)
                 page.on('response',lambda response:failures.append(response.url) if response.status>=500 else None)
                 page.goto(base+'/login');page.get_by_role('link',name='Continue with Google').click()
-                page.wait_for_function('document.getElementById("pig-coins").textContent === "4,800 focus coins"')
+                page.wait_for_function('document.getElementById("pig-coins").textContent === "14,400 focus coins"')
                 page.get_by_role('button',name='Customize Pig Room').click()
                 assert page.locator('.shop-section:visible').count()==5
                 assert page.locator('[data-shop-section="weekly"] .pig-item-card:visible').count()==4
@@ -87,7 +87,7 @@ def main():
                     page.evaluate('load()'); page.wait_for_function('!loading')
                     unlock_and_equip(definition)
                 for definition in RARE_ITEMS: unlock_and_equip(definition)
-                assert page.locator('#customizer-coins').inner_text()==f'{4800-expected_spent:,} coins to make it cozy'
+                assert page.locator('#customizer-coins').inner_text()==f'{14400-expected_spent:,} coins to make it cozy'
                 # Automatically earned milestones need no purchase.
                 for name in ['Star Glasses','Cozy Blanket','Flower Vase','Little Victory Pennant','Cloud Rug']:
                     page.get_by_role('button',name='Equip '+name,exact=True).click()
@@ -101,7 +101,7 @@ def main():
                 page.keyboard.press('Escape')
                 page.locator('.pig-panel').screenshot(path='/tmp/lock-growing-shop-room.png')
                 calendar.now.return_value=NOW.replace(month=7)
-                page.reload();page.wait_for_function('document.getElementById("pig-coins").textContent.includes("1,970")')
+                page.reload();page.wait_for_function('document.getElementById("pig-coins").textContent.includes("5,910")')
                 page.get_by_role('button',name='Customize Pig Room').click()
                 assert page.locator('[data-shop-section="keepsakes"] .pig-item-card:visible').count()>=4
                 assert page.locator('[data-shop-section="seasonal"]').is_hidden()
@@ -126,8 +126,8 @@ def main():
                 assert page.locator('.pig-item-card button').first.evaluate('el=>getComputedStyle(el).transitionDuration')=='0s'
                 page.keyboard.press('Escape')
                 assert page.locator('#customize-pig').evaluate('el=>el===document.activeElement')
-                assert page.locator('#sessions tr').count()==10
-                assert page.locator('#minutes').inner_text()=='4800.0 min'
+                assert page.locator('#sessions tr').count()==20
+                assert page.locator('#minutes').inner_text()=='14400.0 min'
                 assert not errors,errors
                 assert not failures,failures
                 print('PASS: original inventory, grouped shop, six rotating variants across six weeks, all four seasons and off-season keepsakes, milestone equipment, rare purchases, slot replacement, exact unchanged coin economy, reload persistence, real room previews, auth/analytics, keyboard and 1280/768/390/320px; no console or HTTP 5xx errors')

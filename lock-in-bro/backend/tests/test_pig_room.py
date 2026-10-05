@@ -99,12 +99,12 @@ class RoomAPITest(unittest.TestCase):
         self.assertIn('sparkles', initial['equipped_items'])
         bought = self.post('unlock', {'item_id': 'plant'})
         self.assertEqual(bought.status_code, 200)
-        self.assertEqual(bought.json['pig']['coins'], 100)
+        self.assertEqual(bought.json['pig']['coins'], 0)
         self.assertEqual(bought.json['pig']['mood'], 'excited')
         self.assertEqual(bought.json['pig']['weather'], 'sparkle')
         self.assertEqual(bought.json['pig']['message'], 'NEW ITEM UNLOCKED!! ✨')
         self.assertNotIn('plant', bought.json['pig']['equipped_items'])
-        self.assertEqual(self.post('unlock', {'item_id': 'plant'}).json['pig']['coins'], 100)
+        self.assertEqual(self.post('unlock', {'item_id': 'plant'}).json['pig']['coins'], 0)
         equipped = self.post('equip', {'item_id': 'plant', 'equipped': True})
         self.assertIn('plant', equipped.json['pig']['equipped_items'])
         db.session.remove()
@@ -129,9 +129,8 @@ class RoomAPITest(unittest.TestCase):
         self.assertEqual(self.app.test_client().get('/api/me/pig').status_code, 401)
         for data in [[], {'item_id': []}, {'item_id': 'fake'}, {'item_id': 'laptop', 'equipped': 'yes'}]:
             self.assertEqual(self.post('equip', data).status_code, 400)
-        self.post('unlock', {'item_id': 'lights'})
-        self.post('unlock', {'item_id': 'lamp'})
-        self.assertEqual(self.client.get('/api/me/pig').json['pig']['coins'], 10)
+        self.post('unlock', {'item_id': 'books'})
+        self.assertEqual(self.client.get('/api/me/pig').json['pig']['coins'], 30)
         self.assertEqual(self.post('unlock', {'item_id': 'plant'}).status_code, 400)
         self.assertEqual(self.other.get('/api/me/pig').json['pig']['coins'], 0)
         self.assertNotIn('lights', self.other.get('/api/me/pig').json['pig']['equipped_items'])
@@ -174,8 +173,8 @@ class ConcurrentPurchaseTest(unittest.TestCase):
                 db.create_all()
                 user = User(google_sub='buyer'); db.session.add(user); db.session.flush(); uid = user.id
                 db.session.add(ClientInstallation(user_id=uid, client_id=CLIENT))
-                db.session.add(FocusSession(client_id=CLIENT, task='Read', planned_minutes=50,
-                    actual_minutes=50, completed=True, ended_at=NOW))
+                db.session.add(FocusSession(client_id=CLIENT, task='Read', planned_minutes=150,
+                    actual_minutes=150, completed=True, ended_at=NOW))
                 db.session.commit()
             def purchase(_):
                 client = app.test_client()
@@ -186,7 +185,7 @@ class ConcurrentPurchaseTest(unittest.TestCase):
                 self.assertEqual(list(pool.map(purchase, range(2))), [200, 200])
             with app.app_context():
                 profile = db.session.get(PigProfile, uid)
-                self.assertEqual(profile.coins_spent, 50)
+                self.assertEqual(profile.coins_spent, 150)
                 self.assertEqual(profile.purchased_items, ['plant'])
                 db.session.remove(); db.engine.dispose()
 

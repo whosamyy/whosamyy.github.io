@@ -173,7 +173,7 @@ class ShopAPITest(unittest.TestCase):
         self.post('equip','mug_ghost',True)
         self.date.now.return_value=NOW.replace(month=11)
         self.assertEqual(self.post('equip','mug_ghost',True).status_code,200)
-        self.assertEqual(self.post('unlock','mug_ghost').json['pig']['coins'],270)
+        self.assertEqual(self.post('unlock','mug_ghost').json['pig']['coins'],90)
         self.assertEqual(self.post('unlock','plant_tulip').status_code,400)
         self.assertTrue(by_id(self.state())['mug_ghost']['equipped'])
 
@@ -187,12 +187,12 @@ class ShopAPITest(unittest.TestCase):
 
     def test_rare_affordability_no_duplicate_and_user_isolation(self):
         self.assertEqual(self.post('unlock','computer_strawberry').status_code,400)
-        for i in range(2):
+        for i in range(6):
             db.session.add(FocusSession(client_id=CLIENT, task='Long study', planned_minutes=480,
                 actual_minutes=480, completed=True, ended_at=NOW, started_at=NOW-timedelta(days=i+1)))
         db.session.commit()
         self.assertEqual(self.post('unlock','plushie').status_code,200)
-        self.assertEqual(self.post('unlock','plushie').json['pig']['coins'],420)
+        self.assertEqual(self.post('unlock','plushie').json['pig']['coins'],540)
         self.assertEqual(self.post('equip','plushie',True).status_code,200)
         self.assertEqual(self.post('equip','plushie',True,viewer=self.other).status_code,400)
         self.assertEqual(self.post('unlock','plushie',viewer=self.other).status_code,400)
@@ -216,7 +216,7 @@ class ShopAPITest(unittest.TestCase):
         self.assertNotIn('bow',state['equipped_items'])
         self.assertIn('bow_lavender',state['equipped_items'])
         self.assertTrue({'headphones','mug','plant','lamp'} <= set(state['equipped_items']))
-        self.assertEqual(state['coins'],225)
+        self.assertEqual(state['coins'],45)
         self.assertTrue({'mug','plant','lamp','bow_lavender'} <= set(db.session.get(PigProfile,self.uid).purchased_items))
 
 

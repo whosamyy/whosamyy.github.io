@@ -4115,3 +4115,8 @@ Tell me:
 14. A suggested commit message.
 
 Do not commit, push, or deploy anything.
+
+
+## Key Prompt — Higher Shop Prices
+
+i think the shop is too cheap. make the pricing higher for each item

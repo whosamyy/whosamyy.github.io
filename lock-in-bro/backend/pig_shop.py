@@ -9,24 +9,24 @@ def item(item_id, name, category, cost=0, kind='permanent', *, asset=None, style
                 asset=asset or item_id, style=style, slot=slot or asset or item_id, **metadata)
 
 
-# Original IDs, costs and XP thresholds are intentionally unchanged.
+# Original IDs and XP thresholds are preserved; paid prices are tripled.
 LEGACY_ITEMS = tuple(item(key, name, 'accessory', kind='xp', level=level)
                      for level, key, name in ACCESSORIES) + (
     item('laptop', 'Tiny Laptop', 'desk', level=1),
-    item('mug', 'Pink Mug', 'desk', 25, level=1),
-    item('lamp', 'Heart Lamp', 'desk', 60, level=1),
-    item('books', 'Little Book Stack', 'desk', 40, level=1),
-    item('poster', 'Heart Poster', 'wall', 35, level=1),
-    item('lights', 'Fairy Lights', 'wall', 80, level=1),
-    item('plant', 'Desk Plant', 'decor', 50, level=1),
+    item('mug', 'Pink Mug', 'desk', 75, level=1),
+    item('lamp', 'Heart Lamp', 'desk', 180, level=1),
+    item('books', 'Little Book Stack', 'desk', 120, level=1),
+    item('poster', 'Heart Poster', 'wall', 105, level=1),
+    item('lights', 'Fairy Lights', 'wall', 240, level=1),
+    item('plant', 'Desk Plant', 'decor', 150, level=1),
 )
 WEEKLY_ITEMS = (
-    item('bow_lavender', 'Lavender Bow', 'accessory', 90, 'weekly', asset='bow', style='lavender'),
-    item('bow_strawberry', 'Strawberry Bow', 'accessory', 110, 'weekly', asset='bow', style='strawberry'),
-    item('lamp_cloud', 'Cloud Lamp', 'desk', 130, 'weekly', asset='lamp', style='cloud'),
-    item('mug_lavender', 'Lavender Mug', 'desk', 70, 'weekly', asset='mug', style='lavender'),
-    item('plant_strawberry', 'Strawberry Pot', 'decor', 100, 'weekly', asset='plant', style='strawberry'),
-    item('rug_checker', 'Checkerboard Rug', 'decor', 120, 'weekly', asset='rug', style='checker'),
+    item('bow_lavender', 'Lavender Bow', 'accessory', 270, 'weekly', asset='bow', style='lavender'),
+    item('bow_strawberry', 'Strawberry Bow', 'accessory', 330, 'weekly', asset='bow', style='strawberry'),
+    item('lamp_cloud', 'Cloud Lamp', 'desk', 390, 'weekly', asset='lamp', style='cloud'),
+    item('mug_lavender', 'Lavender Mug', 'desk', 210, 'weekly', asset='mug', style='lavender'),
+    item('plant_strawberry', 'Strawberry Pot', 'decor', 300, 'weekly', asset='plant', style='strawberry'),
+    item('rug_checker', 'Checkerboard Rug', 'decor', 360, 'weekly', asset='rug', style='checker'),
 )
 MILESTONE_ITEMS = (
     item('star_glasses', 'Star Glasses', 'accessory', kind='milestone', slot='glasses', milestone='score', target=95, requirement='Complete a session with a focus score of 95+'),
@@ -36,14 +36,14 @@ MILESTONE_ITEMS = (
     item('rug_cloud', 'Cloud Rug', 'decor', kind='milestone', asset='rug', style='cloud', milestone='minutes', target=300, requirement='Complete 300 total focused minutes'),
 )
 SEASONAL_ITEMS = (
-    item('mug_ghost', 'Ghost Mug', 'desk', 90, 'seasonal', asset='mug', style='ghost', season='october', season_label='October'),
-    item('mug_cocoa', 'Hot Cocoa', 'desk', 90, 'seasonal', asset='mug', style='cocoa', season='winter', season_label='Winter'),
-    item('rug_heart', 'Heart Rug', 'decor', 140, 'seasonal', asset='rug', style='heart', season='valentine', season_label='Valentine'),
-    item('plant_tulip', 'Tulip Plant', 'decor', 100, 'seasonal', asset='plant', style='tulip', season='spring', season_label='Spring'),
+    item('mug_ghost', 'Ghost Mug', 'desk', 270, 'seasonal', asset='mug', style='ghost', season='october', season_label='October'),
+    item('mug_cocoa', 'Hot Cocoa', 'desk', 270, 'seasonal', asset='mug', style='cocoa', season='winter', season_label='Winter'),
+    item('rug_heart', 'Heart Rug', 'decor', 420, 'seasonal', asset='rug', style='heart', season='valentine', season_label='Valentine'),
+    item('plant_tulip', 'Tulip Plant', 'decor', 300, 'seasonal', asset='plant', style='tulip', season='spring', season_label='Spring'),
 )
 RARE_ITEMS = (
-    item('computer_strawberry', 'Strawberry Computer Setup', 'desk', 600, 'rare', asset='laptop', style='strawberry'),
-    item('plushie', 'Giant Pig Plushie', 'decor', 900, 'rare'),
+    item('computer_strawberry', 'Strawberry Computer Setup', 'desk', 1800, 'rare', asset='laptop', style='strawberry'),
+    item('plushie', 'Giant Pig Plushie', 'decor', 2700, 'rare'),
 )
 ITEMS = LEGACY_ITEMS + WEEKLY_ITEMS + MILESTONE_ITEMS + SEASONAL_ITEMS + RARE_ITEMS
 ITEM_BY_ID = {entry['id']: entry for entry in ITEMS}

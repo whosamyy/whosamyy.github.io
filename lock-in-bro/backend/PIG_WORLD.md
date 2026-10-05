@@ -68,12 +68,12 @@ used in the room.
 | Accessory | Tiny Strawberry | Existing level 7 |
 | Accessory | Heart Glasses | Existing level 10 |
 | Desk | Tiny Laptop | Free |
-| Desk | Pink Mug | 25 coins |
-| Desk | Heart Lamp | 60 coins |
-| Desk | Little Book Stack | 40 coins |
-| Wall | Heart Poster | 35 coins |
-| Wall | Fairy Lights | 80 coins |
-| Decor | Desk Plant | 50 coins |
+| Desk | Pink Mug | 75 coins |
+| Desk | Heart Lamp | 180 coins |
+| Desk | Little Book Stack | 120 coins |
+| Wall | Heart Poster | 105 coins |
+| Wall | Fairy Lights | 240 coins |
+| Decor | Desk Plant | 150 coins |
 
 Each full completed focused minute earns one coin, including historical
 sessions from all linked installations. Minutes are floored per session and

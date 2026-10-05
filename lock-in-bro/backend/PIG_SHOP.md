@@ -2,9 +2,14 @@
 
 The code-defined catalog now has 29 definitions: all 12 original items, six
 weekly finds, five earned cosmetics, four seasonal finds, and two rare treats.
-Original item IDs, prices, XP thresholds, coin earning, and valid owned/equipped
+Original item IDs, XP thresholds, coin earning, and valid owned/equipped
 items are preserved. Google authentication, focus scores, extension behavior,
 analytics, mood, and weather calculations are unchanged.
+
+All 18 paid items now cost three times their launch price. Permanent paid
+favorites cost 75–240 coins, weekly finds 210–390, seasonal finds 270–420,
+and rare treats 1,800–2,700. The starter laptop, XP accessories, and milestone
+rewards remain free or earned. One completed focused minute still earns one coin.
 
 ## Calendar and weekly finds
 
@@ -48,7 +53,7 @@ rules. Early-ended and running sessions do not count. Requirements, numerical
 progress, and little heart-lock badges appear on colorful cards. Once earned,
 the button becomes Equip. New earned cosmetics are not automatically equipped;
 they do not overwrite a saved room. Original Tiny Laptop stays free and Fairy
-Lights stays purchasable for 80 coins; neither is moved behind a new milestone.
+Lights stays purchasable for 240 coins; neither is moved behind a new milestone.
 
 ## Seasonal finds
 
@@ -56,10 +61,10 @@ All dates use the same UTC calendar, repeat annually, and are inclusive:
 
 | Cosmetic | Availability | Coins | Shared artwork |
 | --- | --- | --- | --- |
-| Ghost Mug | October 1–31 | 90 | Cream mug with a tiny ghost face |
-| Hot Cocoa | December 1–February's last day | 90 | Warm cocoa mug and little marshmallows |
-| Heart Rug | February 1–14 | 140 | Pink rug with a heart motif |
-| Tulip Plant | March 1–May 31 | 100 | Existing plant with a tulip and lavender pot |
+| Ghost Mug | October 1–31 | 270 | Cream mug with a tiny ghost face |
+| Hot Cocoa | December 1–February's last day | 270 | Warm cocoa mug and little marshmallows |
+| Heart Rug | February 1–14 | 420 | Pink rug with a heart motif |
+| Tulip Plant | March 1–May 31 | 300 | Existing plant with a tulip and lavender pot |
 
 Winter and Valentine availability can overlap. Out-of-season unowned finds are
 hidden from the shop and cannot be purchased by posting their ID directly.
@@ -68,9 +73,9 @@ they are outside their season. Monthly/season checks are simple to expand in cod
 
 ## Rare treats
 
-- **Strawberry Computer Setup — 600 coins:** the shared laptop geometry with
+- **Strawberry Computer Setup — 1,800 coins:** the shared laptop geometry with
   strawberry colors and a little strawberry screen emblem.
-- **Giant Pig Plushie — 900 coins:** a soft pink plush pig beside the desk.
+- **Giant Pig Plushie — 2,700 coins:** a soft pink plush pig beside the desk.
 
 Both are always available, entirely cosmetic, and use the unchanged coin balance.
 There are no real-money purchases, penalties, loot boxes, or gameplay advantages.
@@ -124,7 +129,8 @@ continue to protect both API endpoints. Browser-supplied ownership or dates are
 not accepted as authority.
 
 One full completed focused minute still earns one coin. Existing `coins_spent`
-and all original prices remain unchanged; no coins or inventory are reset.
+remains unchanged. All paid item prices are now three times their launch prices;
+existing spending and inventory are preserved without retroactive charges.
 Original equipment is unchanged until the user explicitly selects a replacement
 style. The original default of current XP accessories plus the free laptop remains
 for users who have never customized. No existing database data is modified by
