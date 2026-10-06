@@ -2,28 +2,24 @@
 
 ## Tools Used
 - Codex
+- ChatGPT
 
 ## Code I Wrote or Substantially Modified Myself
-I wrote the focus score calculation myself. It uses whether the session
-was completed, how long I actually focused compared to the planned time,
-and how many times I tried to visit a blocked site to calculate a score
-from 0–100. I also manually tested the extension and adjusted parts of
-the behavior based on what I found.
+I wrote the focus score calculation myself. It uses whether the session was completed, how long I actually focused compared to the planned time, and how many times I tried to visit a blocked site to calculate a score from 0–100.
+
+I also did a lot of the manual testing throughout the project. I tested the website blocking, timer persistence, dashboard syncing, Google login, and the reward features, and then changed or debugged things when I found problems.
 
 ## Which Tool I Used for Which Job
-I used Codex for most of the implementation, including setting up the
-Chrome extension, Flask backend, database, and analytics dashboard. I
-used ChatGPT to help plan the project architecture, think through
-features, and write/debug prompts for Codex. I manually tested the
-extension throughout development.
+I used Codex for most of the implementation, including the Chrome extension, Flask backend, database, Google login, analytics dashboard, and the pig reward/customization features.
+
+I used ChatGPT mostly to help me plan the project, come up with new feature ideas, think through how the extension, backend, and database should connect, and write more specific prompts for Codex when I wanted to add or debug something.
+
+I manually tested the project throughout development instead of only relying on the generated tests.
 
 ## One Place AI Got Something Wrong
-The first version Codex generated looked like it was working, but it did
-not actually block the websites that I asked it to block. It also did not 
-show that a focus session was still active after I closed and reopened the 
-extension popup. I found both problems while manually testing it. I then gave 
-Codex a more specific debugging prompt about Chrome permissions, blocking 
-rules, and persistent session state, and tested the fixes again.
+The first version Codex generated looked like it was working, but it did not actually block the websites that I added to the blocklist. It also did not show that a focus session was still active after I closed and reopened the extension popup.
+
+I found both problems while manually testing the extension. I then gave Codex a more specific debugging prompt about Chrome permissions, blocking rules, and persistent session state, and tested the fixes again until they worked.
 
 ## Key Prompts
 
