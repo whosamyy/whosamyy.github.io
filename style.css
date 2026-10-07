@@ -200,9 +200,7 @@ p { color: var(--muted); }
 .portfolio-preview {
     background: #e9dff1 url("assets/portfolio-preview.svg") center / cover no-repeat;
 }
-.focus-preview {
-    background: #f5dce8 url("assets/lock-in-bro-preview.svg") center / cover no-repeat;
-}
+.project-video { display: block; width: 100%; height: auto; background: #f5dce8; }
 .project-content, .upcoming { padding: 28px; }
 .upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .contact-note { margin-top: 20px; }
