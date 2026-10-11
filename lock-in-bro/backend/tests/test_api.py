@@ -40,6 +40,20 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(stats['focus_by_day'],[{'day':'2026-09-30','minutes':43.5}])
         self.assertEqual(self.viewer.get('/').status_code,200)
         self.assertEqual(self.client.get('/api/me/stats').status_code,401)
+    def test_chart_uses_local_start_date(self):
+        sid = self.client.post('/api/sessions', json={**self.payload,
+            'started_at': '2026-10-01T01:00:00Z'}).json['session_id']
+        self.client.post(f'/api/sessions/{sid}/finish', json=dict(
+            ended_at='2026-10-01T01:45:00Z', completed=True,
+            actual_minutes=45, blocked_count=0, focus_score=100))
+        for zone, day in [('America/Los_Angeles', '2026-09-30'),
+                          ('Asia/Tokyo', '2026-10-01'),
+                          ('Invalid/Zone', '2026-10-01')]:
+            with self.subTest(zone=zone):
+                stats = self.viewer.get('/api/me/stats', query_string={'timezone': zone}).json
+                self.assertEqual(stats['focus_by_day'], [{'day': day, 'minutes': 45}])
+                self.assertEqual(stats['recent_sessions'][0]['started_at'], '2026-10-01T01:00:00Z')
+
     def test_invalid(self):
         self.assertEqual(self.client.post('/api/sessions',data='{',content_type='application/json').status_code,400)
         for key,value in [('client_id',''),('task',''),('planned_minutes',True),('planned_minutes',0),('planned_minutes',481),('blocked_domains',['https://reddit.com/private']),('started_at','yesterday')]:

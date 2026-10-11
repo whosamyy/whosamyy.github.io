@@ -13,7 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException, SecurityError
 from models import db, FocusSession, BlockedAttempt, ClientInstallation, PigProfile, User
 from auth import init_auth, current_user, claim_client, valid_client_id, auth_configured
-from pig_room import ITEM_BY_ID, room_state
+from pig_room import ITEM_BY_ID, room_state, local_zone
 from pig_shop import equip_selection
 
 
@@ -287,8 +287,9 @@ def create_app(config=None):
         finished = [s for s in sessions if s.ended_at is not None]
         scores = [s.focus_score for s in finished if s.focus_score is not None]
         days = defaultdict(float)
+        zone = local_zone(request.args.get('timezone'))
         for s in finished:
-            days[as_utc(s.started_at).date().isoformat()] += s.actual_minutes or 0
+            days[as_utc(s.started_at).astimezone(zone).date().isoformat()] += s.actual_minutes or 0
         domains = Counter(a.domain for s in sessions for a in s.attempts)
         total = sum(s.actual_minutes or 0 for s in finished)
         def iso(value):
