@@ -3,6 +3,9 @@
 config.local
 secrets.json
 
+# Local PostgreSQL migration backups
+*.sql
+
 # SQLite databases and journal files
 *.db
 *.db-*
