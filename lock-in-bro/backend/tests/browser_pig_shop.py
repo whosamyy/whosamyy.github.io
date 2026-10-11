@@ -52,6 +52,19 @@ def main():
                 sticky=page.locator('.customizer-header').bounding_box()
                 assert heading['y'] >= sticky['y']+sticky['height']
                 page.locator('#pig-customizer').screenshot(path='/tmp/lock-growing-shop-weekly.png')
+                purchases=[]
+                page.on('request',lambda request:purchases.append(request.url) if request.method=='POST' and '/api/me/pig/unlock' in request.url else None)
+                page.once('dialog',lambda dialog:dialog.dismiss())
+                page.get_by_role('button',name='Unlock Pink Mug',exact=True).click()
+                assert not purchases
+                assert page.get_by_role('button',name='Unlock Pink Mug',exact=True).is_enabled()
+                assert page.locator('#pig-coins').text_content()=='14,400 focus coins'
+                def confirm_unlock(dialog):
+                    assert dialog.type=='confirm'
+                    assert 'focus coins?' in dialog.message
+                    assert 'coins left.' in dialog.message
+                    dialog.accept()
+                page.on('dialog',confirm_unlock)
                 expected_spent=0
                 def unlock_and_equip(definition):
                     nonlocal expected_spent

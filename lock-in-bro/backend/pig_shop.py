@@ -1,4 +1,4 @@
-"""Small code-defined catalog and a shared UTC calendar; no scheduled jobs."""
+"""Small code-defined catalog with local shop dates; no scheduled jobs."""
 import math
 from datetime import datetime, timedelta, timezone, date
 from pig import ACCESSORIES
@@ -31,7 +31,7 @@ WEEKLY_ITEMS = (
 MILESTONE_ITEMS = (
     item('star_glasses', 'Star Glasses', 'accessory', kind='milestone', slot='glasses', milestone='score', target=95, requirement='Complete a session with a focus score of 95+'),
     item('blanket', 'Cozy Blanket', 'decor', kind='milestone', milestone='long_session', target=60, requirement='Complete a session with 60 focused minutes'),
-    item('vase', 'Flower Vase', 'decor', kind='milestone', milestone='days', target=3, requirement='Complete sessions on 3 different UTC days'),
+    item('vase', 'Flower Vase', 'decor', kind='milestone', milestone='days', target=3, requirement='Complete sessions on 3 different days in your local timezone'),
     item('pennant', 'Little Victory Pennant', 'wall', kind='milestone', milestone='sessions', target=5, requirement='Complete 5 sessions'),
     item('rug_cloud', 'Cloud Rug', 'decor', kind='milestone', asset='rug', style='cloud', milestone='minutes', target=300, requirement='Complete 300 total focused minutes'),
 )
@@ -54,10 +54,10 @@ SECTIONS = (
 )
 
 
-def shop_calendar(now=None):
+def shop_calendar(now=None, zone=timezone.utc):
     now = now or datetime.now(timezone.utc)
     now = now.replace(tzinfo=timezone.utc) if now.tzinfo is None else now.astimezone(timezone.utc)
-    today = now.date()
+    today = now.astimezone(zone).date()
     monday = today - timedelta(days=today.weekday())
     index = (monday - date(1970, 1, 5)).days // 7
     start = index % len(WEEKLY_ITEMS)
@@ -65,7 +65,7 @@ def shop_calendar(now=None):
     year, week, _ = today.isocalendar()
     return dict(week_key=f'{year}-W{week:02}', weekly_ids=weekly,
                 next_rotation=(monday + timedelta(days=7)).isoformat(),
-                days_until_rotation=7-today.weekday(), calendar='UTC')
+                days_until_rotation=7-today.weekday(), calendar=str(zone))
 
 
 def season_active(season, today):
@@ -74,7 +74,7 @@ def season_active(season, today):
             'spring': today.month in (3, 4, 5)}[season]
 
 
-def milestone_progress(sessions):
+def milestone_progress(sessions, zone=timezone.utc):
     completed = [s for s in sessions if s.completed and s.ended_at]
     def minutes(s):
         value = s.actual_minutes or 0
@@ -82,25 +82,26 @@ def milestone_progress(sessions):
     def score(s):
         value = s.focus_score or 0
         return min(100, max(0, value)) if math.isfinite(value) else 0
-    def utc_day(s):
+    def local_day(s):
         value = s.started_at
-        return (value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)).date()
+        instant = value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value
+        return instant.astimezone(zone).date()
     return dict(sessions=len(completed), minutes=sum(math.floor(minutes(s)) for s in completed),
                 score=max((score(s) for s in completed), default=0),
                 long_session=max((minutes(s) for s in completed), default=0),
-                days=len({utc_day(s) for s in completed}))
+                days=len({local_day(s) for s in completed}))
 
 
-def shop_snapshot(sessions, level, purchased, equipped, now=None):
+def shop_snapshot(sessions, level, purchased, equipped, now=None, zone=timezone.utc):
     now = now or datetime.now(timezone.utc)
     now = now.replace(tzinfo=timezone.utc) if now.tzinfo is None else now.astimezone(timezone.utc)
-    calendar = shop_calendar(now)
-    progress = milestone_progress(sessions)
+    calendar = shop_calendar(now, zone)
+    progress = milestone_progress(sessions, zone)
     entries = []
     for definition in ITEMS:
         kind = definition['kind']
         available = (definition['id'] in calendar['weekly_ids'] if kind == 'weekly' else
-                     season_active(definition['season'], now.date()) if kind == 'seasonal' else True)
+                     season_active(definition['season'], now.astimezone(zone).date()) if kind == 'seasonal' else True)
         earned = (level >= definition['level'] if kind == 'xp' else
                   progress[definition['milestone']] >= definition['target'] if kind == 'milestone' else
                   definition['id'] == 'laptop')

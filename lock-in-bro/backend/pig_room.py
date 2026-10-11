@@ -89,7 +89,7 @@ def room_state(sessions, profile=None, now=None, zone='UTC', unlocked_something=
     # None is a deliberate legacy-compatible default. [] means unequipped by user.
     equipped = (profile.equipped_items if profile and profile.equipped_items is not None
                 else sorted(legacy | {'laptop'}))
-    items, shop = shop_snapshot(sessions, state['level'], purchased, set(equipped), now)
+    items, shop = shop_snapshot(sessions, state['level'], purchased, set(equipped), now, zone=local_zone(zone))
     unlocked = {item['id'] for item in items if item['owned']}
     state.update(coins=max(0, earned_coins(sessions) - (profile.coins_spent if profile else 0)),
                  earned_coins=earned_coins(sessions), equipped_items=sorted(set(equipped) & unlocked),

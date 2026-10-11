@@ -13,8 +13,9 @@ rewards remain free or earned. One completed focused minute still earns one coin
 
 ## Calendar and weekly finds
 
-`shop_calendar` in `pig_shop.py` uses the current server date in **UTC**. The
-week starts Monday at 00:00 UTC. The displayed key uses ISO year/week, including
+`shop_calendar` in `pig_shop.py` converts the current server time to the viewer's
+browser timezone, validated by the backend with UTC as a fallback. The week
+starts Monday at 00:00 local time. The displayed key uses ISO year/week, including
 year boundaries. Rotation uses the number of Mondays since 1970-01-05, modulo
 the six-entry weekly pool, then takes four consecutive entries with wrapping.
 There are no duplicate finds. The selection is stable for the whole week,
@@ -32,7 +33,9 @@ calendar table, random selection, or browser-supplied date is needed.
 
 For **October 5–11, 2026 (2026-W41)** the four finds are Lavender Mug,
 Strawberry Pot, Checkerboard Rug, and Lavender Bow. Next rotation is October 12.
-The UI displays the week key, days until rotation, and the Monday/UTC convention.
+The UI displays the week key, days until rotation, and the Monday/local-time convention.
+Paid unlocks show a confirmation dialog with the item, cost, and remaining coins.
+Canceling sends no purchase request; equipping owned items stays immediate.
 
 ## Earned by Locking In
 
@@ -44,7 +47,7 @@ user's linked installations. No duplicate counters are stored.
 | --- | --- |
 | Star Glasses | Complete a session with score 95+ |
 | Cozy Blanket | Complete a session with 60 actual focused minutes |
-| Flower Vase | Complete sessions on three distinct UTC start dates |
+| Flower Vase | Complete sessions on three distinct local start dates |
 | Little Victory Pennant | Complete five sessions |
 | Cloud Rug | Accumulate 300 full completed focused minutes |
 
@@ -57,7 +60,7 @@ Lights stays purchasable for 240 coins; neither is moved behind a new milestone.
 
 ## Seasonal finds
 
-All dates use the same UTC calendar, repeat annually, and are inclusive:
+Seasonal dates use the viewer's local calendar, repeat annually, and are inclusive:
 
 | Cosmetic | Availability | Coins | Shared artwork |
 | --- | --- | --- | --- |
@@ -151,7 +154,8 @@ this development work; tests use temporary/in-memory databases.
   temporary SQLite. Live Google and production PostgreSQL are not exercised.
 - The pool is deliberately small and repeats after six weeks. Additional future
   catalog entries require a code update; there is no generated endless inventory.
-- Dates and distinct-day milestones use UTC, not historical local study time.
+- Shop dates and distinct-day milestones use the viewer's current browser timezone.
+  Historical session timestamps remain stored in UTC and are converted for counting.
 
 The README is unchanged. Later, add one short Main Features bullet covering the
 rotating shop, milestone unlocks, seasonal cosmetics, and item variants. A sentence

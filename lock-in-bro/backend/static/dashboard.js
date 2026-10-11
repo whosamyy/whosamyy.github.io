@@ -97,7 +97,7 @@ function shopLockIcon() {
 }
 function updateItemCards(pig) {
   const previouslyFocused = document.activeElement;
-  $('shop-week').textContent = `${pig.shop.week_key} · new finds in ${pig.shop.days_until_rotation} ${pig.shop.days_until_rotation === 1 ? 'day' : 'days'} · Monday, UTC`;
+  $('shop-week').textContent = `${pig.shop.week_key} · new finds in ${pig.shop.days_until_rotation} ${pig.shop.days_until_rotation === 1 ? 'day' : 'days'} · Monday, your local time`;
   const visibleSections = new Set(pig.shop.sections.map(section => section.id));
   for (const section of pig.shop.sections) {
     let group = $('pig-item-cards').querySelector(`[data-shop-section="${section.id}"]`);
@@ -164,6 +164,11 @@ function updateItemCards(pig) {
 async function customizeItem(id) {
   if (roomBusy || !pigState) return;
   const item = pigState.items.find(item => item.id === id);
+  if (!item) return;
+  if (!item.unlocked) {
+    if (!item.can_buy || pigState.coins < item.cost) return;
+    if (!window.confirm(`Unlock ${item.name} for ${item.cost} focus coins?\n\nYou will have ${pigState.coins - item.cost} coins left.`)) return;
+  }
   roomBusy = true;
   roomRevision += 1;
   updateItemCards(pigState);

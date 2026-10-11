@@ -28,6 +28,33 @@ def by_id(state):
 
 
 class ShopRulesTest(unittest.TestCase):
+    def test_shop_dates_follow_viewer_timezone(self):
+        instant = datetime(2026, 10, 5, 1, tzinfo=timezone.utc)
+        local = room_state([], now=instant, zone='America/Los_Angeles')
+        self.assertEqual(local['shop']['week_key'], '2026-W40')
+        self.assertEqual(local['shop']['days_until_rotation'], 1)
+        self.assertEqual(local['shop']['calendar'], 'America/Los_Angeles')
+        self.assertEqual(room_state([], now=instant, zone='Asia/Tokyo')['shop']['week_key'], '2026-W41')
+        october = datetime(2026, 10, 1, 1, tzinfo=timezone.utc)
+        self.assertFalse(by_id(room_state([], now=october, zone='America/Los_Angeles'))['mug_ghost']['available'])
+        self.assertTrue(by_id(room_state([], now=october, zone='Asia/Tokyo'))['mug_ghost']['available'])
+        self.assertEqual(room_state([], now=instant, zone='Invalid/Zone')['shop']['calendar'], 'UTC')
+
+    def test_day_milestone_counts_local_dates_and_naive_utc(self):
+        sessions = [study(sid=i) for i in range(3)]
+        for session, start in zip(sessions, [datetime(2026,10,1,23,tzinfo=timezone.utc),
+                                            datetime(2026,10,2,1,tzinfo=timezone.utc),
+                                            datetime(2026,10,3,1,tzinfo=timezone.utc)]):
+            session.started_at = start
+        self.assertTrue(by_id(room_state(sessions, now=NOW))['vase']['owned'])
+        local = by_id(room_state(sessions, now=NOW, zone='America/Los_Angeles'))['vase']
+        self.assertEqual(local['progress'], 2)
+        self.assertFalse(local['owned'])
+        self.assertIn('local timezone', local['requirement'])
+        for session in sessions:
+            session.started_at = session.started_at.replace(tzinfo=None)
+        self.assertEqual(by_id(room_state(sessions, now=NOW, zone='America/Los_Angeles'))['vase']['progress'], 2)
+
     def test_shared_svg_assets_are_valid_and_independent(self):
         templates=Path(__file__).resolve().parents[1]/'templates'
         svg=(templates/'pig_room.html').read_text().replace("{% include 'pig.html' %}", (templates/'pig.html').read_text())
