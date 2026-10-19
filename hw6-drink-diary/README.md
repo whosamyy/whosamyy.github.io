@@ -1,39 +1,65 @@
 # Amy's Drink Diary
 
-Starter project for CMU 15-113 HW6: a Flask + SQLite app for tracking matcha,
-boba, coffee, and tea. CRUD features are not implemented yet.
+A café-themed Flask + SQLite app for CMU 15-113 HW6. Track matcha, boba,
+coffee, tea, and other drinks using regular HTML/CSS and Python's `sqlite3`.
 
 ## Run locally
 
-From the repository root:
+From the repository root, set up Flask once:
 
 ```sh
-cd hw6-drink-diary
 python3 -m venv /tmp/amy-drink-diary-venv
-source /tmp/amy-drink-diary-venv/bin/activate
-python -m pip install Flask
-python app.py
+/tmp/amy-drink-diary-venv/bin/python -m pip install Flask
 ```
 
-Open http://127.0.0.1:5000 in your browser. Stop the server with Ctrl+C.
-The development server runs with debug mode enabled for local use.
+Start the app from the repository root:
 
-## Database setup
+```sh
+/tmp/amy-drink-diary-venv/bin/python hw6-drink-diary/app.py
+```
 
-When the app loads, `init_db()` opens `drinks.db` beside `app.py` using
-Python's built-in `sqlite3` module. SQLite creates the file if needed.
-`CREATE TABLE IF NOT EXISTS drinks` creates the table only when it is missing,
-so restarting the app preserves existing records.
+Open http://127.0.0.1:5000. Stop with Ctrl+C. Debug mode is for local development.
+The virtual environment lives in `/tmp`; recreate it if your computer removes it.
 
-The table contains `id`, `shop`, `drink_name`, `category`, `sugar_level`,
-`ice_level`, `rating`, `date`, and `notes`. The main repository's `.gitignore`
-already ignores `*.db` files.
+## CRUD routes
 
-## Structure
+| Operation | Route | Behavior |
+| --- | --- | --- |
+| Create | `/add` (GET/POST) | Show the form; insert a drink on valid submission. |
+| Read | `/` (GET) | Show drink cards, filters, sorting, stats, and Top Rated. |
+| Update | `/edit/<drink_id>` (GET/POST) | Prefill a drink's fields; save changes. |
+| Delete | `/delete/<drink_id>` (POST) | Delete by id after browser confirmation. |
 
-- `app.py`: Flask app, placeholder home route, and database initialization.
-- `templates/`: reserved for regular HTML templates.
-- `static/`: reserved for CSS and other static assets.
-- `prompt_log.md`: original setup prompt.
+Shop, drink name, a listed category, and an integer rating from 1 to 10 are
+required. Optional dates must be valid ISO dates. Invalid submissions show
+errors and preserve the form inputs. Missing drink ids return 404.
 
-There is no React, SQLAlchemy, or external database.
+## SQL and database
+
+`init_db()` creates `drinks.db` beside `app.py` if missing, then uses
+`CREATE TABLE IF NOT EXISTS`. It never clears existing drinks. Database files
+are ignored by the main repository's `.gitignore`.
+
+Insert, update, delete, id lookups, and filter values use `?` placeholders.
+Category and shop filters use exact matches; minimum rating uses `>=`.
+Active filters are joined with `AND` in the SQL `WHERE` clause.
+Sorting uses `ORDER BY` fragments from a fixed dictionary, never raw user input.
+Newest/oldest use the drink date, then id to break ties. Blank dates appear
+last for newest and first for oldest. Rating sorts use id descending for ties.
+
+Stats and Top Rated cover the entire diary, even when filters are active.
+Stats use `COUNT`, `AVG`, and `GROUP BY shop`; most-visited shop ties are broken
+alphabetically. Top Rated shows ratings 9 and 10. An empty diary shows an
+em dash for the average and most visited shop.
+
+## Files
+
+- `app.py`: database setup, SQL queries, validation, and routes.
+- `templates/base.html`: shared header, navigation, and errors.
+- `templates/index.html`: cards, filters, stats, and Top Rated.
+- `templates/drink_form.html`: shared add/edit form.
+- `static/style.css`: responsive pink, cream, and brown styling.
+- `prompt_log.md`: original prompts, preserved verbatim.
+
+JavaScript is used only for the delete confirmation. No SQLAlchemy, React,
+external database, or deployment is involved.

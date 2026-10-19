@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% macro card(drink) %}
+<article class="card">
+  <div class="card-top"><span class="tag">{{ drink.category }}</span><strong>{{ drink.rating }}/10 ★</strong></div>
+  <h3>{{ drink.drink_name }}</h3>
+  <p class="shop">{{ drink.shop }}</p>
+  <dl>
+    <div><dt>Sugar</dt><dd>{{ drink.sugar_level or '—' }}</dd></div>
+    <div><dt>Ice</dt><dd>{{ drink.ice_level or '—' }}</dd></div>
+    <div><dt>Date</dt><dd>{{ drink.date or '—' }}</dd></div>
+  </dl>
+  <p class="notes">{{ drink.notes or 'No notes yet.' }}</p>
+  <div class="actions">
+    <a class="button secondary" href="{{ url_for('edit_drink', drink_id=drink.id) }}">Edit</a>
+    <form method="post" action="{{ url_for('delete_drink', drink_id=drink.id) }}" onsubmit="return confirm('Delete this drink?');"><button class="delete" type="submit">Delete</button></form>
+  </div>
+</article>
+{% endmacro %}
+{% block content %}
+<section aria-label="Diary statistics" class="stats">
+  <div><span>Total drinks</span><strong>{{ stats.total }}</strong></div>
+  <div><span>Average rating</span><strong>{{ '%.1f/10'|format(stats.average) if stats.average is not none else '—' }}</strong></div>
+  <div><span>Most visited shop</span><strong>{{ favorite.shop if favorite else '—' }}</strong></div>
+</section>
+<p class="hint">Stats and Top Rated include your whole diary. Shop ties are alphabetical.</p>
+<section>
+  <h1>My drink diary</h1>
+  <form class="filters" method="get" action="{{ url_for('index') }}">
+    <label>Category<select name="category"><option value="">All categories</option>{% for category in categories %}<option {% if filters.category == category %}selected{% endif %}>{{ category }}</option>{% endfor %}</select></label>
+    <label>Shop<select name="shop"><option value="">All shops</option>{% for shop in shops %}<option {% if filters.shop == shop.shop %}selected{% endif %}>{{ shop.shop }}</option>{% endfor %}</select></label>
+    <label>Minimum rating<input type="number" name="min_rating" min="1" max="10" step="1" value="{{ filters.min_rating }}" placeholder="Any"></label>
+    <label>Sort<select name="sort">{% for value, label in [('newest', 'Newest'), ('oldest', 'Oldest'), ('highest', 'Highest rating'), ('lowest', 'Lowest rating')] %}<option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <button type="submit">Apply</button><a href="{{ url_for('index') }}">Reset</a>
+  </form>
+  <p class="hint">Newest and oldest use the drink date; entries without a date appear last for newest and first for oldest.</p>
+  <div class="grid" id="drink-list">
+    {% for drink in drinks %}{{ card(drink) }}{% else %}<p class="empty">{% if stats.total == 0 %}No drinks yet 🧋 Time to go get one.{% else %}No drinks match these filters.{% endif %}</p>{% endfor %}
+  </div>
+</section>
+<section class="top-rated"><h2>Top Rated ✨</h2><p>The 9s and 10s. Worth another sip.</p><div class="grid">{% for drink in top_rated %}{{ card(drink) }}{% else %}<p class="empty">Your next favorite is out there. Add a drink rated 9 or 10 to see it here.</p>{% endfor %}</div></section>
+{% endblock %}
