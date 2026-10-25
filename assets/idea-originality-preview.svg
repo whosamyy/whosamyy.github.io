@@ -1,37 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200" shape-rendering="crispEdges">
-  <!-- Pastel pixel shapes echo the other cards: an idea and its nearby concepts. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <title>Miniature How Original Is My Idea application</title>
+  <desc>A cream and dusty-rose app window with an idea input, Analyze My Idea button, and a small competitive-landscape result for Cowlar.</desc>
   <rect width="600" height="200" fill="#f3e3df"/>
-  <path d="M0 165h600v35H0z" fill="#e4d3d6"/>
-  <path d="M0 165h600v4H0z" fill="#d1b7c4"/>
-  <!-- Stepped connections between the central idea and company cards. -->
-  <path d="M216 76h35v32h23M326 108h25V69h31M300 132v17h91" fill="none" stroke="#b99ebc" stroke-width="4"/>
-  <path d="M248 74h6v6h-6zM348 66h6v6h-6zM297 146h6v6h-6z" fill="#fff9ed"/>
-  <!-- Two small concept cards with the same blocky window details as the portfolio preview. -->
-  <path d="M127 40h91v66h-91z" fill="#b99ebc"/>
-  <path d="M133 46h79v54h-79z" fill="#fff9ed"/>
-  <path d="M133 46h79v10h-79z" fill="#dfabc0"/>
-  <path d="M139 49h4v4h-4zM146 49h4v4h-4zM153 49h4v4h-4z" fill="#fff9ed"/>
-  <path d="M142 65h19v23h-19z" fill="#a9c69d"/>
-  <path d="M169 65h32v5h-32zM169 76h25v4h-25zM169 86h29v4h-29z" fill="#c6b4cb"/>
-  <path d="M382 33h90v67h-90z" fill="#b99ebc"/>
-  <path d="M388 39h78v55h-78z" fill="#fff9ed"/>
-  <path d="M388 39h78v10h-78z" fill="#c5b5db"/>
-  <path d="M394 42h4v4h-4zM401 42h4v4h-4zM408 42h4v4h-4z" fill="#fff9ed"/>
-  <path d="M397 59h19v23h-19z" fill="#e6b0c2"/>
-  <path d="M424 59h32v5h-32zM424 70h24v4h-24zM424 80h28v4h-28z" fill="#c6b4cb"/>
-  <!-- A lightbulb, built from stepped rectangles rather than a different illustration style. -->
-  <path d="M284 58h32v6h12v12h7v30h-7v12h-9v14h-38v-14h-9v-12h-7V76h7V64h12z" fill="#c6a57f"/>
-  <path d="M286 64h28v6h10v10h5v23h-7v11h-9v12h-26v-12h-9v-11h-7V80h7V70h8z" fill="#f7dca4"/>
-  <path d="M281 79h6v17h-6zM287 73h12v6h-12z" fill="#fff9ed"/>
-  <path d="M291 100h6v10h6v-10h6v15h-6v12h-6v-12h-6z" fill="#d6b789"/>
-  <path d="M281 132h38v7h-38zM284 142h32v7h-32zM290 152h20v6h-20z" fill="#a28bac"/>
-  <!-- Light rays and small sparkles match the surrounding project illustrations. -->
-  <path d="M297 30h6v15h-6zM244 61h12v5h-12zM344 61h12v5h-12zM259 40h6v11h-6zM335 40h6v11h-6z" fill="#c6a57f"/>
-  <path d="M105 119h4v12h-4zM101 123h12v4h-12zM475 118h4v12h-4zM471 122h12v4h-12zM231 23h4v12h-4zM227 27h12v4h-12z" fill="#fff9ed"/>
-  <!-- A magnifying glass suggests exploring connections, without implying an originality score. -->
-  <path d="M397 123h23v5h6v23h-6v5h-23v-5h-6v-23h6z" fill="#a28bac"/>
-  <path d="M399 129h19v21h-19z" fill="#dce8e5"/>
-  <path d="M403 132h5v6h-5z" fill="#fff9ed"/>
-  <path d="M421 150h7v7h7v7h7v7h-9v-7h-7v-7h-5z" fill="#b58a9e"/>
-  <path d="M161 138h7v5h5v-5h7v12h-5v5h-9v-5h-5z" fill="#d69bb8"/>
+  <!-- A substantial app window keeps the preview legible at portfolio-card size. -->
+  <rect x="73" y="16" width="462" height="178" rx="10" fill="#d5b9c7"/>
+  <rect x="68" y="11" width="462" height="178" rx="10" fill="#fffaf3" stroke="#b88da3" stroke-width="2"/>
+  <path d="M78 12h442a9 9 0 0 1 9 9v12H69V21a9 9 0 0 1 9-9z" fill="#dfb6c8"/>
+  <g fill="#fffaf3" shape-rendering="crispEdges"><path d="M81 20h5v5h-5zM91 20h5v5h-5zM101 20h5v5h-5z"/></g>
+  <text x="510" y="25" text-anchor="end" font-family="Arial, sans-serif" font-size="9" fill="#674354">idea, meet world.</text>
+  <text x="300" y="61" text-anchor="middle" font-family="Georgia, serif" font-weight="bold" font-size="23" fill="#563848">How Original Is My Idea? <tspan fill="#96546b">✦</tspan></text>
+  <!-- The input and action mirror the actual landing-page interaction. -->
+  <text x="96" y="80" font-family="Arial, sans-serif" font-weight="bold" font-size="11" fill="#674354">Your next big idea</text>
+  <rect x="94" y="86" width="232" height="48" rx="7" fill="#ffffff" stroke="#cdb8c4"/>
+  <text x="105" y="105" font-family="Arial, sans-serif" font-size="11" fill="#715b67">A wearable that monitors</text>
+  <text x="105" y="121" font-family="Arial, sans-serif" font-size="11" fill="#715b67">livestock health…</text>
+  <rect x="94" y="142" width="232" height="29" rx="8" fill="#96546b"/>
+  <text x="210" y="161" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="12" fill="#ffffff">Analyze My Idea ✦</text>
+  <!-- Miniature landscape report: a real semantic example, not a score. -->
+  <rect x="339" y="76" width="168" height="95" rx="8" fill="#f3e1e9" stroke="#d4b3c4"/>
+  <text x="351" y="92" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#84516b">CLOSEST KNOWN ANALOG</text>
+  <text x="351" y="115" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#563848">Cowlar</text>
+  <text x="351" y="130" font-family="Arial, sans-serif" font-size="10" fill="#715b67">Health monitoring for cows</text>
+  <rect x="351" y="139" width="76" height="19" rx="7" fill="#e5ddef" stroke="#cec0df"/>
+  <text x="389" y="152" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#665071">Agriculture</text>
+  <rect x="434" y="139" width="60" height="19" rx="7" fill="#fffaf3" stroke="#dcc8d0"/>
+  <text x="464" y="152" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#84516b">YC · W17</text>
+  <text x="300" y="183" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7a6370">A little idea. A whole neighborhood of possibilities.</text>
+  <!-- Small pixel sparkles tie the UI illustration to the neighboring previews. -->
+  <g fill="#b88da3" shape-rendering="crispEdges"><path d="M39 49h4v16h-4zM33 55h16v4H33zM553 126h4v16h-4zM547 132h16v4h-16z"/></g>
+  <g fill="#fffaf3" shape-rendering="crispEdges"><path d="M548 47h4v12h-4zM544 51h12v4h-12zM43 151h4v12h-4zM39 155h12v4H39z"/></g>
 </svg>
