@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <title>Sonar Diver underwater escape</title>
+  <desc>A small golden submarine sends glowing sonar through dark reefs while a squid waits nearby and a key glimmers in the deep.</desc>
+  <defs>
+    <linearGradient id="ocean" x2="0" y2="1"><stop stop-color="#174858"/><stop offset="1" stop-color="#04141f"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#75ecdf" stop-opacity=".2"/><stop offset="1" stop-color="#75ecdf" stop-opacity="0"/></radialGradient>
+    <linearGradient id="reef" x2="0" y2="1"><stop stop-color="#365964"/><stop offset="1" stop-color="#102d3d"/></linearGradient>
+  </defs>
+  <rect width="600" height="200" fill="url(#ocean)"/>
+  <path d="M0 10Q80 21 150 10T300 10T450 10T600 10" fill="none" stroke="#95d7d9" stroke-opacity=".4" stroke-width="2"/>
+  <path d="M60 0h22l58 155H18ZM219 0h17l100 180H205Z" fill="#a2e1df" opacity=".035"/>
+  <ellipse cx="265" cy="104" rx="178" ry="115" fill="url(#light)"/>
+  <!-- Three legible sonar arcs and a reflected ray echo the game's navigation mechanic. -->
+  <g fill="none" stroke="#8de9e5">
+    <circle cx="255" cy="103" r="39" stroke-opacity=".8"/>
+    <circle cx="255" cy="103" r="71" stroke-opacity=".5"/>
+    <circle cx="255" cy="103" r="104" stroke-opacity=".25"/>
+    <path d="M259 103 353 54 410 87" stroke-opacity=".65" stroke-width="1.5"/>
+  </g>
+  <!-- Rounded, muted terrain matches the neighboring illustrated previews. -->
+  <path d="M0 167 32 155 61 163 81 152 112 172 145 169 177 184 230 179 263 192 310 183 351 188 386 167 424 176 459 158 493 166 537 149 570 157 600 145V200H0Z" fill="#16333f"/>
+  <path d="M89 137Q72 115 85 93L100 65Q113 51 128 66L143 93Q157 113 143 134Z" fill="url(#reef)" stroke="#507477" stroke-opacity=".5"/>
+  <path d="M352 54Q336 32 354 19L383 22Q405 39 393 62L379 90Q361 103 347 85Z" fill="url(#reef)" stroke="#507477" stroke-opacity=".5"/>
+  <path d="m99 81 14-9 9 12m-22 19 18 4m242-67 13-6 10 8" fill="none" stroke="#7a9a90" stroke-opacity=".3" stroke-width="3"/>
+  <!-- Small submarine, with a warm hull and illuminated porthole. -->
+  <g transform="translate(255 103)">
+    <ellipse rx="31" ry="23" fill="#edd498" opacity=".08"/>
+    <path d="m-20 0-10-9v18Z" fill="#c29150"/>
+    <path d="M-6-11v-9h11v4H0v5" fill="none" stroke="#e7b86c" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="-23" y="-12" width="48" height="24" rx="12" fill="#e9b968" stroke="#ffe1a6" stroke-width="2"/>
+    <circle cx="9" r="6" fill="#8ce0e0" stroke="#fff1ca" stroke-width="2"/>
+    <path d="M-15-2h10m-10 5h8" stroke="#b97f4c" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g fill="none" stroke="#a2dadd" opacity=".35"><circle cx="208" cy="91" r="3"/><circle cx="195" cy="81" r="2"/><circle cx="185" cy="63" r="4"/><circle cx="44" cy="85" r="2"/><circle cx="553" cy="46" r="3"/></g>
+  <!-- Squid silhouette in the darkness; rosy colors nod to the portfolio palette. -->
+  <g transform="translate(474 100)">
+    <path d="M-17 3Q-24-27 0-39 24-27 17 3Z" fill="#87536e" stroke="#bb819a" stroke-opacity=".7"/>
+    <g fill="none" stroke="#87536e" stroke-width="5" stroke-linecap="round"><path d="M-14 0q-16 23-7 34M-6 2q-12 31 1 37M3 3q-3 23 10 34M12 0q16 19 12 28"/></g>
+    <g fill="#efc2c5"><circle cx="-7" cy="-12" r="3"/><circle cx="7" cy="-12" r="3"/></g>
+  </g>
+  <!-- Hidden key and faint drifting particles. -->
+  <g transform="translate(550 128) rotate(-20)" stroke="#f2d38e" fill="none" stroke-width="2.5"><circle r="5"/><path d="M5 0h15v5m-5-5v4"/></g>
+  <g fill="#a9d3cb" opacity=".3"><circle cx="46" cy="131" r="1"/><circle cx="165" cy="41" r="1.5"/><circle cx="318" cy="152" r="1"/><circle cx="407" cy="121" r="1.5"/><circle cx="566" cy="90" r="1"/></g>
+</svg>
