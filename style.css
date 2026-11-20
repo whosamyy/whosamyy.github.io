@@ -206,7 +206,13 @@ p { color: var(--muted); }
 .sonar-preview {
     background: #082b3b url("assets/sonar-diver-preview.svg") center / cover no-repeat;
 }
-.project-video { display: block; width: 100%; height: auto; background: #f5dce8; }
+.project-video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1920 / 978; /* Match the landscape demos. */
+    object-fit: contain;
+    background: #f5dce8;
+}
 .project-content, .upcoming { padding: 28px; }
 .upcoming { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .contact-note { margin-top: 20px; }
